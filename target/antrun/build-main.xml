@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="maven-antrun-" default="main">
+  <target name="main">
+    <delete file="/Users/xuantu/Library/CloudStorage/OneDrive-Personal/03. UIT/T6 Cong nghe Java/Do an/PetcareAdmin/target/original-PetcareAdmin-1.0-SNAPSHOT.jar" failonerror="false" />
+  </target>
+</project>

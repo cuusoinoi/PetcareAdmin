@@ -1,5 +1,20 @@
 package com.petcare.gui;
 
+import com.petcare.gui.panels.AppointmentManagementPanel;
+import com.petcare.gui.panels.CustomerManagementPanel;
+import com.petcare.gui.panels.DashboardPanel;
+import com.petcare.gui.panels.DoctorManagementPanel;
+import com.petcare.gui.panels.InvoiceManagementPanel;
+import com.petcare.gui.panels.MedicalRecordManagementPanel;
+import com.petcare.gui.panels.MedicineManagementPanel;
+import com.petcare.gui.panels.PetEnclosureManagementPanel;
+import com.petcare.gui.panels.PetManagementPanel;
+import com.petcare.gui.panels.ServiceTypeManagementPanel;
+import com.petcare.gui.panels.SettingsManagementPanel;
+import com.petcare.gui.panels.TreatmentManagementPanel;
+import com.petcare.gui.panels.UserManagementPanel;
+import com.petcare.gui.panels.VaccinationManagementPanel;
+import com.petcare.gui.panels.VaccineTypeManagementPanel;
 import com.petcare.model.User;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;

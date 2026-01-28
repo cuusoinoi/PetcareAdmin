@@ -1,0 +1,252 @@
+package com.petcare.gui.panels;
+
+import com.petcare.gui.dialogs.AddEditUserDialog;
+import com.petcare.gui.dialogs.ChangePasswordDialog;
+import com.petcare.model.Database;
+import com.petcare.model.User;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+
+/**
+ * User Management Panel with CRUD operations
+ */
+public class UserManagementPanel extends JPanel {
+    private JTable userTable;
+    private DefaultTableModel tableModel;
+    private JButton addButton;
+    private JButton editButton;
+    private JButton changePasswordButton;
+    private JButton deleteButton;
+    private JButton refreshButton;
+    
+    public UserManagementPanel() {
+        initComponents();
+        loadUsers();
+    }
+    
+    private void initComponents() {
+        setLayout(new BorderLayout());
+        setBackground(new Color(245, 245, 245));
+        
+        // Header
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(Color.WHITE);
+        headerPanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(220, 220, 220)),
+            BorderFactory.createEmptyBorder(15, 20, 15, 20)
+        ));
+        
+        JLabel titleLabel = new JLabel("Quản lý Người dùng");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        headerPanel.add(titleLabel, BorderLayout.WEST);
+        
+        // Buttons panel
+        JPanel buttonPanel = new JPanel(new GridLayout(1, 5, 10, 0));
+        
+        addButton = new JButton("➕ Thêm");
+        addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        addButton.addActionListener(e -> showAddUserDialog());
+        buttonPanel.add(addButton);
+        
+        editButton = new JButton("✏️ Sửa");
+        editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        editButton.addActionListener(e -> showEditUserDialog());
+        buttonPanel.add(editButton);
+        
+        changePasswordButton = new JButton("🔑 Đổi mật khẩu");
+        changePasswordButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        changePasswordButton.addActionListener(e -> showChangePasswordDialog());
+        buttonPanel.add(changePasswordButton);
+        
+        deleteButton = new JButton("🗑️ Xóa");
+        deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        deleteButton.addActionListener(e -> deleteUser());
+        buttonPanel.add(deleteButton);
+        
+        refreshButton = new JButton("🔄 Làm mới");
+        refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        refreshButton.addActionListener(e -> refreshData());
+        buttonPanel.add(refreshButton);
+        
+        headerPanel.add(buttonPanel, BorderLayout.EAST);
+        add(headerPanel, BorderLayout.NORTH);
+        
+        // Table
+        String[] columns = {"ID", "Username", "Họ tên", "Vai trò"};
+        tableModel = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        
+        userTable = new JTable(tableModel);
+        userTable.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        userTable.setRowHeight(30);
+        userTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+        userTable.setSelectionBackground(new Color(139, 69, 19));
+        userTable.setSelectionForeground(Color.WHITE);
+        
+        JScrollPane scrollPane = new JScrollPane(userTable);
+        scrollPane.setBorder(null);
+        add(scrollPane, BorderLayout.CENTER);
+    }
+    
+    public void refreshData() {
+        loadUsers();
+    }
+    
+    private void loadUsers() {
+        tableModel.setRowCount(0);
+        
+        try {
+            String query = "SELECT user_id, username, fullname, role FROM users ORDER BY user_id DESC";
+            ResultSet rs = Database.executeQuery(query);
+            
+            while (rs != null && rs.next()) {
+                String roleLabel = "admin".equals(rs.getString("role")) ? "Quản trị viên" : "Nhân viên";
+                
+                Object[] row = {
+                    rs.getInt("user_id"),
+                    rs.getString("username"),
+                    rs.getString("fullname"),
+                    roleLabel
+                };
+                tableModel.addRow(row);
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, 
+                "Lỗi khi tải dữ liệu: " + ex.getMessage(), 
+                "Lỗi", 
+                JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        }
+    }
+    
+    private void showAddUserDialog() {
+        AddEditUserDialog dialog = new AddEditUserDialog(null, null);
+        dialog.setVisible(true);
+        if (dialog.isSaved()) {
+            refreshData();
+        }
+    }
+    
+    private void showEditUserDialog() {
+        int selectedRow = userTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, 
+                "Vui lòng chọn người dùng cần sửa!", 
+                "Thông báo", 
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        int userId = (Integer) tableModel.getValueAt(selectedRow, 0);
+        User user = getUserById(userId);
+        
+        if (user != null) {
+            AddEditUserDialog dialog = new AddEditUserDialog(null, user);
+            dialog.setVisible(true);
+            if (dialog.isSaved()) {
+                refreshData();
+            }
+        }
+    }
+    
+    private void showChangePasswordDialog() {
+        int selectedRow = userTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, 
+                "Vui lòng chọn người dùng cần đổi mật khẩu!", 
+                "Thông báo", 
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        int userId = (Integer) tableModel.getValueAt(selectedRow, 0);
+        ChangePasswordDialog dialog = new ChangePasswordDialog(null, userId);
+        dialog.setVisible(true);
+    }
+    
+    private void deleteUser() {
+        int selectedRow = userTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, 
+                "Vui lòng chọn người dùng cần xóa!", 
+                "Thông báo", 
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        int userId = (Integer) tableModel.getValueAt(selectedRow, 0);
+        String username = (String) tableModel.getValueAt(selectedRow, 1);
+        
+        int confirm = JOptionPane.showConfirmDialog(this, 
+            "Bạn có chắc muốn xóa người dùng \"" + username + "\"?", 
+            "Xác nhận xóa", 
+            JOptionPane.YES_NO_OPTION);
+        
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                String query = "DELETE FROM users WHERE user_id = ?";
+                int result = Database.executeUpdate(query, userId);
+                
+                if (result > 0) {
+                    JOptionPane.showMessageDialog(this, 
+                        "Xóa người dùng thành công!", 
+                        "Thành công", 
+                        JOptionPane.INFORMATION_MESSAGE);
+                    refreshData();
+                } else {
+                    JOptionPane.showMessageDialog(this, 
+                        "Không thể xóa người dùng.", 
+                        "Lỗi", 
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, 
+                    "Lỗi khi xóa: " + ex.getMessage(), 
+                    "Lỗi", 
+                    JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+            }
+        }
+    }
+    
+    private User getUserById(int userId) {
+        try {
+            String query = "SELECT * FROM users WHERE user_id = ?";
+            ResultSet rs = Database.executeQuery(query, userId);
+            
+            if (rs != null && rs.next()) {
+                User user = new User();
+                user.setId(rs.getInt("user_id"));
+                user.setUsername(rs.getString("username"));
+                user.setFullname(rs.getString("fullname"));
+                user.setAvatar(rs.getString("avatar"));
+                
+                String roleStr = rs.getString("role");
+                if (roleStr != null) {
+                    user.setRole(User.Role.valueOf(roleStr.toUpperCase()));
+                }
+                
+                return user;
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+}

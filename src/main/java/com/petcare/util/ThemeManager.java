@@ -4,6 +4,7 @@ import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import java.awt.Color;
 import java.util.prefs.Preferences;
+import javax.swing.JTable;
 import javax.swing.UIManager;
 
 /**
@@ -39,12 +40,32 @@ public class ThemeManager {
                 applyDarkUiDefaults();
             } else {
                 UIManager.setLookAndFeel(new FlatLightLaf());
+                applyLightUiDefaults();
             }
             prefs.put(THEME_PREF_KEY, theme);
+            prefs.flush();
         } catch (Exception ex) {
             System.err.println("Failed to set theme: " + ex.getMessage());
             ex.printStackTrace();
         }
+    }
+
+    /** Áp dụng màu sáng cho các key đã ghi đè khi dark, để chuyển lại light đúng */
+    private static void applyLightUiDefaults() {
+        UIManager.put("Panel.background", LIGHT_CONTENT);
+        UIManager.put("Table.background", Color.WHITE);
+        UIManager.put("Table.foreground", Color.BLACK);
+        UIManager.put("TableHeader.background", new Color(0xf0f0f0));
+        UIManager.put("TableHeader.foreground", Color.BLACK);
+        UIManager.put("Viewport.background", Color.WHITE);
+        UIManager.put("ScrollPane.background", LIGHT_CONTENT);
+        UIManager.put("TextField.background", Color.WHITE);
+        UIManager.put("TextField.foreground", Color.BLACK);
+        UIManager.put("ComboBox.background", Color.WHITE);
+        UIManager.put("ComboBox.foreground", Color.BLACK);
+        UIManager.put("Label.foreground", Color.BLACK);
+        UIManager.put("Button.background", new Color(0xf0f0f0));
+        UIManager.put("Button.foreground", Color.BLACK);
     }
 
     /** Áp dụng màu nền đen sâu cho toàn bộ UI khi dark mode */
@@ -87,6 +108,55 @@ public class ThemeManager {
 
     public static Color getTitleForeground() {
         return isDarkMode() ? new Color(0xe0e0e0) : Color.BLACK;
+    }
+
+    /** Màu nền và chữ của bảng (JTable) theo theme */
+    public static Color getTableBackground() {
+        return isDarkMode() ? DARK_BG : Color.WHITE;
+    }
+
+    public static Color getTableForeground() {
+        return isDarkMode() ? new Color(0xe0e0e0) : Color.BLACK;
+    }
+
+    public static Color getTableHeaderBackground() {
+        return isDarkMode() ? DARK_HEADER : new Color(0xf0f0f0);
+    }
+
+    public static Color getTableHeaderForeground() {
+        return isDarkMode() ? new Color(0xe0e0e0) : Color.BLACK;
+    }
+
+    /** Màu ô nhập (JTextField) theo theme */
+    public static Color getTextFieldBackground() {
+        return isDarkMode() ? new Color(0x2d2d2d) : Color.WHITE;
+    }
+
+    public static Color getTextFieldForeground() {
+        return isDarkMode() ? new Color(0xe0e0e0) : Color.BLACK;
+    }
+
+    /** Màu nút thường (JButton) theo theme */
+    public static Color getButtonBackground() {
+        return isDarkMode() ? new Color(0x3d3d3d) : new Color(0xf0f0f0);
+    }
+
+    public static Color getButtonForeground() {
+        return isDarkMode() ? new Color(0xe0e0e0) : Color.BLACK;
+    }
+
+    /** Màu icon trên nút (giao diện tối = sáng để thấy, giao diện sáng = tối) */
+    public static Color getIconColor() {
+        return isDarkMode() ? new Color(0xc0c0c0) : new Color(60, 60, 60);
+    }
+
+    /** Áp dụng màu theme cho bảng và header (gọi trong initComponents và updateTheme) */
+    public static void applyTableTheme(JTable table) {
+        if (table == null) return;
+        table.setBackground(getTableBackground());
+        table.setForeground(getTableForeground());
+        table.getTableHeader().setBackground(getTableHeaderBackground());
+        table.getTableHeader().setForeground(getTableHeaderForeground());
     }
     
     /**

@@ -149,7 +149,19 @@ public class SettingsManagementPanel extends JPanel {
         if (titleLabel != null) titleLabel.setForeground(ThemeManager.getTitleForeground());
         if (formPanel != null) formPanel.setBackground(ThemeManager.getFormBackground());
         if (centerWrapper != null) centerWrapper.setBackground(ThemeManager.getFormBackground());
-        if (sideButtonPanel != null) sideButtonPanel.setBackground(ThemeManager.getSideButtonPanelBackground());
+        if (sideButtonPanel != null) {
+            sideButtonPanel.setBackground(ThemeManager.getSideButtonPanelBackground());
+            if (saveButton != null) {
+                saveButton.setBackground(new Color(139, 69, 19));
+                saveButton.setForeground(Color.WHITE);
+                saveButton.setIcon(EmojiFontHelper.createEmojiIcon("💾", Color.WHITE));
+            }
+            if (refreshButton != null) {
+                refreshButton.setBackground(ThemeManager.getButtonBackground());
+                refreshButton.setForeground(ThemeManager.getButtonForeground());
+                refreshButton.setIcon(EmojiFontHelper.createEmojiIcon("🔄", ThemeManager.getIconColor()));
+            }
+        }
     }
 
     private JLabel createLabel(String text) {

@@ -35,6 +35,7 @@ public class PetEnclosureManagementPanel extends JPanel {
     private TablePaginationPanel paginationPanel;
     private JPanel headerPanel;
     private JPanel centerPanel;
+    private JPanel searchPanel;
     private JPanel sideButtonPanel;
     private JLabel titleLabel;
     private JTextField searchField;
@@ -81,11 +82,12 @@ public class PetEnclosureManagementPanel extends JPanel {
         enclosureTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
         enclosureTable.setSelectionBackground(new Color(139, 69, 19));
         enclosureTable.setSelectionForeground(Color.WHITE);
+        ThemeManager.applyTableTheme(enclosureTable);
 
         JScrollPane scrollPane = new JScrollPane(enclosureTable);
         scrollPane.setBorder(null);
 
-        JPanel searchPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 10, 8));
+        searchPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 10, 8));
         searchPanel.setBackground(ThemeManager.getContentBackground());
         searchField = new JTextField(25);
         searchField.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -156,6 +158,7 @@ public class PetEnclosureManagementPanel extends JPanel {
 
     public void updateTheme() {
         setBackground(ThemeManager.getContentBackground());
+        if (searchPanel != null) searchPanel.setBackground(ThemeManager.getContentBackground());
         if (headerPanel != null) {
             headerPanel.setBackground(ThemeManager.getHeaderBackground());
             headerPanel.setBorder(BorderFactory.createCompoundBorder(
@@ -165,7 +168,34 @@ public class PetEnclosureManagementPanel extends JPanel {
         }
         if (titleLabel != null) titleLabel.setForeground(ThemeManager.getTitleForeground());
         if (centerPanel != null) centerPanel.setBackground(ThemeManager.getContentBackground());
-        if (sideButtonPanel != null) sideButtonPanel.setBackground(ThemeManager.getSideButtonPanelBackground());
+        if (sideButtonPanel != null) {
+            sideButtonPanel.setBackground(ThemeManager.getSideButtonPanelBackground());
+            for (java.awt.Component c : sideButtonPanel.getComponents()) {
+                if (c instanceof JButton) {
+                    ((JButton) c).setBackground(ThemeManager.getButtonBackground());
+                    ((JButton) c).setForeground(ThemeManager.getButtonForeground());
+                }
+            }
+            java.awt.Color iconColor = ThemeManager.getIconColor();
+            addButton.setIcon(EmojiFontHelper.createEmojiIcon("➕", iconColor));
+            editButton.setIcon(EmojiFontHelper.createEmojiIcon("✏️", iconColor));
+            checkoutButton.setIcon(EmojiFontHelper.createEmojiIcon("✅", Color.WHITE));
+            checkoutButton.setBackground(new Color(40, 167, 69));
+            checkoutButton.setForeground(Color.WHITE);
+            deleteButton.setIcon(EmojiFontHelper.createEmojiIcon("🗑️", iconColor));
+            refreshButton.setIcon(EmojiFontHelper.createEmojiIcon("🔄", iconColor));
+        }
+        if (searchField != null) {
+            searchField.setBackground(ThemeManager.getTextFieldBackground());
+            searchField.setForeground(ThemeManager.getTextFieldForeground());
+        }
+        if (searchPanel != null) {
+            for (java.awt.Component c : searchPanel.getComponents()) {
+                if (c instanceof JLabel) ((JLabel) c).setForeground(ThemeManager.getTitleForeground());
+            }
+        }
+        if (paginationPanel != null) paginationPanel.updateTheme();
+        ThemeManager.applyTableTheme(enclosureTable);
     }
 
 

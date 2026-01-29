@@ -55,47 +55,9 @@ public class PetEnclosureManagementPanel extends JPanel {
         JLabel titleLabel = new JLabel("Quản lý Lưu chuồng");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
         headerPanel.add(titleLabel, BorderLayout.WEST);
-        
-        // Buttons panel
-        JPanel buttonPanel = new JPanel(new GridLayout(1, 5, 10, 0));
-        
-        addButton = new JButton(EmojiFontHelper.withEmoji("➕", "Check-in"));
-        addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(addButton);
-        addButton.addActionListener(e -> showCheckInDialog());
-        buttonPanel.add(addButton);
-        
-        editButton = new JButton(EmojiFontHelper.withEmoji("✏️", "Sửa"));
-        editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(editButton);
-        editButton.addActionListener(e -> showEditEnclosureDialog());
-        buttonPanel.add(editButton);
-        
-        checkoutButton = new JButton(EmojiFontHelper.withEmoji("✅", "Check-out"));
-        checkoutButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(checkoutButton);
-        checkoutButton.setBackground(new Color(40, 167, 69));
-        checkoutButton.setForeground(Color.WHITE);
-        checkoutButton.addActionListener(e -> showCheckoutDialog());
-        buttonPanel.add(checkoutButton);
-        
-        deleteButton = new JButton(EmojiFontHelper.withEmoji("🗑️", "Xóa"));
-        deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(deleteButton);
-        deleteButton.addActionListener(e -> deleteEnclosure());
-        buttonPanel.add(deleteButton);
-        
-        refreshButton = new JButton(EmojiFontHelper.withEmoji("🔄", "Làm mới"));
-        refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(refreshButton);
-        refreshButton.addActionListener(e -> refreshData());
-        buttonPanel.add(refreshButton);
-        
-        headerPanel.add(buttonPanel, BorderLayout.EAST);
         add(headerPanel, BorderLayout.NORTH);
-        
-        // Table
-        String[] columns = {"ID", "Số chuồng", "Khách hàng", "Thú cưng", "Ngày Check-in", 
+
+        String[] columns = {"ID", "Số chuồng", "Khách hàng", "Thú cưng", "Ngày Check-in",
                            "Ngày Check-out", "Phí/ngày", "Đặt cọc", "Trạng thái"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
@@ -103,20 +65,63 @@ public class PetEnclosureManagementPanel extends JPanel {
                 return false;
             }
         };
-        
+
         enclosureTable = new JTable(tableModel);
         enclosureTable.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         enclosureTable.setRowHeight(30);
         enclosureTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
         enclosureTable.setSelectionBackground(new Color(139, 69, 19));
         enclosureTable.setSelectionForeground(Color.WHITE);
-        
+
         JScrollPane scrollPane = new JScrollPane(enclosureTable);
         scrollPane.setBorder(null);
-        add(scrollPane, BorderLayout.CENTER);
 
+        java.awt.Color iconColor = new Color(60, 60, 60);
+        JPanel sideButtonPanel = new JPanel(new GridLayout(0, 1, 0, 6));
+        sideButtonPanel.setBackground(new Color(245, 245, 245));
+        sideButtonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        sideButtonPanel.setMinimumSize(new java.awt.Dimension(175, 0));
+        sideButtonPanel.setPreferredSize(new java.awt.Dimension(175, 0));
+        addButton = new JButton("Check-in");
+        addButton.setIcon(EmojiFontHelper.createEmojiIcon("➕", iconColor));
+        addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(addButton);
+        addButton.addActionListener(e -> showCheckInDialog());
+        sideButtonPanel.add(addButton);
+        editButton = new JButton("Sửa");
+        editButton.setIcon(EmojiFontHelper.createEmojiIcon("✏️", iconColor));
+        editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(editButton);
+        editButton.addActionListener(e -> showEditEnclosureDialog());
+        sideButtonPanel.add(editButton);
+        checkoutButton = new JButton("Check-out");
+        checkoutButton.setIcon(EmojiFontHelper.createEmojiIcon("✅", Color.WHITE));
+        checkoutButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(checkoutButton);
+        checkoutButton.setBackground(new Color(40, 167, 69));
+        checkoutButton.setForeground(Color.WHITE);
+        checkoutButton.addActionListener(e -> showCheckoutDialog());
+        sideButtonPanel.add(checkoutButton);
+        deleteButton = new JButton("Xóa");
+        deleteButton.setIcon(EmojiFontHelper.createEmojiIcon("🗑️", iconColor));
+        deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(deleteButton);
+        deleteButton.addActionListener(e -> deleteEnclosure());
+        sideButtonPanel.add(deleteButton);
+        refreshButton = new JButton("Làm mới");
+        refreshButton.setIcon(EmojiFontHelper.createEmojiIcon("🔄", iconColor));
+        refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(refreshButton);
+        refreshButton.addActionListener(e -> refreshData());
+        sideButtonPanel.add(refreshButton);
+
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.setBackground(new Color(245, 245, 245));
+        centerPanel.add(scrollPane, BorderLayout.CENTER);
         paginationPanel = new TablePaginationPanel(enclosureTable);
-        add(paginationPanel, BorderLayout.SOUTH);
+        centerPanel.add(paginationPanel, BorderLayout.SOUTH);
+        add(centerPanel, BorderLayout.CENTER);
+        add(sideButtonPanel, BorderLayout.EAST);
     }
     
     public void refreshData() {

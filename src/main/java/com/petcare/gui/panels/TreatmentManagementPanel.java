@@ -56,52 +56,8 @@ public class TreatmentManagementPanel extends JPanel {
         JLabel titleLabel = new JLabel("Quản lý Liệu trình điều trị");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
         headerPanel.add(titleLabel, BorderLayout.WEST);
-        
-        // Buttons panel
-        JPanel buttonPanel = new JPanel(new GridLayout(1, 6, 10, 0));
-        
-        addButton = new JButton(EmojiFontHelper.withEmoji("➕", "Thêm"));
-        addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(addButton);
-        addButton.addActionListener(e -> showAddTreatmentDialog());
-        buttonPanel.add(addButton);
-        
-        editButton = new JButton(EmojiFontHelper.withEmoji("✏️", "Sửa"));
-        editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(editButton);
-        editButton.addActionListener(e -> showEditTreatmentDialog());
-        buttonPanel.add(editButton);
-        
-        viewSessionsButton = new JButton(EmojiFontHelper.withEmoji("📋", "Xem buổi điều trị"));
-        viewSessionsButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(viewSessionsButton);
-        viewSessionsButton.addActionListener(e -> showTreatmentSessions());
-        buttonPanel.add(viewSessionsButton);
-        
-        completeButton = new JButton(EmojiFontHelper.withEmoji("✅", "Kết thúc"));
-        completeButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(completeButton);
-        completeButton.setBackground(new Color(40, 167, 69));
-        completeButton.setForeground(Color.WHITE);
-        completeButton.addActionListener(e -> completeTreatment());
-        buttonPanel.add(completeButton);
-        
-        deleteButton = new JButton(EmojiFontHelper.withEmoji("🗑️", "Xóa"));
-        deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(deleteButton);
-        deleteButton.addActionListener(e -> deleteTreatment());
-        buttonPanel.add(deleteButton);
-        
-        refreshButton = new JButton(EmojiFontHelper.withEmoji("🔄", "Làm mới"));
-        refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(refreshButton);
-        refreshButton.addActionListener(e -> refreshData());
-        buttonPanel.add(refreshButton);
-        
-        headerPanel.add(buttonPanel, BorderLayout.EAST);
         add(headerPanel, BorderLayout.NORTH);
-        
-        // Table
+
         String[] columns = {"ID", "Ngày bắt đầu", "Ngày kết thúc", "Khách hàng", "Thú cưng", "Trạng thái"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
@@ -109,20 +65,69 @@ public class TreatmentManagementPanel extends JPanel {
                 return false;
             }
         };
-        
+
         treatmentTable = new JTable(tableModel);
         treatmentTable.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         treatmentTable.setRowHeight(30);
         treatmentTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
         treatmentTable.setSelectionBackground(new Color(139, 69, 19));
         treatmentTable.setSelectionForeground(Color.WHITE);
-        
+
         JScrollPane scrollPane = new JScrollPane(treatmentTable);
         scrollPane.setBorder(null);
-        add(scrollPane, BorderLayout.CENTER);
 
+        java.awt.Color iconColor = new Color(60, 60, 60);
+        JPanel sideButtonPanel = new JPanel(new GridLayout(0, 1, 0, 6));
+        sideButtonPanel.setBackground(new Color(245, 245, 245));
+        sideButtonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        sideButtonPanel.setMinimumSize(new java.awt.Dimension(175, 0));
+        sideButtonPanel.setPreferredSize(new java.awt.Dimension(175, 0));
+        addButton = new JButton("Thêm");
+        addButton.setIcon(EmojiFontHelper.createEmojiIcon("➕", iconColor));
+        addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(addButton);
+        addButton.addActionListener(e -> showAddTreatmentDialog());
+        sideButtonPanel.add(addButton);
+        editButton = new JButton("Sửa");
+        editButton.setIcon(EmojiFontHelper.createEmojiIcon("✏️", iconColor));
+        editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(editButton);
+        editButton.addActionListener(e -> showEditTreatmentDialog());
+        sideButtonPanel.add(editButton);
+        viewSessionsButton = new JButton("Xem buổi điều trị");
+        viewSessionsButton.setIcon(EmojiFontHelper.createEmojiIcon("📋", iconColor));
+        viewSessionsButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(viewSessionsButton);
+        viewSessionsButton.addActionListener(e -> showTreatmentSessions());
+        sideButtonPanel.add(viewSessionsButton);
+        completeButton = new JButton("Kết thúc");
+        completeButton.setIcon(EmojiFontHelper.createEmojiIcon("✅", Color.WHITE));
+        completeButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(completeButton);
+        completeButton.setBackground(new Color(40, 167, 69));
+        completeButton.setForeground(Color.WHITE);
+        completeButton.addActionListener(e -> completeTreatment());
+        sideButtonPanel.add(completeButton);
+        deleteButton = new JButton("Xóa");
+        deleteButton.setIcon(EmojiFontHelper.createEmojiIcon("🗑️", iconColor));
+        deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(deleteButton);
+        deleteButton.addActionListener(e -> deleteTreatment());
+        sideButtonPanel.add(deleteButton);
+        refreshButton = new JButton("Làm mới");
+        refreshButton.setIcon(EmojiFontHelper.createEmojiIcon("🔄", iconColor));
+        refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(refreshButton);
+        refreshButton.addActionListener(e -> refreshData());
+        sideButtonPanel.add(refreshButton);
+
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.setBackground(new Color(245, 245, 245));
+        centerPanel.add(scrollPane, BorderLayout.CENTER);
         paginationPanel = new TablePaginationPanel(treatmentTable);
-        add(paginationPanel, BorderLayout.SOUTH);
+        centerPanel.add(paginationPanel, BorderLayout.SOUTH);
+        add(centerPanel, BorderLayout.CENTER);
+        add(sideButtonPanel, BorderLayout.EAST);
     }
     
     public void refreshData() {

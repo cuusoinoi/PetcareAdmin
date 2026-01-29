@@ -54,40 +54,6 @@ public class UserManagementPanel extends JPanel {
         JLabel titleLabel = new JLabel("Quản lý Người dùng");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
         headerPanel.add(titleLabel, BorderLayout.WEST);
-
-        JPanel buttonPanel = new JPanel(new GridLayout(1, 5, 10, 0));
-
-        addButton = new JButton(EmojiFontHelper.withEmoji("➕", "Thêm"));
-        addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(addButton);
-        addButton.addActionListener(e -> showAddUserDialog());
-        buttonPanel.add(addButton);
-
-        editButton = new JButton(EmojiFontHelper.withEmoji("✏️", "Sửa"));
-        editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(editButton);
-        editButton.addActionListener(e -> showEditUserDialog());
-        buttonPanel.add(editButton);
-
-        changePasswordButton = new JButton(EmojiFontHelper.withEmoji("🔑", "Đổi mật khẩu"));
-        changePasswordButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(changePasswordButton);
-        changePasswordButton.addActionListener(e -> showChangePasswordDialog());
-        buttonPanel.add(changePasswordButton);
-
-        deleteButton = new JButton(EmojiFontHelper.withEmoji("🗑️", "Xóa"));
-        deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(deleteButton);
-        deleteButton.addActionListener(e -> deleteUser());
-        buttonPanel.add(deleteButton);
-
-        refreshButton = new JButton(EmojiFontHelper.withEmoji("🔄", "Làm mới"));
-        refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(refreshButton);
-        refreshButton.addActionListener(e -> refreshData());
-        buttonPanel.add(refreshButton);
-
-        headerPanel.add(buttonPanel, BorderLayout.EAST);
         add(headerPanel, BorderLayout.NORTH);
 
         String[] columns = {"ID", "Username", "Họ tên", "Vai trò"};
@@ -107,10 +73,51 @@ public class UserManagementPanel extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(userTable);
         scrollPane.setBorder(null);
-        add(scrollPane, BorderLayout.CENTER);
 
+        java.awt.Color iconColor = new Color(60, 60, 60);
+        JPanel sideButtonPanel = new JPanel(new GridLayout(0, 1, 0, 6));
+        sideButtonPanel.setBackground(new Color(245, 245, 245));
+        sideButtonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        sideButtonPanel.setMinimumSize(new java.awt.Dimension(175, 0));
+        sideButtonPanel.setPreferredSize(new java.awt.Dimension(175, 0));
+        addButton = new JButton("Thêm");
+        addButton.setIcon(EmojiFontHelper.createEmojiIcon("➕", iconColor));
+        addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(addButton);
+        addButton.addActionListener(e -> showAddUserDialog());
+        sideButtonPanel.add(addButton);
+        editButton = new JButton("Sửa");
+        editButton.setIcon(EmojiFontHelper.createEmojiIcon("✏️", iconColor));
+        editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(editButton);
+        editButton.addActionListener(e -> showEditUserDialog());
+        sideButtonPanel.add(editButton);
+        changePasswordButton = new JButton("Đổi mật khẩu");
+        changePasswordButton.setIcon(EmojiFontHelper.createEmojiIcon("🔑", iconColor));
+        changePasswordButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(changePasswordButton);
+        changePasswordButton.addActionListener(e -> showChangePasswordDialog());
+        sideButtonPanel.add(changePasswordButton);
+        deleteButton = new JButton("Xóa");
+        deleteButton.setIcon(EmojiFontHelper.createEmojiIcon("🗑️", iconColor));
+        deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(deleteButton);
+        deleteButton.addActionListener(e -> deleteUser());
+        sideButtonPanel.add(deleteButton);
+        refreshButton = new JButton("Làm mới");
+        refreshButton.setIcon(EmojiFontHelper.createEmojiIcon("🔄", iconColor));
+        refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(refreshButton);
+        refreshButton.addActionListener(e -> refreshData());
+        sideButtonPanel.add(refreshButton);
+
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.setBackground(new Color(245, 245, 245));
+        centerPanel.add(scrollPane, BorderLayout.CENTER);
         paginationPanel = new TablePaginationPanel(userTable);
-        add(paginationPanel, BorderLayout.SOUTH);
+        centerPanel.add(paginationPanel, BorderLayout.SOUTH);
+        add(centerPanel, BorderLayout.CENTER);
+        add(sideButtonPanel, BorderLayout.EAST);
     }
 
     public void refreshData() {

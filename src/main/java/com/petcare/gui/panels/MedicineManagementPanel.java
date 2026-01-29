@@ -51,34 +51,6 @@ public class MedicineManagementPanel extends JPanel {
         JLabel titleLabel = new JLabel("Quản lý Thuốc");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
         headerPanel.add(titleLabel, BorderLayout.WEST);
-
-        JPanel buttonPanel = new JPanel(new GridLayout(1, 4, 10, 0));
-
-addButton = new JButton(EmojiFontHelper.withEmoji("➕", "Thêm"));
-        addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(addButton);
-        addButton.addActionListener(e -> showAddMedicineDialog());
-        buttonPanel.add(addButton);
-        
-        editButton = new JButton(EmojiFontHelper.withEmoji("✏️", "Sửa"));
-        editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(editButton);
-        editButton.addActionListener(e -> showEditMedicineDialog());
-        buttonPanel.add(editButton);
-        
-        deleteButton = new JButton(EmojiFontHelper.withEmoji("🗑️", "Xóa"));
-        deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(deleteButton);
-        deleteButton.addActionListener(e -> deleteMedicine());
-        buttonPanel.add(deleteButton);
-        
-        refreshButton = new JButton(EmojiFontHelper.withEmoji("🔄", "Làm mới"));
-        refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(refreshButton);
-        refreshButton.addActionListener(e -> refreshData());
-        buttonPanel.add(refreshButton);
-
-        headerPanel.add(buttonPanel, BorderLayout.EAST);
         add(headerPanel, BorderLayout.NORTH);
 
         String[] columns = {"ID", "Tên thuốc", "Đường dùng"};
@@ -98,10 +70,45 @@ addButton = new JButton(EmojiFontHelper.withEmoji("➕", "Thêm"));
 
         JScrollPane scrollPane = new JScrollPane(medicineTable);
         scrollPane.setBorder(null);
-        add(scrollPane, BorderLayout.CENTER);
 
+        java.awt.Color iconColor = new Color(60, 60, 60);
+        JPanel sideButtonPanel = new JPanel(new GridLayout(0, 1, 0, 6));
+        sideButtonPanel.setBackground(new Color(245, 245, 245));
+        sideButtonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        sideButtonPanel.setMinimumSize(new java.awt.Dimension(175, 0));
+        sideButtonPanel.setPreferredSize(new java.awt.Dimension(175, 0));
+        addButton = new JButton("Thêm");
+        addButton.setIcon(EmojiFontHelper.createEmojiIcon("➕", iconColor));
+        addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(addButton);
+        addButton.addActionListener(e -> showAddMedicineDialog());
+        sideButtonPanel.add(addButton);
+        editButton = new JButton("Sửa");
+        editButton.setIcon(EmojiFontHelper.createEmojiIcon("✏️", iconColor));
+        editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(editButton);
+        editButton.addActionListener(e -> showEditMedicineDialog());
+        sideButtonPanel.add(editButton);
+        deleteButton = new JButton("Xóa");
+        deleteButton.setIcon(EmojiFontHelper.createEmojiIcon("🗑️", iconColor));
+        deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(deleteButton);
+        deleteButton.addActionListener(e -> deleteMedicine());
+        sideButtonPanel.add(deleteButton);
+        refreshButton = new JButton("Làm mới");
+        refreshButton.setIcon(EmojiFontHelper.createEmojiIcon("🔄", iconColor));
+        refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(refreshButton);
+        refreshButton.addActionListener(e -> refreshData());
+        sideButtonPanel.add(refreshButton);
+
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.setBackground(new Color(245, 245, 245));
+        centerPanel.add(scrollPane, BorderLayout.CENTER);
         paginationPanel = new TablePaginationPanel(medicineTable);
-        add(paginationPanel, BorderLayout.SOUTH);
+        centerPanel.add(paginationPanel, BorderLayout.SOUTH);
+        add(centerPanel, BorderLayout.CENTER);
+        add(sideButtonPanel, BorderLayout.EAST);
     }
 
     public void refreshData() {

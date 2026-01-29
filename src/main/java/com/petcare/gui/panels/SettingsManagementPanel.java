@@ -5,7 +5,6 @@ import com.petcare.model.exception.PetcareException;
 import com.petcare.service.GeneralSettingService;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import javax.swing.BorderFactory;
@@ -14,7 +13,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import com.formdev.flatlaf.FlatClientProperties;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
 
@@ -55,14 +53,6 @@ public class SettingsManagementPanel extends JPanel {
         JLabel titleLabel = new JLabel("Cài đặt Hệ thống");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
         headerPanel.add(titleLabel, BorderLayout.WEST);
-
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        refreshButton = new JButton(EmojiFontHelper.withEmoji("🔄", "Làm mới"));
-        refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(refreshButton);
-        refreshButton.addActionListener(e -> loadSettings());
-        buttonPanel.add(refreshButton);
-        headerPanel.add(buttonPanel, BorderLayout.EAST);
         add(headerPanel, BorderLayout.NORTH);
 
         JPanel formPanel = new JPanel(new GridLayout(0, 2, 15, 15));
@@ -112,21 +102,32 @@ public class SettingsManagementPanel extends JPanel {
         signingPlaceField = createTextField();
         formPanel.add(signingPlaceField);
 
-        add(formPanel, BorderLayout.CENTER);
+        JPanel centerWrapper = new JPanel(new BorderLayout());
+        centerWrapper.setBackground(Color.WHITE);
+        centerWrapper.add(formPanel, BorderLayout.CENTER);
+        add(centerWrapper, BorderLayout.CENTER);
 
-        JPanel savePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        savePanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 30, 20));
-        savePanel.setBackground(Color.WHITE);
-        saveButton = new JButton(EmojiFontHelper.withEmoji("💾", "Lưu cài đặt"));
-        saveButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        java.awt.Color iconColor = new Color(60, 60, 60);
+        JPanel sideButtonPanel = new JPanel(new GridLayout(0, 1, 0, 6));
+        sideButtonPanel.setBackground(new Color(245, 245, 245));
+        sideButtonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        sideButtonPanel.setMinimumSize(new java.awt.Dimension(175, 0));
+        sideButtonPanel.setPreferredSize(new java.awt.Dimension(175, 0));
+        saveButton = new JButton("Lưu cài đặt");
+        saveButton.setIcon(EmojiFontHelper.createEmojiIcon("💾", Color.WHITE));
+        saveButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(saveButton);
         saveButton.setBackground(new Color(139, 69, 19));
         saveButton.setForeground(Color.WHITE);
-        saveButton.setBorderPainted(false);
-        saveButton.setPreferredSize(new java.awt.Dimension(200, 40));
-        saveButton.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         saveButton.addActionListener(e -> saveSettings());
-        savePanel.add(saveButton);
-        add(savePanel, BorderLayout.SOUTH);
+        sideButtonPanel.add(saveButton);
+        refreshButton = new JButton("Làm mới");
+        refreshButton.setIcon(EmojiFontHelper.createEmojiIcon("🔄", iconColor));
+        refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(refreshButton);
+        refreshButton.addActionListener(e -> loadSettings());
+        sideButtonPanel.add(refreshButton);
+        add(sideButtonPanel, BorderLayout.EAST);
     }
 
     private JLabel createLabel(String text) {

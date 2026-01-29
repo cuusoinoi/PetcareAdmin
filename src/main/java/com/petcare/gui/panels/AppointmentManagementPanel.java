@@ -67,36 +67,6 @@ public class AppointmentManagementPanel extends JPanel {
         statusFilterCombo.addActionListener(e -> loadAppointments());
         filterPanel.add(statusFilterCombo);
         headerPanel.add(filterPanel, BorderLayout.CENTER);
-
-        JPanel buttonPanel = new JPanel(new GridLayout(1, 5, 10, 0));
-        addButton = new JButton(EmojiFontHelper.withEmoji("➕", "Thêm"));
-        addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(addButton);
-        addButton.addActionListener(e -> showAddAppointmentDialog());
-        buttonPanel.add(addButton);
-        editButton = new JButton(EmojiFontHelper.withEmoji("✏️", "Sửa"));
-        editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(editButton);
-        editButton.addActionListener(e -> showEditAppointmentDialog());
-        buttonPanel.add(editButton);
-        updateStatusButton = new JButton(EmojiFontHelper.withEmoji("✅", "Cập nhật trạng thái"));
-        updateStatusButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(updateStatusButton);
-        updateStatusButton.setBackground(new Color(40, 167, 69));
-        updateStatusButton.setForeground(Color.WHITE);
-        updateStatusButton.addActionListener(e -> showUpdateStatusDialog());
-        buttonPanel.add(updateStatusButton);
-        deleteButton = new JButton(EmojiFontHelper.withEmoji("🗑️", "Xóa"));
-        deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(deleteButton);
-        deleteButton.addActionListener(e -> deleteAppointment());
-        buttonPanel.add(deleteButton);
-        refreshButton = new JButton(EmojiFontHelper.withEmoji("🔄", "Làm mới"));
-        refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        GUIUtil.setToolbarButtonSize(refreshButton);
-        refreshButton.addActionListener(e -> refreshData());
-        buttonPanel.add(refreshButton);
-        headerPanel.add(buttonPanel, BorderLayout.EAST);
         add(headerPanel, BorderLayout.NORTH);
 
         String[] columns = {"ID", "Ngày giờ", "Loại", "Khách hàng", "Thú cưng", "Bác sĩ", "Dịch vụ", "Trạng thái"};
@@ -114,10 +84,53 @@ public class AppointmentManagementPanel extends JPanel {
         appointmentTable.setSelectionForeground(Color.WHITE);
         JScrollPane scrollPane = new JScrollPane(appointmentTable);
         scrollPane.setBorder(null);
-        add(scrollPane, BorderLayout.CENTER);
 
+        JPanel sideButtonPanel = new JPanel(new GridLayout(0, 1, 0, 6));
+        sideButtonPanel.setBackground(new Color(245, 245, 245));
+        sideButtonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        sideButtonPanel.setMinimumSize(new java.awt.Dimension(175, 0));
+        sideButtonPanel.setPreferredSize(new java.awt.Dimension(175, 0));
+        java.awt.Color iconColor = new Color(60, 60, 60);
+        addButton = new JButton("Thêm");
+        addButton.setIcon(EmojiFontHelper.createEmojiIcon("➕", iconColor));
+        addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(addButton);
+        addButton.addActionListener(e -> showAddAppointmentDialog());
+        sideButtonPanel.add(addButton);
+        editButton = new JButton("Sửa");
+        editButton.setIcon(EmojiFontHelper.createEmojiIcon("✏️", iconColor));
+        editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(editButton);
+        editButton.addActionListener(e -> showEditAppointmentDialog());
+        sideButtonPanel.add(editButton);
+        updateStatusButton = new JButton("Đổi trạng thái");
+        updateStatusButton.setIcon(EmojiFontHelper.createEmojiIcon("✅", Color.WHITE));
+        updateStatusButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(updateStatusButton);
+        updateStatusButton.setBackground(new Color(40, 167, 69));
+        updateStatusButton.setForeground(Color.WHITE);
+        updateStatusButton.addActionListener(e -> showUpdateStatusDialog());
+        sideButtonPanel.add(updateStatusButton);
+        deleteButton = new JButton("Xóa");
+        deleteButton.setIcon(EmojiFontHelper.createEmojiIcon("🗑️", iconColor));
+        deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(deleteButton);
+        deleteButton.addActionListener(e -> deleteAppointment());
+        sideButtonPanel.add(deleteButton);
+        refreshButton = new JButton("Làm mới");
+        refreshButton.setIcon(EmojiFontHelper.createEmojiIcon("🔄", iconColor));
+        refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(refreshButton);
+        refreshButton.addActionListener(e -> refreshData());
+        sideButtonPanel.add(refreshButton);
+
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.setBackground(new Color(245, 245, 245));
+        centerPanel.add(scrollPane, BorderLayout.CENTER);
         paginationPanel = new TablePaginationPanel(appointmentTable);
-        add(paginationPanel, BorderLayout.SOUTH);
+        centerPanel.add(paginationPanel, BorderLayout.SOUTH);
+        add(centerPanel, BorderLayout.CENTER);
+        add(sideButtonPanel, BorderLayout.EAST);
     }
 
     public void refreshData() {

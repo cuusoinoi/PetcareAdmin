@@ -162,10 +162,20 @@ public class Sidebar extends JPanel {
         // Scroll pane for menu
         JScrollPane scrollPane = new JScrollPane(menuPanel);
         scrollPane.setBorder(null);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
-        
+        // Thanh cuộn dễ nhìn, dễ bấm: rộng hơn, màu tương phản với nền nâu
+        javax.swing.JScrollBar verticalBar = scrollPane.getVerticalScrollBar();
+        verticalBar.setUnitIncrement(16);
+        verticalBar.setPreferredSize(new Dimension(12, 0));
+        verticalBar.putClientProperty(FlatClientProperties.STYLE, ""
+            + "track:#5C3A0F;"
+            + "thumb:#D4C4A8;"
+            + "thumbHover:#E8DCC8;"
+            + "thumbPressed:#C4B498;"
+            + "trackArc:6;"
+            + "thumbArc:6;"
+            + "width:12");
         add(scrollPane, BorderLayout.CENTER);
         
         // Footer with theme toggle and logout

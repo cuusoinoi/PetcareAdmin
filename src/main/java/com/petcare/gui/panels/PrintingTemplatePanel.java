@@ -6,20 +6,12 @@ import com.petcare.service.InvoiceService;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.PrintHelper;
 import com.petcare.util.ThemeManager;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
+
+import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JEditorPane;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 /**
  * Panel Mẫu in lưu chuồng: chọn hóa đơn, xem Giấy cam kết / Hóa đơn lưu chuồng, in trang hiện tại.
@@ -36,7 +28,9 @@ public class PrintingTemplatePanel extends JPanel {
     private JEditorPane previewPane;
     private final InvoiceService invoiceService = InvoiceService.getInstance();
     private static final SimpleDateFormat SDF_DATE_TIME = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-    /** Fragment HTML đang xem (để áp dụng lại theme khi đổi sáng/tối). */
+    /**
+     * Fragment HTML đang xem (để áp dụng lại theme khi đổi sáng/tối).
+     */
     private String lastPreviewFragment;
 
     public PrintingTemplatePanel() {
@@ -202,39 +196,39 @@ public class PrintingTemplatePanel extends JPanel {
         String totalColorHex = dark ? "#ff8a80" : "#dc3545";
         // Cả sáng và tối đều có style block để JEditorPane luôn áp theme mới, tránh cache cũ
         String styleBlock = "<style type=\"text/css\">"
-            + "body { background: " + bgHex + " !important; color: " + fgHex + " !important; }"
-            + "div.invoice-sheet, div.commitment-sheet { background: " + bgHex + " !important; color: " + fgHex + " !important; }"
-            + "table { border-color: " + borderHex + " !important; }"
-            + "thead th, table th, th, td { background: " + thBgHex + " !important; color: " + fgHex + " !important; border-color: " + borderHex + " !important; }"
-            + "tbody td { background: " + bgHex + " !important; color: " + fgHex + " !important; }"
-            + "tr[style*='background'] td { background: " + trAltHex + " !important; color: " + fgHex + " !important; }"
-            + "td[style*='color: #dc3545'], td[style*='color:#dc3545'], td[style*='color: #ff8a80'], td[style*='color:#ff8a80'] { color: " + totalColorHex + " !important; }"
-            + "</style>";
+                + "body { background: " + bgHex + " !important; color: " + fgHex + " !important; }"
+                + "div.invoice-sheet, div.commitment-sheet { background: " + bgHex + " !important; color: " + fgHex + " !important; }"
+                + "table { border-color: " + borderHex + " !important; }"
+                + "thead th, table th, th, td { background: " + thBgHex + " !important; color: " + fgHex + " !important; border-color: " + borderHex + " !important; }"
+                + "tbody td { background: " + bgHex + " !important; color: " + fgHex + " !important; }"
+                + "tr[style*='background'] td { background: " + trAltHex + " !important; color: " + fgHex + " !important; }"
+                + "td[style*='color: #dc3545'], td[style*='color:#dc3545'], td[style*='color: #ff8a80'], td[style*='color:#ff8a80'] { color: " + totalColorHex + " !important; }"
+                + "</style>";
         String inner;
         if (bodyContent != null && !bodyContent.isEmpty()) {
             // Chế độ tối: thay màu inline trên bản sao để hiển thị (JEditorPane có thể bỏ qua CSS)
             // Chế độ sáng: dùng nguyên bản (màu trắng/xám sáng). Không lưu bản đã thay vào lastPreviewFragment.
             if (dark) {
                 inner = bodyContent
-                    .replace("background: #f5f5f5", "background: #3d3d3d")
-                    .replace("background:#f5f5f5", "background:#3d3d3d")
-                    .replace("background: #f9f9f9", "background: #383838")
-                    .replace("background:#f9f9f9", "background:#383838")
-                    .replace("border: 1px solid #ddd", "border: 1px solid #555555")
-                    .replace("border:1px solid #ddd", "border:1px solid #555555")
-                    .replace("color: #dc3545", "color: #ff8a80")
-                    .replace("color:#dc3545", "color:#ff8a80");
+                        .replace("background: #f5f5f5", "background: #3d3d3d")
+                        .replace("background:#f5f5f5", "background:#3d3d3d")
+                        .replace("background: #f9f9f9", "background: #383838")
+                        .replace("background:#f9f9f9", "background:#383838")
+                        .replace("border: 1px solid #ddd", "border: 1px solid #555555")
+                        .replace("border:1px solid #ddd", "border:1px solid #555555")
+                        .replace("color: #dc3545", "color: #ff8a80")
+                        .replace("color:#dc3545", "color:#ff8a80");
             } else {
                 // Đảm bảo chế độ sáng: đưa lại màu gốc nếu fragment đã từng bị thay (ví dụ do lỗi)
                 inner = bodyContent
-                    .replace("background: #3d3d3d", "background: #f5f5f5")
-                    .replace("background:#3d3d3d", "background:#f5f5f5")
-                    .replace("background: #383838", "background: #f9f9f9")
-                    .replace("background:#383838", "background:#f9f9f9")
-                    .replace("border: 1px solid #555555", "border: 1px solid #ddd")
-                    .replace("border:1px solid #555555", "border:1px solid #ddd")
-                    .replace("color: #ff8a80", "color: #dc3545")
-                    .replace("color:#ff8a80", "color:#dc3545");
+                        .replace("background: #3d3d3d", "background: #f5f5f5")
+                        .replace("background:#3d3d3d", "background:#f5f5f5")
+                        .replace("background: #383838", "background: #f9f9f9")
+                        .replace("background:#383838", "background:#f9f9f9")
+                        .replace("border: 1px solid #555555", "border: 1px solid #ddd")
+                        .replace("border:1px solid #555555", "border:1px solid #ddd")
+                        .replace("color: #ff8a80", "color: #dc3545")
+                        .replace("color:#ff8a80", "color:#dc3545");
             }
         } else {
             inner = "<p style='margin:0'>Chọn hóa đơn và bấm \"Xem Giấy cam kết\" hoặc \"Xem Hóa đơn\".</p>";

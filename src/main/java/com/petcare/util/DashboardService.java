@@ -1,11 +1,10 @@
 package com.petcare.util;
 
 import com.petcare.persistence.Database;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +14,7 @@ import java.util.Map;
  * Service class for Dashboard data
  */
 public class DashboardService {
-    
+
     /**
      * Get total customer count
      */
@@ -30,7 +29,7 @@ public class DashboardService {
         }
         return 0;
     }
-    
+
     /**
      * Get total pet count
      */
@@ -45,7 +44,7 @@ public class DashboardService {
         }
         return 0;
     }
-    
+
     /**
      * Get medical record count for current month
      */
@@ -69,7 +68,7 @@ public class DashboardService {
         }
         return 0;
     }
-    
+
     /**
      * Get pet enclosure count for current month
      */
@@ -93,7 +92,7 @@ public class DashboardService {
         }
         return 0;
     }
-    
+
     /**
      * Get total revenue for current year
      */
@@ -117,7 +116,7 @@ public class DashboardService {
         }
         return 0;
     }
-    
+
     /**
      * Get medical records count by day for last N days
      * Returns Map<date, count>
@@ -130,7 +129,7 @@ public class DashboardService {
         }
         return new HashMap<>();
     }
-    
+
     /**
      * Get check-in/check-out stats for last N days
      */
@@ -142,7 +141,7 @@ public class DashboardService {
         }
         return new HashMap<>();
     }
-    
+
     /**
      * Get monthly revenue stats for last 12 months
      */
@@ -172,7 +171,7 @@ public class DashboardService {
         }
         return result;
     }
-    
+
     /**
      * Calculate percentage change
      */
@@ -184,7 +183,7 @@ public class DashboardService {
         }
         return 0.0;
     }
-    
+
     /**
      * Helper class for service revenue
      */

@@ -41,26 +41,91 @@ public class PetEnclosure {
         }
     }
 
-    public int getPetEnclosureId() { return petEnclosureId; }
-    public void setPetEnclosureId(int petEnclosureId) { this.petEnclosureId = petEnclosureId; }
-    public int getCustomerId() { return customerId; }
-    public void setCustomerId(int customerId) { this.customerId = customerId; }
-    public int getPetId() { return petId; }
-    public void setPetId(int petId) { this.petId = petId; }
-    public int getPetEnclosureNumber() { return petEnclosureNumber; }
-    public void setPetEnclosureNumber(int petEnclosureNumber) { this.petEnclosureNumber = petEnclosureNumber; }
-    public Date getCheckInDate() { return checkInDate; }
-    public void setCheckInDate(Date checkInDate) { this.checkInDate = checkInDate; }
-    public Date getCheckOutDate() { return checkOutDate; }
-    public void setCheckOutDate(Date checkOutDate) { this.checkOutDate = checkOutDate; }
-    public int getDailyRate() { return dailyRate; }
-    public void setDailyRate(int dailyRate) { this.dailyRate = dailyRate; }
-    public int getDeposit() { return deposit; }
-    public void setDeposit(int deposit) { this.deposit = deposit; }
-    public int getEmergencyLimit() { return emergencyLimit; }
-    public void setEmergencyLimit(int emergencyLimit) { this.emergencyLimit = emergencyLimit; }
-    public String getPetEnclosureNote() { return petEnclosureNote; }
-    public void setPetEnclosureNote(String petEnclosureNote) { this.petEnclosureNote = petEnclosureNote; }
-    public Status getPetEnclosureStatus() { return petEnclosureStatus; }
-    public void setPetEnclosureStatus(Status petEnclosureStatus) { this.petEnclosureStatus = petEnclosureStatus; }
+    public int getPetEnclosureId() {
+        return petEnclosureId;
+    }
+
+    public void setPetEnclosureId(int petEnclosureId) {
+        this.petEnclosureId = petEnclosureId;
+    }
+
+    public int getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
+    }
+
+    public int getPetId() {
+        return petId;
+    }
+
+    public void setPetId(int petId) {
+        this.petId = petId;
+    }
+
+    public int getPetEnclosureNumber() {
+        return petEnclosureNumber;
+    }
+
+    public void setPetEnclosureNumber(int petEnclosureNumber) {
+        this.petEnclosureNumber = petEnclosureNumber;
+    }
+
+    public Date getCheckInDate() {
+        return checkInDate;
+    }
+
+    public void setCheckInDate(Date checkInDate) {
+        this.checkInDate = checkInDate;
+    }
+
+    public Date getCheckOutDate() {
+        return checkOutDate;
+    }
+
+    public void setCheckOutDate(Date checkOutDate) {
+        this.checkOutDate = checkOutDate;
+    }
+
+    public int getDailyRate() {
+        return dailyRate;
+    }
+
+    public void setDailyRate(int dailyRate) {
+        this.dailyRate = dailyRate;
+    }
+
+    public int getDeposit() {
+        return deposit;
+    }
+
+    public void setDeposit(int deposit) {
+        this.deposit = deposit;
+    }
+
+    public int getEmergencyLimit() {
+        return emergencyLimit;
+    }
+
+    public void setEmergencyLimit(int emergencyLimit) {
+        this.emergencyLimit = emergencyLimit;
+    }
+
+    public String getPetEnclosureNote() {
+        return petEnclosureNote;
+    }
+
+    public void setPetEnclosureNote(String petEnclosureNote) {
+        this.petEnclosureNote = petEnclosureNote;
+    }
+
+    public Status getPetEnclosureStatus() {
+        return petEnclosureStatus;
+    }
+
+    public void setPetEnclosureStatus(Status petEnclosureStatus) {
+        this.petEnclosureStatus = petEnclosureStatus;
+    }
 }

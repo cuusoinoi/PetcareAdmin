@@ -4,8 +4,9 @@ import com.petcare.model.domain.Appointment;
 import com.petcare.model.entity.AppointmentEntity;
 import com.petcare.model.entity.AppointmentListDto;
 import com.petcare.model.exception.PetcareException;
-import com.petcare.repository.IAppointmentRepository;
 import com.petcare.repository.AppointmentRepository;
+import com.petcare.repository.IAppointmentRepository;
+
 import java.util.List;
 
 /**
@@ -32,7 +33,9 @@ public class AppointmentService {
         }
     }
 
-    /** statusFilterLabel: "Tất cả" or "Chờ xác nhận", "Đã xác nhận", "Hoàn thành", "Đã hủy" */
+    /**
+     * statusFilterLabel: "Tất cả" or "Chờ xác nhận", "Đã xác nhận", "Hoàn thành", "Đã hủy"
+     */
     public List<AppointmentListDto> getAppointmentsForList(String statusFilterLabel) throws PetcareException {
         String code = statusFilterLabel == null || statusFilterLabel.equals("Tất cả") ? null : labelToStatusCode(statusFilterLabel);
         return repository.findAllForList(code);
@@ -79,22 +82,32 @@ public class AppointmentService {
     public static String statusCodeToLabel(String code) {
         if (code == null) return "";
         switch (code) {
-            case "pending": return "Chờ xác nhận";
-            case "confirmed": return "Đã xác nhận";
-            case "completed": return "Hoàn thành";
-            case "cancelled": return "Đã hủy";
-            default: return code;
+            case "pending":
+                return "Chờ xác nhận";
+            case "confirmed":
+                return "Đã xác nhận";
+            case "completed":
+                return "Hoàn thành";
+            case "cancelled":
+                return "Đã hủy";
+            default:
+                return code;
         }
     }
 
     private static String labelToStatusCode(String label) {
         if (label == null) return "";
         switch (label) {
-            case "Chờ xác nhận": return "pending";
-            case "Đã xác nhận": return "confirmed";
-            case "Hoàn thành": return "completed";
-            case "Đã hủy": return "cancelled";
-            default: return "";
+            case "Chờ xác nhận":
+                return "pending";
+            case "Đã xác nhận":
+                return "confirmed";
+            case "Hoàn thành":
+                return "completed";
+            case "Đã hủy":
+                return "cancelled";
+            default:
+                return "";
         }
     }
 

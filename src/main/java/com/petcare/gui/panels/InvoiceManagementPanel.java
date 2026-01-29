@@ -5,26 +5,17 @@ import com.petcare.gui.dialogs.InvoiceDetailsDialog;
 import com.petcare.model.entity.InvoiceListDto;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.service.InvoiceService;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.table.DefaultTableModel;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
 import com.petcare.util.ThemeManager;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 /**
  * Invoice Management Panel with CRUD operations
@@ -43,12 +34,12 @@ public class InvoiceManagementPanel extends JPanel {
     private JButton viewButton;
     private JButton deleteButton;
     private JButton refreshButton;
-    
+
     public InvoiceManagementPanel() {
         initComponents();
         loadInvoices();
     }
-    
+
     private void initComponents() {
         setLayout(new BorderLayout());
         setBackground(ThemeManager.getContentBackground());
@@ -56,8 +47,8 @@ public class InvoiceManagementPanel extends JPanel {
         headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(ThemeManager.getHeaderBackground());
         headerPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(15, 20, 15, 20)
+                BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(15, 20, 15, 20)
         ));
 
         titleLabel = new JLabel("Quản lý Hóa đơn");
@@ -92,11 +83,19 @@ public class InvoiceManagementPanel extends JPanel {
         searchField.putClientProperty("JTextField.placeholderText", "Tìm theo ID, ngày, khách hàng, thú cưng...");
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void insertUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            public void insertUpdate(DocumentEvent e) {
+                paginationPanel.setSearchText(searchField.getText().trim());
+            }
+
             @Override
-            public void removeUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            public void removeUpdate(DocumentEvent e) {
+                paginationPanel.setSearchText(searchField.getText().trim());
+            }
+
             @Override
-            public void changedUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            public void changedUpdate(DocumentEvent e) {
+                paginationPanel.setSearchText(searchField.getText().trim());
+            }
         });
         searchPanel.add(new JLabel("Tìm kiếm:"));
         searchPanel.add(searchField);
@@ -141,7 +140,7 @@ public class InvoiceManagementPanel extends JPanel {
         add(centerPanel, BorderLayout.CENTER);
         add(sideButtonPanel, BorderLayout.EAST);
     }
-    
+
     public void refreshData() {
         loadInvoices();
     }
@@ -152,8 +151,8 @@ public class InvoiceManagementPanel extends JPanel {
         if (headerPanel != null) {
             headerPanel.setBackground(ThemeManager.getHeaderBackground());
             headerPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
-                BorderFactory.createEmptyBorder(15, 20, 15, 20)
+                    BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
+                    BorderFactory.createEmptyBorder(15, 20, 15, 20)
             ));
         }
         if (titleLabel != null) titleLabel.setForeground(ThemeManager.getTitleForeground());
@@ -193,14 +192,14 @@ public class InvoiceManagementPanel extends JPanel {
             for (InvoiceListDto dto : list) {
                 String dateStr = dto.getInvoiceDate() != null ? sdf.format(dto.getInvoiceDate()) : "";
                 tableModel.addRow(new Object[]{
-                    dto.getInvoiceId(),
-                    dateStr,
-                    dto.getCustomerName() != null ? dto.getCustomerName() : "",
-                    dto.getPetName() != null ? dto.getPetName() : "",
-                    formatCurrency(dto.getSubtotal()),
-                    formatCurrency(dto.getDiscount()),
-                    formatCurrency(dto.getDeposit()),
-                    formatCurrency(dto.getTotalAmount())
+                        dto.getInvoiceId(),
+                        dateStr,
+                        dto.getCustomerName() != null ? dto.getCustomerName() : "",
+                        dto.getPetName() != null ? dto.getPetName() : "",
+                        formatCurrency(dto.getSubtotal()),
+                        formatCurrency(dto.getDiscount()),
+                        formatCurrency(dto.getDeposit()),
+                        formatCurrency(dto.getTotalAmount())
                 });
             }
             if (paginationPanel != null) paginationPanel.refresh();
@@ -208,7 +207,7 @@ public class InvoiceManagementPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Lỗi khi tải dữ liệu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     private void showAddInvoiceDialog() {
         AddInvoiceDialog dialog = new AddInvoiceDialog(null);
         dialog.setVisible(true);
@@ -216,14 +215,14 @@ public class InvoiceManagementPanel extends JPanel {
             refreshData();
         }
     }
-    
+
     private void showInvoiceDetails() {
         int selectedRow = invoiceTable.getSelectedRow();
         if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, 
-                "Vui lòng chọn hóa đơn cần xem!", 
-                "Thông báo", 
-                JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "Vui lòng chọn hóa đơn cần xem!",
+                    "Thông báo",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
         int modelRow = invoiceTable.convertRowIndexToModel(selectedRow);
@@ -231,24 +230,24 @@ public class InvoiceManagementPanel extends JPanel {
         InvoiceDetailsDialog dialog = new InvoiceDetailsDialog(null, invoiceId);
         dialog.setVisible(true);
     }
-    
+
     private void deleteInvoice() {
         int selectedRow = invoiceTable.getSelectedRow();
         if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, 
-                "Vui lòng chọn hóa đơn cần xóa!", 
-                "Thông báo", 
-                JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "Vui lòng chọn hóa đơn cần xóa!",
+                    "Thông báo",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
         int modelRow = invoiceTable.convertRowIndexToModel(selectedRow);
         int invoiceId = (Integer) tableModel.getValueAt(modelRow, 0);
-        
-        int confirm = JOptionPane.showConfirmDialog(this, 
-            "Bạn có chắc muốn xóa hóa đơn #" + invoiceId + "?", 
-            "Xác nhận xóa", 
-            JOptionPane.YES_NO_OPTION);
-        
+
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "Bạn có chắc muốn xóa hóa đơn #" + invoiceId + "?",
+                "Xác nhận xóa",
+                JOptionPane.YES_NO_OPTION);
+
         if (confirm == JOptionPane.YES_OPTION) {
             try {
                 InvoiceService.getInstance().deleteInvoice(invoiceId);
@@ -259,7 +258,7 @@ public class InvoiceManagementPanel extends JPanel {
             }
         }
     }
-    
+
     private String formatCurrency(int amount) {
         return String.format("%,d", amount) + " VNĐ";
     }

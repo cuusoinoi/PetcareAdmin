@@ -2,6 +2,7 @@ package com.petcare.repository;
 
 import com.petcare.model.entity.ServiceTypeEntity;
 import com.petcare.model.exception.PetcareException;
+
 import java.util.List;
 
 /**
@@ -15,7 +16,9 @@ public interface IServiceTypeRepository {
 
     ServiceTypeEntity findByName(String serviceName) throws PetcareException;
 
-    /** Find first service type whose name starts with prefix (e.g. "Lưu chuồng"). */
+    /**
+     * Find first service type whose name starts with prefix (e.g. "Lưu chuồng").
+     */
     ServiceTypeEntity findByNameStartsWith(String prefix) throws PetcareException;
 
     int insert(ServiceTypeEntity entity) throws PetcareException;

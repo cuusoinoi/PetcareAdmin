@@ -7,20 +7,12 @@ import com.petcare.service.InvoiceService;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.PrintHelper;
 import com.petcare.util.ThemeManager;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
 
 /**
  * Dialog for viewing invoice details
@@ -40,11 +32,11 @@ public class InvoiceDetailsDialog extends JDialog {
         setLayout(new BorderLayout());
         setTitle("Chi tiết Hóa đơn #" + invoiceId);
         getContentPane().setBackground(ThemeManager.getContentBackground());
-        
+
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(ThemeManager.getContentBackground());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        
+
         // Invoice info
         JPanel infoPanel = new JPanel(new java.awt.GridLayout(0, 2, 15, 10));
         infoPanel.setBackground(ThemeManager.getContentBackground());
@@ -94,29 +86,29 @@ public class InvoiceDetailsDialog extends JDialog {
             List<InvoiceDetailListDto> details = InvoiceService.getInstance().getInvoiceDetails(invoiceId);
             for (InvoiceDetailListDto dto : details) {
                 tableModel.addRow(new Object[]{
-                    dto.getServiceName() != null ? dto.getServiceName() : "",
-                    dto.getQuantity(),
-                    formatCurrency(dto.getUnitPrice()),
-                    formatCurrency(dto.getTotalPrice())
+                        dto.getServiceName() != null ? dto.getServiceName() : "",
+                        dto.getQuantity(),
+                        formatCurrency(dto.getUnitPrice()),
+                        formatCurrency(dto.getTotalPrice())
                 });
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        
+
         JTable detailsTable = new JTable(tableModel);
         detailsTable.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         detailsTable.setRowHeight(30);
         detailsTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
         ThemeManager.applyTableTheme(detailsTable);
-        
+
         JScrollPane scrollPane = new JScrollPane(detailsTable);
         scrollPane.setBackground(ThemeManager.getContentBackground());
         scrollPane.setBorder(BorderFactory.createTitledBorder("Chi tiết dịch vụ"));
         mainPanel.add(scrollPane, BorderLayout.CENTER);
-        
+
         add(mainPanel, BorderLayout.CENTER);
-        
+
         // Buttons
         JPanel buttonPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 10, 0));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
@@ -143,21 +135,21 @@ public class InvoiceDetailsDialog extends JDialog {
 
         add(buttonPanel, BorderLayout.SOUTH);
     }
-    
+
     private JLabel createInfoLabel(String text) {
         JLabel label = new JLabel(text);
         label.setFont(new Font("Segoe UI", Font.BOLD, 13));
         label.setForeground(ThemeManager.getTitleForeground());
         return label;
     }
-    
+
     private JLabel createInfoValue(String text) {
         JLabel label = new JLabel(text != null ? text : "");
         label.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         label.setForeground(ThemeManager.getTableForeground());
         return label;
     }
-    
+
     private String formatCurrency(int amount) {
         return String.format("%,d", amount) + " VNĐ";
     }

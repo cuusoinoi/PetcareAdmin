@@ -1,20 +1,13 @@
 package com.petcare.gui.panels;
 
 import com.petcare.util.ThemeManager;
-import java.awt.Component;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.util.Collections;
-import java.util.Comparator;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.RowFilter;
-import javax.swing.RowSorter;
-import javax.swing.SortOrder;
+
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Thanh phân trang đặt dưới JTable: sắp xếp theo cột (click tiêu đề) và phân trang.
@@ -67,10 +60,31 @@ public class TablePaginationPanel extends JPanel {
             updateButtonsAndLabel();
         });
 
-        firstBtn.addActionListener(e -> { currentPage = 1; applyPageFilter(); updateButtonsAndLabel(); });
-        prevBtn.addActionListener(e -> { if (currentPage > 1) { currentPage--; applyPageFilter(); updateButtonsAndLabel(); } });
-        nextBtn.addActionListener(e -> { if (currentPage < getTotalPages()) { currentPage++; applyPageFilter(); updateButtonsAndLabel(); } });
-        lastBtn.addActionListener(e -> { currentPage = getTotalPages(); if (currentPage < 1) currentPage = 1; applyPageFilter(); updateButtonsAndLabel(); });
+        firstBtn.addActionListener(e -> {
+            currentPage = 1;
+            applyPageFilter();
+            updateButtonsAndLabel();
+        });
+        prevBtn.addActionListener(e -> {
+            if (currentPage > 1) {
+                currentPage--;
+                applyPageFilter();
+                updateButtonsAndLabel();
+            }
+        });
+        nextBtn.addActionListener(e -> {
+            if (currentPage < getTotalPages()) {
+                currentPage++;
+                applyPageFilter();
+                updateButtonsAndLabel();
+            }
+        });
+        lastBtn.addActionListener(e -> {
+            currentPage = getTotalPages();
+            if (currentPage < 1) currentPage = 1;
+            applyPageFilter();
+            updateButtonsAndLabel();
+        });
 
         add(new JLabel("Hiển thị:"));
         add(pageSizeCombo);
@@ -84,7 +98,9 @@ public class TablePaginationPanel extends JPanel {
         updateButtonsAndLabel();
     }
 
-    /** Cập nhật màu theo theme (gọi từ panel cha khi đổi giao diện sáng/tối). */
+    /**
+     * Cập nhật màu theo theme (gọi từ panel cha khi đổi giao diện sáng/tối).
+     */
     public void updateTheme() {
         setBackground(ThemeManager.getContentBackground());
         infoLabel.setForeground(ThemeManager.getTitleForeground());
@@ -105,14 +121,18 @@ public class TablePaginationPanel extends JPanel {
         }
     }
 
-    /** Gọi sau khi load xong dữ liệu (model đã thay đổi) để về trang 1 và cập nhật filter. */
+    /**
+     * Gọi sau khi load xong dữ liệu (model đã thay đổi) để về trang 1 và cập nhật filter.
+     */
     public void refresh() {
         currentPage = 1;
         applyPageFilter();
         updateButtonsAndLabel();
     }
 
-    /** Lọc bảng theo từ khóa (tìm kiếm). Gọi khi user gõ vào ô tìm kiếm. */
+    /**
+     * Lọc bảng theo từ khóa (tìm kiếm). Gọi khi user gõ vào ô tìm kiếm.
+     */
     public void setSearchText(String text) {
         this.searchText = text != null ? text.trim() : "";
         currentPage = 1;
@@ -182,7 +202,10 @@ public class TablePaginationPanel extends JPanel {
                 int modelRow = entry.getIdentifier();
                 int viewIdx = -1;
                 for (int i = 0; i < viewToModel.length; i++) {
-                    if (viewToModel[i] == modelRow) { viewIdx = i; break; }
+                    if (viewToModel[i] == modelRow) {
+                        viewIdx = i;
+                        break;
+                    }
                 }
                 if (viewIdx < 0) return false;
                 return viewIdx >= (page - 1) * size && viewIdx < page * size;
@@ -218,7 +241,9 @@ public class TablePaginationPanel extends JPanel {
         lastBtn.setEnabled(!searching && currentPage < totalPages);
     }
 
-    /** So sánh theo số để cột ID (và cột số khác) sắp 1, 2, 3, ..., 9, 10, 11 chứ không phải 1, 10, 11, ..., 2. */
+    /**
+     * So sánh theo số để cột ID (và cột số khác) sắp 1, 2, 3, ..., 9, 10, 11 chứ không phải 1, 10, 11, ..., 2.
+     */
     private static Comparator<Object> numericComparator() {
         return (a, b) -> {
             int na = toInt(a);
@@ -236,7 +261,10 @@ public class TablePaginationPanel extends JPanel {
         if (o instanceof String) {
             String s = ((String) o).trim().replaceAll("[^0-9-]", "");
             if (!s.isEmpty()) {
-                try { return Integer.parseInt(s); } catch (NumberFormatException ignored) { }
+                try {
+                    return Integer.parseInt(s);
+                } catch (NumberFormatException ignored) {
+                }
             }
         }
         return 0;

@@ -1,25 +1,14 @@
 package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import com.petcare.util.EmojiFontHelper;
-import com.petcare.util.ThemeManager;
 import com.petcare.model.domain.User;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.service.UserService;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
+import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.ThemeManager;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Dialog for adding/editing user - uses UserService and domain User only
@@ -68,8 +57,8 @@ public class AddEditUserDialog extends JDialog {
         passwordField.setBackground(ThemeManager.getTextFieldBackground());
         passwordField.setForeground(ThemeManager.getTextFieldForeground());
         passwordField.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+                BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         passwordField.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         formPanel.add(passwordField);
@@ -127,8 +116,8 @@ public class AddEditUserDialog extends JDialog {
         field.setBackground(ThemeManager.getTextFieldBackground());
         field.setForeground(ThemeManager.getTextFieldForeground());
         field.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+                BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         field.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         return field;
@@ -175,7 +164,7 @@ public class AddEditUserDialog extends JDialog {
                 String plainPassword = new String(passwordField.getPassword());
                 userService.createUser(newUser, plainPassword);
                 JOptionPane.showMessageDialog(this, "Thêm người dùng thành công!", "Thành công",
-                    JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.INFORMATION_MESSAGE);
                 saved = true;
                 dispose();
             } else {
@@ -184,7 +173,7 @@ public class AddEditUserDialog extends JDialog {
                 user.setRole(role);
                 userService.updateUser(user);
                 JOptionPane.showMessageDialog(this, "Cập nhật người dùng thành công!", "Thành công",
-                    JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.INFORMATION_MESSAGE);
                 saved = true;
                 dispose();
             }

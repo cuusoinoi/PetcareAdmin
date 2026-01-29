@@ -1,28 +1,18 @@
 package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import com.petcare.util.EmojiFontHelper;
-import com.petcare.util.ThemeManager;
 import com.petcare.model.domain.TreatmentCourse;
 import com.petcare.service.CustomerService;
 import com.petcare.service.PetService;
 import com.petcare.service.TreatmentCourseService;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
+import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.ThemeManager;
+
+import javax.swing.*;
+import java.awt.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 /**
  * Dialog for adding/editing treatment course
@@ -37,13 +27,13 @@ public class AddEditTreatmentDialog extends JDialog {
     private JButton cancelButton;
     private boolean saved = false;
     private TreatmentCourse course;
-    
+
     public AddEditTreatmentDialog(JDialog parent, TreatmentCourse course) {
         super(parent, true);
         this.course = course;
         initComponents();
         loadCustomers();
-        
+
         if (course != null) {
             loadCourseData();
             setTitle("Sửa liệu trình điều trị");
@@ -52,18 +42,18 @@ public class AddEditTreatmentDialog extends JDialog {
             statusCombo.setSelectedIndex(0); // Default: Đang điều trị
         }
     }
-    
+
     private void initComponents() {
         setSize(500, 300);
         setLocationRelativeTo(getParent());
         setLayout(new BorderLayout());
         getContentPane().setBackground(ThemeManager.getContentBackground());
-        
+
         // Form panel
         JPanel formPanel = new JPanel(new GridLayout(0, 2, 15, 15));
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         formPanel.setBackground(ThemeManager.getContentBackground());
-        
+
         // Customer
         formPanel.add(createLabel("Khách hàng *:"));
         customerCombo = new JComboBox<>();
@@ -73,7 +63,7 @@ public class AddEditTreatmentDialog extends JDialog {
         customerCombo.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         customerCombo.addActionListener(e -> loadPetsByCustomer());
         formPanel.add(customerCombo);
-        
+
         // Pet
         formPanel.add(createLabel("Thú cưng *:"));
         petCombo = new JComboBox<>();
@@ -82,19 +72,19 @@ public class AddEditTreatmentDialog extends JDialog {
         petCombo.setForeground(ThemeManager.getTextFieldForeground());
         petCombo.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         formPanel.add(petCombo);
-        
+
         // Start Date
         formPanel.add(createLabel("Ngày bắt đầu * (dd/MM/yyyy):"));
         startDateField = createTextField();
         startDateField.putClientProperty("JTextField.placeholderText", "dd/MM/yyyy");
         formPanel.add(startDateField);
-        
+
         // End Date
         formPanel.add(createLabel("Ngày kết thúc (dd/MM/yyyy):"));
         endDateField = createTextField();
         endDateField.putClientProperty("JTextField.placeholderText", "dd/MM/yyyy");
         formPanel.add(endDateField);
-        
+
         // Status
         formPanel.add(createLabel("Trạng thái:"));
         statusCombo = new JComboBox<>();
@@ -105,14 +95,14 @@ public class AddEditTreatmentDialog extends JDialog {
         statusCombo.addItem("Đang điều trị");
         statusCombo.addItem("Kết thúc");
         formPanel.add(statusCombo);
-        
+
         add(formPanel, BorderLayout.CENTER);
-        
+
         // Button panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
         buttonPanel.setBackground(ThemeManager.getContentBackground());
-        
+
         saveButton = new JButton(EmojiFontHelper.withEmoji("💾", "Lưu"));
         saveButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         saveButton.setBackground(new Color(139, 69, 19));
@@ -121,7 +111,7 @@ public class AddEditTreatmentDialog extends JDialog {
         saveButton.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         saveButton.addActionListener(e -> saveTreatment());
         buttonPanel.add(saveButton);
-        
+
         cancelButton = new JButton(EmojiFontHelper.withEmoji("❌", "Hủy"));
         cancelButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         cancelButton.setBackground(ThemeManager.getButtonBackground());
@@ -129,30 +119,30 @@ public class AddEditTreatmentDialog extends JDialog {
         cancelButton.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         cancelButton.addActionListener(e -> dispose());
         buttonPanel.add(cancelButton);
-        
+
         add(buttonPanel, BorderLayout.SOUTH);
     }
-    
+
     private JLabel createLabel(String text) {
         JLabel label = new JLabel(text);
         label.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         label.setForeground(ThemeManager.getTitleForeground());
         return label;
     }
-    
+
     private JTextField createTextField() {
         JTextField field = new JTextField();
         field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         field.setBackground(ThemeManager.getTextFieldBackground());
         field.setForeground(ThemeManager.getTextFieldForeground());
         field.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+                BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         field.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         return field;
     }
-    
+
     private void loadCustomers() {
         customerCombo.removeAllItems();
         customerCombo.addItem("-- Chọn khách hàng --");
@@ -179,7 +169,7 @@ public class AddEditTreatmentDialog extends JDialog {
             ex.printStackTrace();
         }
     }
-    
+
     private void loadCourseData() {
         if (course != null) {
             // Set customer
@@ -191,7 +181,7 @@ public class AddEditTreatmentDialog extends JDialog {
                     break;
                 }
             }
-            
+
             // Set pet
             for (int i = 0; i < petCombo.getItemCount(); i++) {
                 String item = petCombo.getItemAt(i);
@@ -200,7 +190,7 @@ public class AddEditTreatmentDialog extends JDialog {
                     break;
                 }
             }
-            
+
             // Set dates
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
             if (course.getStartDate() != null) {
@@ -209,14 +199,14 @@ public class AddEditTreatmentDialog extends JDialog {
             if (course.getEndDate() != null) {
                 endDateField.setText(sdf.format(course.getEndDate()));
             }
-            
+
             // Set status
             if (course.getStatus() != null) {
                 statusCombo.setSelectedItem(course.getStatus().getLabel());
             }
         }
     }
-    
+
     private void saveTreatment() {
         // Validation
         if (customerCombo.getSelectedIndex() == 0) {
@@ -224,51 +214,51 @@ public class AddEditTreatmentDialog extends JDialog {
             customerCombo.requestFocus();
             return;
         }
-        
+
         if (petCombo.getSelectedIndex() == 0) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn thú cưng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             petCombo.requestFocus();
             return;
         }
-        
+
         if (startDateField.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập ngày bắt đầu!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             startDateField.requestFocus();
             return;
         }
-        
+
         try {
             // Get IDs
             String customerSelected = (String) customerCombo.getSelectedItem();
             int customerId = Integer.parseInt(customerSelected.split(" - ")[0]);
-            
+
             String petSelected = (String) petCombo.getSelectedItem();
             int petId = Integer.parseInt(petSelected.split(" - ")[0]);
-            
+
             // Parse dates
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
             Date startDate;
             try {
                 startDate = sdf.parse(startDateField.getText().trim());
             } catch (ParseException ex) {
-                JOptionPane.showMessageDialog(this, "Ngày bắt đầu không đúng định dạng (dd/MM/yyyy)!", 
-                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Ngày bắt đầu không đúng định dạng (dd/MM/yyyy)!",
+                        "Lỗi", JOptionPane.ERROR_MESSAGE);
                 startDateField.requestFocus();
                 return;
             }
-            
+
             Date endDate = null;
             if (!endDateField.getText().trim().isEmpty()) {
                 try {
                     endDate = sdf.parse(endDateField.getText().trim());
                 } catch (ParseException ex) {
-                    JOptionPane.showMessageDialog(this, "Ngày kết thúc không đúng định dạng (dd/MM/yyyy)!", 
-                        "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Ngày kết thúc không đúng định dạng (dd/MM/yyyy)!",
+                            "Lỗi", JOptionPane.ERROR_MESSAGE);
                     endDateField.requestFocus();
                     return;
                 }
             }
-            
+
             String statusLabel = (String) statusCombo.getSelectedItem();
             TreatmentCourse.Status status = "Đang điều trị".equals(statusLabel) ? TreatmentCourse.Status.ACTIVE : TreatmentCourse.Status.COMPLETED;
             TreatmentCourseService service = TreatmentCourseService.getInstance();
@@ -299,7 +289,7 @@ public class AddEditTreatmentDialog extends JDialog {
             ex.printStackTrace();
         }
     }
-    
+
     public boolean isSaved() {
         return saved;
     }

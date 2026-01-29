@@ -39,20 +39,67 @@ public class MedicalRecord {
         }
     }
 
-    public int getMedicalRecordId() { return medicalRecordId; }
-    public void setMedicalRecordId(int medicalRecordId) { this.medicalRecordId = medicalRecordId; }
-    public int getCustomerId() { return customerId; }
-    public void setCustomerId(int customerId) { this.customerId = customerId; }
-    public int getPetId() { return petId; }
-    public void setPetId(int petId) { this.petId = petId; }
-    public int getDoctorId() { return doctorId; }
-    public void setDoctorId(int doctorId) { this.doctorId = doctorId; }
-    public RecordType getMedicalRecordType() { return medicalRecordType; }
-    public void setMedicalRecordType(RecordType medicalRecordType) { this.medicalRecordType = medicalRecordType; }
-    public Date getMedicalRecordVisitDate() { return medicalRecordVisitDate; }
-    public void setMedicalRecordVisitDate(Date medicalRecordVisitDate) { this.medicalRecordVisitDate = medicalRecordVisitDate; }
-    public String getMedicalRecordSummary() { return medicalRecordSummary; }
-    public void setMedicalRecordSummary(String medicalRecordSummary) { this.medicalRecordSummary = medicalRecordSummary; }
-    public String getMedicalRecordDetails() { return medicalRecordDetails; }
-    public void setMedicalRecordDetails(String medicalRecordDetails) { this.medicalRecordDetails = medicalRecordDetails; }
+    public int getMedicalRecordId() {
+        return medicalRecordId;
+    }
+
+    public void setMedicalRecordId(int medicalRecordId) {
+        this.medicalRecordId = medicalRecordId;
+    }
+
+    public int getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
+    }
+
+    public int getPetId() {
+        return petId;
+    }
+
+    public void setPetId(int petId) {
+        this.petId = petId;
+    }
+
+    public int getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(int doctorId) {
+        this.doctorId = doctorId;
+    }
+
+    public RecordType getMedicalRecordType() {
+        return medicalRecordType;
+    }
+
+    public void setMedicalRecordType(RecordType medicalRecordType) {
+        this.medicalRecordType = medicalRecordType;
+    }
+
+    public Date getMedicalRecordVisitDate() {
+        return medicalRecordVisitDate;
+    }
+
+    public void setMedicalRecordVisitDate(Date medicalRecordVisitDate) {
+        this.medicalRecordVisitDate = medicalRecordVisitDate;
+    }
+
+    public String getMedicalRecordSummary() {
+        return medicalRecordSummary;
+    }
+
+    public void setMedicalRecordSummary(String medicalRecordSummary) {
+        this.medicalRecordSummary = medicalRecordSummary;
+    }
+
+    public String getMedicalRecordDetails() {
+        return medicalRecordDetails;
+    }
+
+    public void setMedicalRecordDetails(String medicalRecordDetails) {
+        this.medicalRecordDetails = medicalRecordDetails;
+    }
 }

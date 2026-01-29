@@ -1,8 +1,6 @@
 package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import com.petcare.util.EmojiFontHelper;
-import com.petcare.util.ThemeManager;
 import com.petcare.model.domain.Appointment;
 import com.petcare.model.domain.ServiceType;
 import com.petcare.model.exception.PetcareException;
@@ -11,26 +9,15 @@ import com.petcare.service.CustomerService;
 import com.petcare.service.DoctorService;
 import com.petcare.service.PetService;
 import com.petcare.service.ServiceTypeService;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
+import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.ThemeManager;
+
+import javax.swing.*;
+import java.awt.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 
 /**
  * Dialog for adding/editing appointment
@@ -49,7 +36,7 @@ public class AddEditAppointmentDialog extends JDialog {
     private JButton cancelButton;
     private boolean saved = false;
     private Appointment appointment;
-    
+
     public AddEditAppointmentDialog(JDialog parent, Appointment appointment) {
         super(parent, true);
         this.appointment = appointment;
@@ -57,7 +44,7 @@ public class AddEditAppointmentDialog extends JDialog {
         loadCustomers();
         loadDoctors();
         loadServiceTypes();
-        
+
         if (appointment != null) {
             loadAppointmentData();
             setTitle("Sửa lịch hẹn");
@@ -65,18 +52,18 @@ public class AddEditAppointmentDialog extends JDialog {
             setTitle("Thêm lịch hẹn mới");
         }
     }
-    
+
     private void initComponents() {
         setSize(600, 500);
         setLocationRelativeTo(getParent());
         setLayout(new BorderLayout());
         getContentPane().setBackground(ThemeManager.getContentBackground());
-        
+
         // Form panel
         JPanel formPanel = new JPanel(new GridLayout(0, 2, 15, 15));
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         formPanel.setBackground(ThemeManager.getContentBackground());
-        
+
         // Customer
         formPanel.add(createLabel("Khách hàng *:"));
         customerCombo = new JComboBox<>();
@@ -86,7 +73,7 @@ public class AddEditAppointmentDialog extends JDialog {
         customerCombo.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         customerCombo.addActionListener(e -> loadPetsByCustomer());
         formPanel.add(customerCombo);
-        
+
         // Pet
         formPanel.add(createLabel("Thú cưng *:"));
         petCombo = new JComboBox<>();
@@ -95,7 +82,7 @@ public class AddEditAppointmentDialog extends JDialog {
         petCombo.setForeground(ThemeManager.getTextFieldForeground());
         petCombo.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         formPanel.add(petCombo);
-        
+
         // Doctor
         formPanel.add(createLabel("Bác sĩ:"));
         doctorCombo = new JComboBox<>();
@@ -104,7 +91,7 @@ public class AddEditAppointmentDialog extends JDialog {
         doctorCombo.setForeground(ThemeManager.getTextFieldForeground());
         doctorCombo.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         formPanel.add(doctorCombo);
-        
+
         // Service
         formPanel.add(createLabel("Dịch vụ:"));
         serviceCombo = new JComboBox<>();
@@ -113,7 +100,7 @@ public class AddEditAppointmentDialog extends JDialog {
         serviceCombo.setForeground(ThemeManager.getTextFieldForeground());
         serviceCombo.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         formPanel.add(serviceCombo);
-        
+
         // Type
         formPanel.add(createLabel("Loại *:"));
         typeCombo = new JComboBox<>();
@@ -125,19 +112,19 @@ public class AddEditAppointmentDialog extends JDialog {
         typeCombo.addItem("Spa");
         typeCombo.addItem("Tiêm chủng");
         formPanel.add(typeCombo);
-        
+
         // Appointment Date
         formPanel.add(createLabel("Ngày hẹn * (dd/MM/yyyy):"));
         appointmentDateField = createTextField();
         appointmentDateField.putClientProperty("JTextField.placeholderText", "dd/MM/yyyy");
         formPanel.add(appointmentDateField);
-        
+
         // Appointment Time
         formPanel.add(createLabel("Giờ hẹn * (HH:mm):"));
         appointmentTimeField = createTextField();
         appointmentTimeField.putClientProperty("JTextField.placeholderText", "HH:mm");
         formPanel.add(appointmentTimeField);
-        
+
         // Status
         formPanel.add(createLabel("Trạng thái:"));
         statusCombo = new JComboBox<>();
@@ -150,7 +137,7 @@ public class AddEditAppointmentDialog extends JDialog {
         statusCombo.addItem("Hoàn thành");
         statusCombo.addItem("Đã hủy");
         formPanel.add(statusCombo);
-        
+
         // Notes
         formPanel.add(createLabel("Ghi chú:"));
         notesArea = new JTextArea(3, 20);
@@ -158,19 +145,19 @@ public class AddEditAppointmentDialog extends JDialog {
         notesArea.setBackground(ThemeManager.getTextFieldBackground());
         notesArea.setForeground(ThemeManager.getTextFieldForeground());
         notesArea.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(5, 5, 5, 5)
+                BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)
         ));
         notesArea.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         formPanel.add(notesArea);
-        
+
         add(formPanel, BorderLayout.CENTER);
-        
+
         // Button panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
         buttonPanel.setBackground(ThemeManager.getContentBackground());
-        
+
         saveButton = new JButton(EmojiFontHelper.withEmoji("💾", "Lưu"));
         saveButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         saveButton.setBackground(new Color(139, 69, 19));
@@ -179,7 +166,7 @@ public class AddEditAppointmentDialog extends JDialog {
         saveButton.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         saveButton.addActionListener(e -> saveAppointment());
         buttonPanel.add(saveButton);
-        
+
         cancelButton = new JButton(EmojiFontHelper.withEmoji("❌", "Hủy"));
         cancelButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         cancelButton.setBackground(ThemeManager.getButtonBackground());
@@ -187,30 +174,30 @@ public class AddEditAppointmentDialog extends JDialog {
         cancelButton.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         cancelButton.addActionListener(e -> dispose());
         buttonPanel.add(cancelButton);
-        
+
         add(buttonPanel, BorderLayout.SOUTH);
     }
-    
+
     private JLabel createLabel(String text) {
         JLabel label = new JLabel(text);
         label.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         label.setForeground(ThemeManager.getTitleForeground());
         return label;
     }
-    
+
     private JTextField createTextField() {
         JTextField field = new JTextField();
         field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         field.setBackground(ThemeManager.getTextFieldBackground());
         field.setForeground(ThemeManager.getTextFieldForeground());
         field.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+                BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         field.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         return field;
     }
-    
+
     private void loadCustomers() {
         customerCombo.removeAllItems();
         customerCombo.addItem("-- Chọn khách hàng --");
@@ -249,7 +236,7 @@ public class AddEditAppointmentDialog extends JDialog {
             ex.printStackTrace();
         }
     }
-    
+
     private void loadServiceTypes() {
         serviceCombo.removeAllItems();
         serviceCombo.addItem("-- Chọn dịch vụ (tùy chọn) --");
@@ -261,7 +248,7 @@ public class AddEditAppointmentDialog extends JDialog {
             ex.printStackTrace();
         }
     }
-    
+
     private void loadAppointmentData() {
         if (appointment != null) {
             // Set customer
@@ -273,7 +260,7 @@ public class AddEditAppointmentDialog extends JDialog {
                     break;
                 }
             }
-            
+
             // Set pet
             for (int i = 0; i < petCombo.getItemCount(); i++) {
                 String item = petCombo.getItemAt(i);
@@ -282,7 +269,7 @@ public class AddEditAppointmentDialog extends JDialog {
                     break;
                 }
             }
-            
+
             // Set doctor
             if (appointment.getDoctorId() != null) {
                 for (int i = 0; i < doctorCombo.getItemCount(); i++) {
@@ -293,7 +280,7 @@ public class AddEditAppointmentDialog extends JDialog {
                     }
                 }
             }
-            
+
             // Set service
             if (appointment.getServiceTypeId() != null) {
                 for (int i = 0; i < serviceCombo.getItemCount(); i++) {
@@ -304,12 +291,12 @@ public class AddEditAppointmentDialog extends JDialog {
                     }
                 }
             }
-            
+
             // Set type
             if (appointment.getAppointmentType() != null) {
                 typeCombo.setSelectedItem(appointment.getAppointmentType().getLabel());
             }
-            
+
             // Set date and time
             if (appointment.getAppointmentDate() != null) {
                 SimpleDateFormat dateSdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -317,16 +304,16 @@ public class AddEditAppointmentDialog extends JDialog {
                 appointmentDateField.setText(dateSdf.format(appointment.getAppointmentDate()));
                 appointmentTimeField.setText(timeSdf.format(appointment.getAppointmentDate()));
             }
-            
+
             // Set status
             if (appointment.getStatus() != null) {
                 statusCombo.setSelectedItem(appointment.getStatus().getLabel());
             }
-            
+
             notesArea.setText(appointment.getNotes() != null ? appointment.getNotes() : "");
         }
     }
-    
+
     private void saveAppointment() {
         // Validation
         if (customerCombo.getSelectedIndex() == 0) {
@@ -334,55 +321,55 @@ public class AddEditAppointmentDialog extends JDialog {
             customerCombo.requestFocus();
             return;
         }
-        
+
         if (petCombo.getSelectedIndex() == 0) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn thú cưng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             petCombo.requestFocus();
             return;
         }
-        
+
         if (typeCombo.getSelectedIndex() == -1) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn loại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             typeCombo.requestFocus();
             return;
         }
-        
+
         if (appointmentDateField.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập ngày hẹn!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             appointmentDateField.requestFocus();
             return;
         }
-        
+
         if (appointmentTimeField.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập giờ hẹn!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             appointmentTimeField.requestFocus();
             return;
         }
-        
+
         try {
             // Get IDs
             String customerSelected = (String) customerCombo.getSelectedItem();
             int customerId = Integer.parseInt(customerSelected.split(" - ")[0]);
-            
+
             String petSelected = (String) petCombo.getSelectedItem();
             int petId = Integer.parseInt(petSelected.split(" - ")[0]);
-            
+
             Integer doctorId = null;
             if (doctorCombo.getSelectedIndex() > 0) {
                 String doctorSelected = (String) doctorCombo.getSelectedItem();
                 doctorId = Integer.parseInt(doctorSelected.split(" - ")[0]);
             }
-            
+
             Integer serviceTypeId = null;
             if (serviceCombo.getSelectedIndex() > 0) {
                 String serviceSelected = (String) serviceCombo.getSelectedItem();
                 serviceTypeId = Integer.parseInt(serviceSelected.split(" - ")[0]);
             }
-            
+
             String typeStr = (String) typeCombo.getSelectedItem();
             String statusLabel = (String) statusCombo.getSelectedItem();
             String statusCode = getStatusCodeFromLabel(statusLabel);
-            
+
             // Parse date and time
             SimpleDateFormat dateSdf = new SimpleDateFormat("dd/MM/yyyy");
             SimpleDateFormat timeSdf = new SimpleDateFormat("HH:mm");
@@ -390,7 +377,7 @@ public class AddEditAppointmentDialog extends JDialog {
             try {
                 Date date = dateSdf.parse(appointmentDateField.getText().trim());
                 Date time = timeSdf.parse(appointmentTimeField.getText().trim());
-                
+
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(date);
                 Calendar timeCal = Calendar.getInstance();
@@ -398,15 +385,15 @@ public class AddEditAppointmentDialog extends JDialog {
                 cal.set(Calendar.HOUR_OF_DAY, timeCal.get(Calendar.HOUR_OF_DAY));
                 cal.set(Calendar.MINUTE, timeCal.get(Calendar.MINUTE));
                 cal.set(Calendar.SECOND, 0);
-                
+
                 appointmentDate = cal.getTime();
             } catch (ParseException ex) {
-                JOptionPane.showMessageDialog(this, 
-                    "Ngày hoặc giờ không đúng định dạng!", 
-                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        "Ngày hoặc giờ không đúng định dạng!",
+                        "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            
+
             Appointment app = appointment != null ? appointment : new Appointment();
             app.setCustomerId(customerId);
             app.setPetId(petId);
@@ -439,14 +426,19 @@ public class AddEditAppointmentDialog extends JDialog {
 
     private String getStatusCodeFromLabel(String label) {
         switch (label) {
-            case "Chờ xác nhận": return "pending";
-            case "Đã xác nhận": return "confirmed";
-            case "Hoàn thành": return "completed";
-            case "Đã hủy": return "cancelled";
-            default: return "pending";
+            case "Chờ xác nhận":
+                return "pending";
+            case "Đã xác nhận":
+                return "confirmed";
+            case "Hoàn thành":
+                return "completed";
+            case "Đã hủy":
+                return "cancelled";
+            default:
+                return "pending";
         }
     }
-    
+
     public boolean isSaved() {
         return saved;
     }

@@ -1,30 +1,19 @@
 package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import com.petcare.util.EmojiFontHelper;
-import com.petcare.util.ThemeManager;
 import com.petcare.model.domain.MedicalRecord;
 import com.petcare.service.CustomerService;
 import com.petcare.service.DoctorService;
 import com.petcare.service.MedicalRecordService;
 import com.petcare.service.PetService;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
+import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.ThemeManager;
+
+import javax.swing.*;
+import java.awt.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 
 /**
  * Dialog for adding/editing medical record
@@ -41,14 +30,14 @@ public class AddEditMedicalRecordDialog extends JDialog {
     private JButton cancelButton;
     private boolean saved = false;
     private MedicalRecord record;
-    
+
     public AddEditMedicalRecordDialog(JDialog parent, MedicalRecord record) {
         super(parent, true);
         this.record = record;
         initComponents();
         loadCustomers();
         loadDoctors();
-        
+
         if (record != null) {
             loadRecordData();
             setTitle("Sửa hồ sơ khám bệnh");
@@ -56,18 +45,18 @@ public class AddEditMedicalRecordDialog extends JDialog {
             setTitle("Thêm hồ sơ khám bệnh mới");
         }
     }
-    
+
     private void initComponents() {
         setSize(600, 550);
         setLocationRelativeTo(getParent());
         setLayout(new BorderLayout());
         getContentPane().setBackground(ThemeManager.getContentBackground());
-        
+
         // Form panel
         JPanel formPanel = new JPanel(new GridLayout(0, 2, 15, 15));
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         formPanel.setBackground(ThemeManager.getContentBackground());
-        
+
         // Customer
         formPanel.add(createLabel("Khách hàng *:"));
         customerCombo = new JComboBox<>();
@@ -77,7 +66,7 @@ public class AddEditMedicalRecordDialog extends JDialog {
         customerCombo.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         customerCombo.addActionListener(e -> loadPetsByCustomer());
         formPanel.add(customerCombo);
-        
+
         // Pet
         formPanel.add(createLabel("Thú cưng *:"));
         petCombo = new JComboBox<>();
@@ -86,7 +75,7 @@ public class AddEditMedicalRecordDialog extends JDialog {
         petCombo.setForeground(ThemeManager.getTextFieldForeground());
         petCombo.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         formPanel.add(petCombo);
-        
+
         // Doctor
         formPanel.add(createLabel("Bác sĩ *:"));
         doctorCombo = new JComboBox<>();
@@ -95,7 +84,7 @@ public class AddEditMedicalRecordDialog extends JDialog {
         doctorCombo.setForeground(ThemeManager.getTextFieldForeground());
         doctorCombo.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         formPanel.add(doctorCombo);
-        
+
         // Type
         formPanel.add(createLabel("Loại *:"));
         typeCombo = new JComboBox<>();
@@ -107,13 +96,13 @@ public class AddEditMedicalRecordDialog extends JDialog {
         typeCombo.addItem("Điều trị");
         typeCombo.addItem("Vaccine");
         formPanel.add(typeCombo);
-        
+
         // Visit Date
         formPanel.add(createLabel("Ngày khám * (dd/MM/yyyy):"));
         visitDateField = createTextField();
         visitDateField.putClientProperty("JTextField.placeholderText", "dd/MM/yyyy");
         formPanel.add(visitDateField);
-        
+
         // Summary
         formPanel.add(createLabel("Tóm tắt:"));
         summaryArea = new JTextArea(3, 20);
@@ -121,12 +110,12 @@ public class AddEditMedicalRecordDialog extends JDialog {
         summaryArea.setBackground(ThemeManager.getTextFieldBackground());
         summaryArea.setForeground(ThemeManager.getTextFieldForeground());
         summaryArea.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(5, 5, 5, 5)
+                BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)
         ));
         summaryArea.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         formPanel.add(summaryArea);
-        
+
         // Details
         formPanel.add(createLabel("Chi tiết:"));
         detailsArea = new JTextArea(4, 20);
@@ -134,19 +123,19 @@ public class AddEditMedicalRecordDialog extends JDialog {
         detailsArea.setBackground(ThemeManager.getTextFieldBackground());
         detailsArea.setForeground(ThemeManager.getTextFieldForeground());
         detailsArea.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(5, 5, 5, 5)
+                BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)
         ));
         detailsArea.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         formPanel.add(detailsArea);
-        
+
         add(formPanel, BorderLayout.CENTER);
-        
+
         // Button panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
         buttonPanel.setBackground(ThemeManager.getContentBackground());
-        
+
         saveButton = new JButton(EmojiFontHelper.withEmoji("💾", "Lưu"));
         saveButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         saveButton.setBackground(new Color(139, 69, 19));
@@ -155,7 +144,7 @@ public class AddEditMedicalRecordDialog extends JDialog {
         saveButton.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         saveButton.addActionListener(e -> saveRecord());
         buttonPanel.add(saveButton);
-        
+
         cancelButton = new JButton(EmojiFontHelper.withEmoji("❌", "Hủy"));
         cancelButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         cancelButton.setBackground(ThemeManager.getButtonBackground());
@@ -163,30 +152,30 @@ public class AddEditMedicalRecordDialog extends JDialog {
         cancelButton.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         cancelButton.addActionListener(e -> dispose());
         buttonPanel.add(cancelButton);
-        
+
         add(buttonPanel, BorderLayout.SOUTH);
     }
-    
+
     private JLabel createLabel(String text) {
         JLabel label = new JLabel(text);
         label.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         label.setForeground(ThemeManager.getTitleForeground());
         return label;
     }
-    
+
     private JTextField createTextField() {
         JTextField field = new JTextField();
         field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         field.setBackground(ThemeManager.getTextFieldBackground());
         field.setForeground(ThemeManager.getTextFieldForeground());
         field.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+                BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         field.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         return field;
     }
-    
+
     private void loadCustomers() {
         customerCombo.removeAllItems();
         customerCombo.addItem("-- Chọn khách hàng --");
@@ -225,7 +214,7 @@ public class AddEditMedicalRecordDialog extends JDialog {
             ex.printStackTrace();
         }
     }
-    
+
     private void loadRecordData() {
         if (record != null) {
             // Set customer
@@ -237,7 +226,7 @@ public class AddEditMedicalRecordDialog extends JDialog {
                     break;
                 }
             }
-            
+
             // Set pet
             for (int i = 0; i < petCombo.getItemCount(); i++) {
                 String item = petCombo.getItemAt(i);
@@ -246,7 +235,7 @@ public class AddEditMedicalRecordDialog extends JDialog {
                     break;
                 }
             }
-            
+
             // Set doctor
             for (int i = 0; i < doctorCombo.getItemCount(); i++) {
                 String item = doctorCombo.getItemAt(i);
@@ -255,23 +244,23 @@ public class AddEditMedicalRecordDialog extends JDialog {
                     break;
                 }
             }
-            
+
             // Set type
             if (record.getMedicalRecordType() != null) {
                 typeCombo.setSelectedItem(record.getMedicalRecordType().getLabel());
             }
-            
+
             // Set date
             if (record.getMedicalRecordVisitDate() != null) {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                 visitDateField.setText(sdf.format(record.getMedicalRecordVisitDate()));
             }
-            
+
             summaryArea.setText(record.getMedicalRecordSummary() != null ? record.getMedicalRecordSummary() : "");
             detailsArea.setText(record.getMedicalRecordDetails() != null ? record.getMedicalRecordDetails() : "");
         }
     }
-    
+
     private void saveRecord() {
         // Validation
         if (customerCombo.getSelectedIndex() == 0) {
@@ -279,56 +268,56 @@ public class AddEditMedicalRecordDialog extends JDialog {
             customerCombo.requestFocus();
             return;
         }
-        
+
         if (petCombo.getSelectedIndex() == 0) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn thú cưng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             petCombo.requestFocus();
             return;
         }
-        
+
         if (doctorCombo.getSelectedIndex() == 0) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn bác sĩ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             doctorCombo.requestFocus();
             return;
         }
-        
+
         if (typeCombo.getSelectedIndex() == -1) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn loại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             typeCombo.requestFocus();
             return;
         }
-        
+
         if (visitDateField.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập ngày khám!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             visitDateField.requestFocus();
             return;
         }
-        
+
         try {
             // Get IDs
             String customerSelected = (String) customerCombo.getSelectedItem();
             int customerId = Integer.parseInt(customerSelected.split(" - ")[0]);
-            
+
             String petSelected = (String) petCombo.getSelectedItem();
             int petId = Integer.parseInt(petSelected.split(" - ")[0]);
-            
+
             String doctorSelected = (String) doctorCombo.getSelectedItem();
             int doctorId = Integer.parseInt(doctorSelected.split(" - ")[0]);
-            
+
             String typeStr = (String) typeCombo.getSelectedItem();
-            
+
             // Parse date
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
             Date visitDate;
             try {
                 visitDate = sdf.parse(visitDateField.getText().trim());
             } catch (ParseException ex) {
-                JOptionPane.showMessageDialog(this, "Ngày khám không đúng định dạng (dd/MM/yyyy)!", 
-                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Ngày khám không đúng định dạng (dd/MM/yyyy)!",
+                        "Lỗi", JOptionPane.ERROR_MESSAGE);
                 visitDateField.requestFocus();
                 return;
             }
-            
+
             MedicalRecordService service = MedicalRecordService.getInstance();
             if (record == null) {
                 MedicalRecord newRecord = new MedicalRecord();
@@ -361,7 +350,7 @@ public class AddEditMedicalRecordDialog extends JDialog {
             ex.printStackTrace();
         }
     }
-    
+
     public boolean isSaved() {
         return saved;
     }

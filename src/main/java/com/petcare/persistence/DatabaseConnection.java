@@ -2,20 +2,21 @@ package com.petcare.persistence;
 
 import com.petcare.model.exception.PetcareException;
 import com.petcare.util.DatabaseConfig;
+import org.h2.tools.RunScript;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PushbackInputStream;
-import java.nio.charset.StandardCharsets;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.h2.tools.RunScript;
 
 /**
  * Quản lý kết nối DB. Cấu hình từ src/main/resources/database.properties.
@@ -34,37 +35,39 @@ public class DatabaseConnection {
     private static void initializeConnection() {
         synchronized (initLock) {
             try {
-            Class.forName(DatabaseConfig.getDriver());
-            connection = DriverManager.getConnection(
-                DatabaseConfig.getUrl(),
-                DatabaseConfig.getUser(),
-                DatabaseConfig.getPassword()
-            );
-            logger.info("Database connection established successfully (" + DatabaseConfig.getDriver() + ")");
-            if (DatabaseConfig.getDriver().contains("h2") && !schemaChecked) {
-                schemaChecked = true;
-                runH2Init(connection);
-                // RunScript có thể đóng connection; lấy connection mới cho các thao tác sau
-                if (connection == null || connection.isClosed()) {
-                    connection = DriverManager.getConnection(
+                Class.forName(DatabaseConfig.getDriver());
+                connection = DriverManager.getConnection(
                         DatabaseConfig.getUrl(),
                         DatabaseConfig.getUser(),
                         DatabaseConfig.getPassword()
-                    );
-                    logger.info("H2: new connection opened after schema/data load.");
+                );
+                logger.info("Database connection established successfully (" + DatabaseConfig.getDriver() + ")");
+                if (DatabaseConfig.getDriver().contains("h2") && !schemaChecked) {
+                    schemaChecked = true;
+                    runH2Init(connection);
+                    // RunScript có thể đóng connection; lấy connection mới cho các thao tác sau
+                    if (connection == null || connection.isClosed()) {
+                        connection = DriverManager.getConnection(
+                                DatabaseConfig.getUrl(),
+                                DatabaseConfig.getUser(),
+                                DatabaseConfig.getPassword()
+                        );
+                        logger.info("H2: new connection opened after schema/data load.");
+                    }
                 }
+            } catch (ClassNotFoundException ex) {
+                logger.log(Level.SEVERE, "JDBC Driver not found: " + DatabaseConfig.getDriver(), ex);
+                throw new RuntimeException("Failed to load JDBC Driver", ex);
+            } catch (SQLException ex) {
+                logger.log(Level.SEVERE, "Failed to establish database connection", ex);
+                throw new RuntimeException("Failed to connect to database: " + ex.getMessage(), ex);
             }
-        } catch (ClassNotFoundException ex) {
-            logger.log(Level.SEVERE, "JDBC Driver not found: " + DatabaseConfig.getDriver(), ex);
-            throw new RuntimeException("Failed to load JDBC Driver", ex);
-        } catch (SQLException ex) {
-            logger.log(Level.SEVERE, "Failed to establish database connection", ex);
-            throw new RuntimeException("Failed to connect to database: " + ex.getMessage(), ex);
-        }
         }
     }
 
-    /** H2: chạy schema-and-data-h2.sql mỗi lần start app (DROP bảng cũ, tạo mới, INSERT toàn bộ kể cả admin). */
+    /**
+     * H2: chạy schema-and-data-h2.sql mỗi lần start app (DROP bảng cũ, tạo mới, INSERT toàn bộ kể cả admin).
+     */
     private static void runH2Init(Connection conn) {
         logger.info("H2: chạy schema-and-data-h2.sql (tạo DB mới + insert dữ liệu)...");
         try (InputStream raw = DatabaseConnection.class.getClassLoader().getResourceAsStream("schema-and-data-h2.sql")) {
@@ -82,7 +85,9 @@ public class DatabaseConnection {
         }
     }
 
-    /** Bỏ BOM UTF-8 (EF BB BF) ở đầu stream nếu có, tránh lỗi cú pháp H2. */
+    /**
+     * Bỏ BOM UTF-8 (EF BB BF) ở đầu stream nếu có, tránh lỗi cú pháp H2.
+     */
     private static InputStream skipUtf8Bom(InputStream in) throws IOException {
         PushbackInputStream pin = new PushbackInputStream(in, 3);
         byte[] buf = new byte[3];
@@ -108,17 +113,17 @@ public class DatabaseConnection {
             }
             Connection real = connection;
             return (Connection) Proxy.newProxyInstance(
-                DatabaseConnection.class.getClassLoader(),
-                new Class<?>[] { Connection.class },
-                new InvocationHandler() {
-                    @Override
-                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                        if ("close".equals(method.getName())) {
-                            return null; // no-op: không đóng connection thật
+                    DatabaseConnection.class.getClassLoader(),
+                    new Class<?>[]{Connection.class},
+                    new InvocationHandler() {
+                        @Override
+                        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                            if ("close".equals(method.getName())) {
+                                return null; // no-op: không đóng connection thật
+                            }
+                            return method.invoke(real, args);
                         }
-                        return method.invoke(real, args);
-                    }
-                });
+                    });
         } catch (SQLException ex) {
             logger.log(Level.SEVERE, "Error checking connection status", ex);
             throw new PetcareException("Database connection error", ex);

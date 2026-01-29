@@ -1,32 +1,20 @@
 package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import com.petcare.util.EmojiFontHelper;
-import com.petcare.util.ThemeManager;
 import com.petcare.model.domain.Customer;
 import com.petcare.model.domain.Pet;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.service.CustomerService;
 import com.petcare.service.PetService;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
+import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.ThemeManager;
+
+import javax.swing.*;
+import java.awt.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 
 /**
  * Dialog for adding/editing pet
@@ -49,7 +37,7 @@ public class AddEditPetDialog extends JDialog {
     private Pet pet;
     private PetService petService;
     private CustomerService customerService;
-    
+
     public AddEditPetDialog(JDialog parent, Pet pet) {
         super(parent, true);
         this.pet = pet;
@@ -57,7 +45,7 @@ public class AddEditPetDialog extends JDialog {
         this.customerService = CustomerService.getInstance();
         initComponents();
         loadCustomers();
-        
+
         if (pet != null) {
             loadPetData();
             setTitle("Sửa thú cưng");
@@ -65,18 +53,18 @@ public class AddEditPetDialog extends JDialog {
             setTitle("Thêm thú cưng mới");
         }
     }
-    
+
     private void initComponents() {
         setSize(600, 550);
         setLocationRelativeTo(getParent());
         setLayout(new BorderLayout());
         getContentPane().setBackground(ThemeManager.getContentBackground());
-        
+
         // Form panel
         JPanel formPanel = new JPanel(new GridLayout(0, 2, 15, 15));
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         formPanel.setBackground(ThemeManager.getContentBackground());
-        
+
         // Customer
         formPanel.add(createLabel("Khách hàng *:"));
         customerCombo = new JComboBox<>();
@@ -85,17 +73,17 @@ public class AddEditPetDialog extends JDialog {
         customerCombo.setForeground(ThemeManager.getTextFieldForeground());
         customerCombo.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         formPanel.add(customerCombo);
-        
+
         // Name
         formPanel.add(createLabel("Tên thú cưng *:"));
         nameField = createTextField();
         formPanel.add(nameField);
-        
+
         // Species
         formPanel.add(createLabel("Loài/Giống:"));
         speciesField = createTextField();
         formPanel.add(speciesField);
-        
+
         // Gender
         formPanel.add(createLabel("Giới tính:"));
         JPanel genderPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -110,18 +98,18 @@ public class AddEditPetDialog extends JDialog {
         genderPanel.add(maleRadio);
         genderPanel.add(femaleRadio);
         formPanel.add(genderPanel);
-        
+
         // DOB
         formPanel.add(createLabel("Ngày sinh (dd/MM/yyyy):"));
         dobField = createTextField();
         dobField.putClientProperty("JTextField.placeholderText", "dd/MM/yyyy");
         formPanel.add(dobField);
-        
+
         // Weight
         formPanel.add(createLabel("Cân nặng (kg):"));
         weightField = createTextField();
         formPanel.add(weightField);
-        
+
         // Sterilization
         formPanel.add(createLabel("Triệt sản:"));
         JPanel sterilizationPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -136,7 +124,7 @@ public class AddEditPetDialog extends JDialog {
         sterilizationPanel.add(sterilizedYesRadio);
         sterilizationPanel.add(sterilizedNoRadio);
         formPanel.add(sterilizationPanel);
-        
+
         // Characteristic
         formPanel.add(createLabel("Đặc điểm:"));
         characteristicArea = new JTextArea(2, 20);
@@ -144,12 +132,12 @@ public class AddEditPetDialog extends JDialog {
         characteristicArea.setBackground(ThemeManager.getTextFieldBackground());
         characteristicArea.setForeground(ThemeManager.getTextFieldForeground());
         characteristicArea.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(5, 5, 5, 5)
+                BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)
         ));
         characteristicArea.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         formPanel.add(characteristicArea);
-        
+
         // Allergy
         formPanel.add(createLabel("Dị ứng thuốc:"));
         allergyArea = new JTextArea(2, 20);
@@ -157,19 +145,19 @@ public class AddEditPetDialog extends JDialog {
         allergyArea.setBackground(ThemeManager.getTextFieldBackground());
         allergyArea.setForeground(ThemeManager.getTextFieldForeground());
         allergyArea.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(5, 5, 5, 5)
+                BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)
         ));
         allergyArea.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         formPanel.add(allergyArea);
-        
+
         add(formPanel, BorderLayout.CENTER);
-        
+
         // Button panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
         buttonPanel.setBackground(ThemeManager.getContentBackground());
-        
+
         saveButton = new JButton(EmojiFontHelper.withEmoji("💾", "Lưu"));
         saveButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         saveButton.setBackground(new Color(139, 69, 19));
@@ -178,7 +166,7 @@ public class AddEditPetDialog extends JDialog {
         saveButton.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         saveButton.addActionListener(e -> savePet());
         buttonPanel.add(saveButton);
-        
+
         cancelButton = new JButton(EmojiFontHelper.withEmoji("❌", "Hủy"));
         cancelButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         cancelButton.setBackground(ThemeManager.getButtonBackground());
@@ -186,34 +174,34 @@ public class AddEditPetDialog extends JDialog {
         cancelButton.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         cancelButton.addActionListener(e -> dispose());
         buttonPanel.add(cancelButton);
-        
+
         add(buttonPanel, BorderLayout.SOUTH);
     }
-    
+
     private JLabel createLabel(String text) {
         JLabel label = new JLabel(text);
         label.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         label.setForeground(ThemeManager.getTitleForeground());
         return label;
     }
-    
+
     private JTextField createTextField() {
         JTextField field = new JTextField();
         field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         field.setBackground(ThemeManager.getTextFieldBackground());
         field.setForeground(ThemeManager.getTextFieldForeground());
         field.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+                BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         field.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         return field;
     }
-    
+
     private void loadCustomers() {
         customerCombo.removeAllItems();
         customerCombo.addItem("-- Chọn khách hàng --");
-        
+
         try {
             List<Customer> customers = customerService.getAllCustomers();
             for (Customer customer : customers) {
@@ -221,14 +209,14 @@ public class AddEditPetDialog extends JDialog {
                 customerCombo.addItem(display);
             }
         } catch (PetcareException ex) {
-            JOptionPane.showMessageDialog(this, 
-                "Lỗi khi tải danh sách khách hàng: " + ex.getMessage(), 
-                "Lỗi", 
-                JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "Lỗi khi tải danh sách khách hàng: " + ex.getMessage(),
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
     }
-    
+
     private void loadPetData() {
         if (pet != null) {
             // Set customer
@@ -239,10 +227,10 @@ public class AddEditPetDialog extends JDialog {
                     break;
                 }
             }
-            
+
             nameField.setText(pet.getPetName());
             speciesField.setText(pet.getPetSpecies() != null ? pet.getPetSpecies() : "");
-            
+
             // Set gender - pet.getPetGender() returns "0" or "1"
             if (pet.getPetGender() != null) {
                 if (pet.getPetGender().equals("0")) {
@@ -251,16 +239,16 @@ public class AddEditPetDialog extends JDialog {
                     femaleRadio.setSelected(true);
                 }
             }
-            
+
             if (pet.getPetDob() != null) {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                 dobField.setText(sdf.format(pet.getPetDob()));
             }
-            
+
             if (pet.getPetWeight() != null) {
                 weightField.setText(String.valueOf(pet.getPetWeight()));
             }
-            
+
             // Set sterilization - pet.getPetSterilization() returns "0" or "1"
             if (pet.getPetSterilization() != null) {
                 if (pet.getPetSterilization().equals("1")) {
@@ -269,12 +257,12 @@ public class AddEditPetDialog extends JDialog {
                     sterilizedNoRadio.setSelected(true);
                 }
             }
-            
+
             characteristicArea.setText(pet.getPetCharacteristic() != null ? pet.getPetCharacteristic() : "");
             allergyArea.setText(pet.getPetDrugAllergy() != null ? pet.getPetDrugAllergy() : "");
         }
     }
-    
+
     private void savePet() {
         // Validation
         if (customerCombo.getSelectedIndex() == 0) {
@@ -282,18 +270,18 @@ public class AddEditPetDialog extends JDialog {
             customerCombo.requestFocus();
             return;
         }
-        
+
         if (nameField.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập tên thú cưng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             nameField.requestFocus();
             return;
         }
-        
+
         try {
             // Get customer ID
             String selected = (String) customerCombo.getSelectedItem();
             int customerId = Integer.parseInt(selected.split(" - ")[0]);
-            
+
             // Parse date
             Date dob = null;
             if (!dobField.getText().trim().isEmpty()) {
@@ -301,13 +289,13 @@ public class AddEditPetDialog extends JDialog {
                     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                     dob = sdf.parse(dobField.getText().trim());
                 } catch (ParseException ex) {
-                    JOptionPane.showMessageDialog(this, "Ngày sinh không đúng định dạng (dd/MM/yyyy)!", 
-                        "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Ngày sinh không đúng định dạng (dd/MM/yyyy)!",
+                            "Lỗi", JOptionPane.ERROR_MESSAGE);
                     dobField.requestFocus();
                     return;
                 }
             }
-            
+
             // Parse weight
             Double weight = null;
             if (!weightField.getText().trim().isEmpty()) {
@@ -319,7 +307,7 @@ public class AddEditPetDialog extends JDialog {
                     return;
                 }
             }
-            
+
             // Get gender
             String gender = null;
             if (maleRadio.isSelected()) {
@@ -327,7 +315,7 @@ public class AddEditPetDialog extends JDialog {
             } else if (femaleRadio.isSelected()) {
                 gender = "1";
             }
-            
+
             // Get sterilization
             String sterilization = null;
             if (sterilizedYesRadio.isSelected()) {
@@ -335,27 +323,27 @@ public class AddEditPetDialog extends JDialog {
             } else if (sterilizedNoRadio.isSelected()) {
                 sterilization = "0";
             }
-            
+
             // Create Pet domain model - validation will happen in setters
             Pet petToSave;
             if (pet == null) {
                 // Create new pet
                 petToSave = new Pet(
-                    customerId,
-                    nameField.getText().trim(),
-                    speciesField.getText().trim().isEmpty() ? null : speciesField.getText().trim(),
-                    gender,
-                    dob,
-                    weight,
-                    sterilization,
-                    characteristicArea.getText().trim().isEmpty() ? null : characteristicArea.getText().trim(),
-                    allergyArea.getText().trim().isEmpty() ? null : allergyArea.getText().trim()
+                        customerId,
+                        nameField.getText().trim(),
+                        speciesField.getText().trim().isEmpty() ? null : speciesField.getText().trim(),
+                        gender,
+                        dob,
+                        weight,
+                        sterilization,
+                        characteristicArea.getText().trim().isEmpty() ? null : characteristicArea.getText().trim(),
+                        allergyArea.getText().trim().isEmpty() ? null : allergyArea.getText().trim()
                 );
-                
+
                 // Save via service
                 petService.createPet(petToSave);
-                JOptionPane.showMessageDialog(this, "Thêm thú cưng thành công!", "Thành công", 
-                    JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Thêm thú cưng thành công!", "Thành công",
+                        JOptionPane.INFORMATION_MESSAGE);
                 saved = true;
                 dispose();
             } else {
@@ -369,11 +357,11 @@ public class AddEditPetDialog extends JDialog {
                 pet.setPetSterilization(sterilization);
                 pet.setPetCharacteristic(characteristicArea.getText().trim().isEmpty() ? null : characteristicArea.getText().trim());
                 pet.setPetDrugAllergy(allergyArea.getText().trim().isEmpty() ? null : allergyArea.getText().trim());
-                
+
                 // Save via service
                 petService.updatePet(pet);
-                JOptionPane.showMessageDialog(this, "Cập nhật thú cưng thành công!", "Thành công", 
-                    JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Cập nhật thú cưng thành công!", "Thành công",
+                        JOptionPane.INFORMATION_MESSAGE);
                 saved = true;
                 dispose();
             }
@@ -385,7 +373,7 @@ public class AddEditPetDialog extends JDialog {
             ex.printStackTrace();
         }
     }
-    
+
     public boolean isSaved() {
         return saved;
     }

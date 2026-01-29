@@ -3,19 +3,12 @@ package com.petcare.gui.panels;
 import com.petcare.model.domain.GeneralSetting;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.service.GeneralSettingService;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GridLayout;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
 import com.petcare.util.ThemeManager;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Settings Management Panel - uses GeneralSettingService only
@@ -52,8 +45,8 @@ public class SettingsManagementPanel extends JPanel {
         headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(ThemeManager.getHeaderBackground());
         headerPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(15, 20, 15, 20)
+                BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(15, 20, 15, 20)
         ));
 
         titleLabel = new JLabel("Cài đặt Hệ thống");
@@ -142,8 +135,8 @@ public class SettingsManagementPanel extends JPanel {
         if (headerPanel != null) {
             headerPanel.setBackground(ThemeManager.getHeaderBackground());
             headerPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
-                BorderFactory.createEmptyBorder(15, 20, 15, 20)
+                    BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
+                    BorderFactory.createEmptyBorder(15, 20, 15, 20)
             ));
         }
         if (titleLabel != null) titleLabel.setForeground(ThemeManager.getTitleForeground());
@@ -174,8 +167,8 @@ public class SettingsManagementPanel extends JPanel {
         JTextField field = new JTextField();
         field.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         field.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(220, 220, 220)),
-            BorderFactory.createEmptyBorder(8, 12, 8, 12)
+                BorderFactory.createLineBorder(new Color(220, 220, 220)),
+                BorderFactory.createEmptyBorder(8, 12, 8, 12)
         ));
         return field;
     }

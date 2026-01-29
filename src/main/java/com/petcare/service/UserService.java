@@ -5,6 +5,7 @@ import com.petcare.model.entity.UserEntity;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.repository.IUserRepository;
 import com.petcare.repository.UserRepository;
+
 import java.security.MessageDigest;
 import java.util.List;
 import java.util.stream.Collectors;

@@ -16,16 +16,51 @@ public class TreatmentCourseEntity {
     public TreatmentCourseEntity() {
     }
 
-    public int getTreatmentCourseId() { return treatmentCourseId; }
-    public void setTreatmentCourseId(int treatmentCourseId) { this.treatmentCourseId = treatmentCourseId; }
-    public int getCustomerId() { return customerId; }
-    public void setCustomerId(int customerId) { this.customerId = customerId; }
-    public int getPetId() { return petId; }
-    public void setPetId(int petId) { this.petId = petId; }
-    public Date getStartDate() { return startDate; }
-    public void setStartDate(Date startDate) { this.startDate = startDate; }
-    public Date getEndDate() { return endDate; }
-    public void setEndDate(Date endDate) { this.endDate = endDate; }
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public int getTreatmentCourseId() {
+        return treatmentCourseId;
+    }
+
+    public void setTreatmentCourseId(int treatmentCourseId) {
+        this.treatmentCourseId = treatmentCourseId;
+    }
+
+    public int getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
+    }
+
+    public int getPetId() {
+        return petId;
+    }
+
+    public void setPetId(int petId) {
+        this.petId = petId;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

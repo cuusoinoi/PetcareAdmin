@@ -48,8 +48,19 @@ public final class DatabaseConfig {
         }
     }
 
-    public static String getDriver() { return driver; }
-    public static String getUrl() { return url; }
-    public static String getUser() { return user; }
-    public static String getPassword() { return password; }
+    public static String getDriver() {
+        return driver;
+    }
+
+    public static String getUrl() {
+        return url;
+    }
+
+    public static String getUser() {
+        return user;
+    }
+
+    public static String getPassword() {
+        return password;
+    }
 }

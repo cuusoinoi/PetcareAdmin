@@ -1,6 +1,7 @@
 package com.petcare.model.domain;
 
 import com.petcare.model.exception.PetcareException;
+
 import java.util.Date;
 import java.util.Objects;
 
@@ -19,20 +20,20 @@ public class Pet {
     private String petSterilization; // "0" = chưa triệt sản, "1" = đã triệt sản
     private String petCharacteristic;
     private String petDrugAllergy;
-    
+
     /**
      * Default constructor
      */
     public Pet() {
     }
-    
+
     /**
      * Constructor with validation
      */
     public Pet(int customerId, String petName, String petSpecies,
-              String petGender, Date petDob, Double petWeight,
-              String petSterilization, String petCharacteristic, String petDrugAllergy) 
-              throws PetcareException {
+               String petGender, Date petDob, Double petWeight,
+               String petSterilization, String petCharacteristic, String petDrugAllergy)
+            throws PetcareException {
         setCustomerId(customerId);
         setPetName(petName);
         setPetSpecies(petSpecies);
@@ -43,21 +44,21 @@ public class Pet {
         setPetCharacteristic(petCharacteristic);
         setPetDrugAllergy(petDrugAllergy);
     }
-    
+
     // Getters and Setters with validation
-    
+
     public int getPetId() {
         return petId;
     }
-    
+
     public void setPetId(int petId) {
         this.petId = petId;
     }
-    
+
     public int getCustomerId() {
         return customerId;
     }
-    
+
     /**
      * Set customer ID with validation
      */
@@ -67,11 +68,11 @@ public class Pet {
         }
         this.customerId = customerId;
     }
-    
+
     public String getPetName() {
         return petName;
     }
-    
+
     /**
      * Set pet name with validation
      */
@@ -84,11 +85,11 @@ public class Pet {
         }
         this.petName = petName.trim();
     }
-    
+
     public String getPetSpecies() {
         return petSpecies;
     }
-    
+
     /**
      * Set pet species with validation
      */
@@ -98,11 +99,11 @@ public class Pet {
         }
         this.petSpecies = petSpecies != null ? petSpecies.trim() : null;
     }
-    
+
     public String getPetGender() {
         return petGender;
     }
-    
+
     /**
      * Set pet gender with validation
      */
@@ -110,8 +111,8 @@ public class Pet {
         if (petGender != null && !petGender.trim().isEmpty()) {
             String gender = petGender.trim();
             // Accept: "0" (Đực), "1" (Cái), or Vietnamese labels
-            if (!gender.equals("0") && !gender.equals("1") && 
-                !gender.equals("Đực") && !gender.equals("Cái")) {
+            if (!gender.equals("0") && !gender.equals("1") &&
+                    !gender.equals("Đực") && !gender.equals("Cái")) {
                 throw new PetcareException("Giới tính phải là: Đực (0) hoặc Cái (1)");
             }
             // Normalize to "0" or "1"
@@ -126,11 +127,11 @@ public class Pet {
             this.petGender = null;
         }
     }
-    
+
     public Date getPetDob() {
         return petDob;
     }
-    
+
     /**
      * Set pet date of birth with validation
      */
@@ -140,11 +141,11 @@ public class Pet {
         }
         this.petDob = petDob;
     }
-    
+
     public Double getPetWeight() {
         return petWeight;
     }
-    
+
     /**
      * Set pet weight with validation
      */
@@ -154,11 +155,11 @@ public class Pet {
         }
         this.petWeight = petWeight;
     }
-    
+
     public String getPetSterilization() {
         return petSterilization;
     }
-    
+
     /**
      * Set pet sterilization status
      */
@@ -166,7 +167,7 @@ public class Pet {
         if (petSterilization != null && !petSterilization.trim().isEmpty()) {
             String status = petSterilization.trim();
             if (!status.equals("0") && !status.equals("1") &&
-                !status.equals("Chưa triệt sản") && !status.equals("Đã triệt sản")) {
+                    !status.equals("Chưa triệt sản") && !status.equals("Đã triệt sản")) {
                 throw new IllegalArgumentException("Trạng thái triệt sản không hợp lệ");
             }
             // Normalize to "0" or "1"
@@ -181,29 +182,29 @@ public class Pet {
             this.petSterilization = null;
         }
     }
-    
+
     public String getPetCharacteristic() {
         return petCharacteristic;
     }
-    
+
     /**
      * Set pet characteristic
      */
     public void setPetCharacteristic(String petCharacteristic) {
         this.petCharacteristic = petCharacteristic != null ? petCharacteristic.trim() : null;
     }
-    
+
     public String getPetDrugAllergy() {
         return petDrugAllergy;
     }
-    
+
     /**
      * Set pet drug allergy
      */
     public void setPetDrugAllergy(String petDrugAllergy) {
         this.petDrugAllergy = petDrugAllergy != null ? petDrugAllergy.trim() : null;
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -211,12 +212,12 @@ public class Pet {
         Pet pet = (Pet) o;
         return petId == pet.petId;
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(petId);
     }
-    
+
     @Override
     public String toString() {
         return "Pet{" +

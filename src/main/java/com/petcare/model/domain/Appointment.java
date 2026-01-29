@@ -55,8 +55,13 @@ public class Appointment {
             this.label = label;
         }
 
-        public String getCode() { return code; }
-        public String getLabel() { return label; }
+        public String getCode() {
+            return code;
+        }
+
+        public String getLabel() {
+            return label;
+        }
 
         public static Status fromCode(String code) {
             if (code == null) return null;
@@ -70,24 +75,83 @@ public class Appointment {
     public Appointment() {
     }
 
-    public int getAppointmentId() { return appointmentId; }
-    public void setAppointmentId(int appointmentId) { this.appointmentId = appointmentId; }
-    public int getCustomerId() { return customerId; }
-    public void setCustomerId(int customerId) { this.customerId = customerId; }
-    public int getPetId() { return petId; }
-    public void setPetId(int petId) { this.petId = petId; }
-    public Integer getDoctorId() { return doctorId; }
-    public void setDoctorId(Integer doctorId) { this.doctorId = doctorId; }
-    public Integer getServiceTypeId() { return serviceTypeId; }
-    public void setServiceTypeId(Integer serviceTypeId) { this.serviceTypeId = serviceTypeId; }
-    public Date getAppointmentDate() { return appointmentDate; }
-    public void setAppointmentDate(Date appointmentDate) { this.appointmentDate = appointmentDate; }
-    public AppointmentType getAppointmentType() { return appointmentType; }
-    public void setAppointmentType(AppointmentType appointmentType) { this.appointmentType = appointmentType; }
-    public Status getStatus() { return status; }
-    public void setStatus(Status status) { this.status = status; }
-    public String getNotes() { return notes; }
-    public void setNotes(String notes) { this.notes = notes; }
-    public Date getCreatedAt() { return createdAt; }
-    public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
+    public int getAppointmentId() {
+        return appointmentId;
+    }
+
+    public void setAppointmentId(int appointmentId) {
+        this.appointmentId = appointmentId;
+    }
+
+    public int getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
+    }
+
+    public int getPetId() {
+        return petId;
+    }
+
+    public void setPetId(int petId) {
+        this.petId = petId;
+    }
+
+    public Integer getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(Integer doctorId) {
+        this.doctorId = doctorId;
+    }
+
+    public Integer getServiceTypeId() {
+        return serviceTypeId;
+    }
+
+    public void setServiceTypeId(Integer serviceTypeId) {
+        this.serviceTypeId = serviceTypeId;
+    }
+
+    public Date getAppointmentDate() {
+        return appointmentDate;
+    }
+
+    public void setAppointmentDate(Date appointmentDate) {
+        this.appointmentDate = appointmentDate;
+    }
+
+    public AppointmentType getAppointmentType() {
+        return appointmentType;
+    }
+
+    public void setAppointmentType(AppointmentType appointmentType) {
+        this.appointmentType = appointmentType;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
 }

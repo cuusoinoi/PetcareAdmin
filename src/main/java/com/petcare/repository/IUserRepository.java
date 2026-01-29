@@ -2,6 +2,7 @@ package com.petcare.repository;
 
 import com.petcare.model.entity.UserEntity;
 import com.petcare.model.exception.PetcareException;
+
 import java.util.List;
 
 /**
@@ -26,6 +27,8 @@ public interface IUserRepository {
 
     boolean existsByUsername(String username) throws PetcareException;
 
-    /** Check username exists excluding given id (for update). */
+    /**
+     * Check username exists excluding given id (for update).
+     */
     boolean existsByUsernameExcludingId(String username, int excludeId) throws PetcareException;
 }

@@ -25,8 +25,13 @@ public class TreatmentCourse {
             this.label = label;
         }
 
-        public String getCode() { return code; }
-        public String getLabel() { return label; }
+        public String getCode() {
+            return code;
+        }
+
+        public String getLabel() {
+            return label;
+        }
 
         public static Status fromCode(String code) {
             if (code == null) return null;
@@ -37,16 +42,51 @@ public class TreatmentCourse {
         }
     }
 
-    public int getTreatmentCourseId() { return treatmentCourseId; }
-    public void setTreatmentCourseId(int treatmentCourseId) { this.treatmentCourseId = treatmentCourseId; }
-    public int getCustomerId() { return customerId; }
-    public void setCustomerId(int customerId) { this.customerId = customerId; }
-    public int getPetId() { return petId; }
-    public void setPetId(int petId) { this.petId = petId; }
-    public Date getStartDate() { return startDate; }
-    public void setStartDate(Date startDate) { this.startDate = startDate; }
-    public Date getEndDate() { return endDate; }
-    public void setEndDate(Date endDate) { this.endDate = endDate; }
-    public Status getStatus() { return status; }
-    public void setStatus(Status status) { this.status = status; }
+    public int getTreatmentCourseId() {
+        return treatmentCourseId;
+    }
+
+    public void setTreatmentCourseId(int treatmentCourseId) {
+        this.treatmentCourseId = treatmentCourseId;
+    }
+
+    public int getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
+    }
+
+    public int getPetId() {
+        return petId;
+    }
+
+    public void setPetId(int petId) {
+        this.petId = petId;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 }

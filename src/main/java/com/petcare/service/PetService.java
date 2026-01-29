@@ -6,6 +6,7 @@ import com.petcare.model.entity.PetEntity;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.repository.IPetRepository;
 import com.petcare.repository.PetRepository;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,7 +18,7 @@ public class PetService {
     private static PetService instance;
     private IPetRepository repository;
     private CustomerService customerService;
-    
+
     /**
      * Private constructor for Singleton pattern
      */
@@ -25,7 +26,7 @@ public class PetService {
         this.repository = new PetRepository();
         this.customerService = CustomerService.getInstance();
     }
-    
+
     /**
      * Get singleton instance
      */
@@ -35,7 +36,7 @@ public class PetService {
         }
         return instance;
     }
-    
+
     /**
      * Set repository (for dependency injection and testing)
      */
@@ -45,7 +46,7 @@ public class PetService {
         }
         this.repository = repository;
     }
-    
+
     /**
      * Get all pets
      */
@@ -55,7 +56,7 @@ public class PetService {
                 .map(this::entityToDomain)
                 .collect(Collectors.toList());
     }
-    
+
     /**
      * Get pet by ID
      */
@@ -63,7 +64,7 @@ public class PetService {
         PetEntity entity = repository.findById(id);
         return entity != null ? entityToDomain(entity) : null;
     }
-    
+
     /**
      * Get pets by customer ID
      */
@@ -73,7 +74,7 @@ public class PetService {
                 .map(this::entityToDomain)
                 .collect(Collectors.toList());
     }
-    
+
     /**
      * Create a new pet
      * Business rules:
@@ -85,13 +86,13 @@ public class PetService {
         if (customer == null) {
             throw new PetcareException("Không tìm thấy khách hàng với ID: " + pet.getCustomerId());
         }
-        
+
         // Convert domain model to entity
         PetEntity entity = domainToEntity(pet);
-        
+
         // Insert into database
         int result = repository.insert(entity);
-        
+
         if (result > 0) {
             // Set the generated ID back to domain model
             pet.setPetId(entity.getPetId());
@@ -99,7 +100,7 @@ public class PetService {
             throw new PetcareException("Không thể tạo thú cưng mới");
         }
     }
-    
+
     /**
      * Update an existing pet
      * Business rules:
@@ -112,7 +113,7 @@ public class PetService {
         if (existing == null) {
             throw new PetcareException("Không tìm thấy thú cưng với ID: " + pet.getPetId());
         }
-        
+
         // Business rule: Check if customer exists (if changed)
         if (existing.getCustomerId() != pet.getCustomerId()) {
             Customer customer = customerService.getCustomerById(pet.getCustomerId());
@@ -120,18 +121,18 @@ public class PetService {
                 throw new PetcareException("Không tìm thấy khách hàng với ID: " + pet.getCustomerId());
             }
         }
-        
+
         // Convert domain model to entity
         PetEntity entity = domainToEntity(pet);
-        
+
         // Update in database
         int result = repository.update(entity);
-        
+
         if (result == 0) {
             throw new PetcareException("Không thể cập nhật thú cưng");
         }
     }
-    
+
     /**
      * Delete a pet
      * Business rules:
@@ -144,19 +145,19 @@ public class PetService {
         if (pet == null) {
             throw new PetcareException("Không tìm thấy thú cưng với ID: " + id);
         }
-        
+
         // TODO: Business rule - Check if pet has related records
         // This would require other repositories to check for related records
         // For now, we'll allow deletion (database foreign key constraints will handle it)
-        
+
         // Delete from database
         int result = repository.delete(id);
-        
+
         if (result == 0) {
             throw new PetcareException("Không thể xóa thú cưng");
         }
     }
-    
+
     /**
      * Convert Entity to Domain Model
      */
@@ -178,7 +179,7 @@ public class PetService {
             throw new RuntimeException("Invalid entity data: " + ex.getMessage(), ex);
         }
     }
-    
+
     /**
      * Convert Domain Model to Entity
      */

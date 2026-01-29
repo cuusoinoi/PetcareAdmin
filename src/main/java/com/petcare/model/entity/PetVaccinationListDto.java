@@ -14,18 +14,59 @@ public class PetVaccinationListDto {
     private String petName;
     private String doctorName;
 
-    public int getPetVaccinationId() { return petVaccinationId; }
-    public void setPetVaccinationId(int petVaccinationId) { this.petVaccinationId = petVaccinationId; }
-    public Date getVaccinationDate() { return vaccinationDate; }
-    public void setVaccinationDate(Date vaccinationDate) { this.vaccinationDate = vaccinationDate; }
-    public Date getNextVaccinationDate() { return nextVaccinationDate; }
-    public void setNextVaccinationDate(Date nextVaccinationDate) { this.nextVaccinationDate = nextVaccinationDate; }
-    public String getVaccineName() { return vaccineName; }
-    public void setVaccineName(String vaccineName) { this.vaccineName = vaccineName; }
-    public String getCustomerName() { return customerName; }
-    public void setCustomerName(String customerName) { this.customerName = customerName; }
-    public String getPetName() { return petName; }
-    public void setPetName(String petName) { this.petName = petName; }
-    public String getDoctorName() { return doctorName; }
-    public void setDoctorName(String doctorName) { this.doctorName = doctorName; }
+    public int getPetVaccinationId() {
+        return petVaccinationId;
+    }
+
+    public void setPetVaccinationId(int petVaccinationId) {
+        this.petVaccinationId = petVaccinationId;
+    }
+
+    public Date getVaccinationDate() {
+        return vaccinationDate;
+    }
+
+    public void setVaccinationDate(Date vaccinationDate) {
+        this.vaccinationDate = vaccinationDate;
+    }
+
+    public Date getNextVaccinationDate() {
+        return nextVaccinationDate;
+    }
+
+    public void setNextVaccinationDate(Date nextVaccinationDate) {
+        this.nextVaccinationDate = nextVaccinationDate;
+    }
+
+    public String getVaccineName() {
+        return vaccineName;
+    }
+
+    public void setVaccineName(String vaccineName) {
+        this.vaccineName = vaccineName;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public String getPetName() {
+        return petName;
+    }
+
+    public void setPetName(String petName) {
+        this.petName = petName;
+    }
+
+    public String getDoctorName() {
+        return doctorName;
+    }
+
+    public void setDoctorName(String doctorName) {
+        this.doctorName = doctorName;
+    }
 }

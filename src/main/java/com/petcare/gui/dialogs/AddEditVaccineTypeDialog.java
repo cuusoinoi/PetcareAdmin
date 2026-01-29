@@ -1,24 +1,14 @@
 package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import com.petcare.util.EmojiFontHelper;
-import com.petcare.util.ThemeManager;
 import com.petcare.model.domain.VaccineType;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.service.VaccineTypeService;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.ThemeManager;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Dialog for adding/editing vaccine type - uses VaccineTypeService and domain VaccineType only
@@ -64,8 +54,8 @@ public class AddEditVaccineTypeDialog extends JDialog {
         descriptionArea.setBackground(ThemeManager.getTextFieldBackground());
         descriptionArea.setForeground(ThemeManager.getTextFieldForeground());
         descriptionArea.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(5, 5, 5, 5)
+                BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)
         ));
         descriptionArea.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         formPanel.add(descriptionArea);
@@ -109,8 +99,8 @@ public class AddEditVaccineTypeDialog extends JDialog {
         field.setBackground(ThemeManager.getTextFieldBackground());
         field.setForeground(ThemeManager.getTextFieldForeground());
         field.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+                BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         field.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         return field;
@@ -136,7 +126,7 @@ public class AddEditVaccineTypeDialog extends JDialog {
                 newVaccine.setDescription(descriptionArea.getText().trim().isEmpty() ? null : descriptionArea.getText().trim());
                 vaccineTypeService.createVaccineType(newVaccine);
                 JOptionPane.showMessageDialog(this, "Thêm vaccine thành công!", "Thành công",
-                    JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.INFORMATION_MESSAGE);
                 saved = true;
                 dispose();
             } else {
@@ -144,7 +134,7 @@ public class AddEditVaccineTypeDialog extends JDialog {
                 vaccine.setDescription(descriptionArea.getText().trim().isEmpty() ? null : descriptionArea.getText().trim());
                 vaccineTypeService.updateVaccineType(vaccine);
                 JOptionPane.showMessageDialog(this, "Cập nhật vaccine thành công!", "Thành công",
-                    JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.INFORMATION_MESSAGE);
                 saved = true;
                 dispose();
             }

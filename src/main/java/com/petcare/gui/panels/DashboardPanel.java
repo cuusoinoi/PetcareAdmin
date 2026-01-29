@@ -1,13 +1,23 @@
 package com.petcare.gui.panels;
 
 import com.petcare.util.DashboardService;
-import com.petcare.util.ThemeManager;
 import com.petcare.util.DashboardService.ServiceRevenue;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridLayout;
+import com.petcare.util.ThemeManager;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.PiePlot;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.general.DefaultPieDataset;
+
+import javax.swing.*;
+import java.awt.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -17,33 +27,20 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.CategoryLabelPositions;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
-import org.jfree.chart.plot.PiePlot;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultPieDataset;
 
 /**
  * Dashboard Panel with stat cards and charts
  */
 public class DashboardPanel extends JPanel {
-    
+
     public DashboardPanel() {
         initComponents();
         loadData();
     }
-    
-    /** Gọi khi bấm menu Dashboard để cập nhật lại thẻ thống kê và biểu đồ. */
+
+    /**
+     * Gọi khi bấm menu Dashboard để cập nhật lại thẻ thống kê và biểu đồ.
+     */
     public void refreshData() {
         loadData();
     }
@@ -68,11 +65,11 @@ public class DashboardPanel extends JPanel {
         JPanel panel = new JPanel(new GridLayout(1, 5, 15, 0));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         panel.setBackground(ThemeManager.getContentBackground());
-        
+
         // Cards will be created in loadData()
         return panel;
     }
-    
+
     private void loadData() {
         try {
             loadDataInternal();
@@ -92,21 +89,21 @@ public class DashboardPanel extends JPanel {
         int medicalCount = DashboardService.getMedicalRecordCountThisMonth();
         int enclosureCount = DashboardService.getPetEnclosureCountThisMonth();
         long revenue = DashboardService.getInvoiceRevenueThisYear();
-        
+
         // Calculate percentage changes
         Calendar cal = Calendar.getInstance();
         Date today = cal.getTime();
         cal.add(Calendar.DAY_OF_MONTH, -1);
         Date yesterday = cal.getTime();
-        
+
         int medicalYesterday = DashboardService.getMedicalRecordCountByDate(yesterday);
         int medicalToday = DashboardService.getMedicalRecordCountByDate(today);
         double medicalPercentChange = DashboardService.calculatePercentChange(medicalYesterday, medicalToday);
-        
+
         int enclosureYesterday = DashboardService.getPetEnclosureCountByDate(yesterday);
         int enclosureToday = DashboardService.getPetEnclosureCountByDate(today);
         double enclosurePercentChange = DashboardService.calculatePercentChange(enclosureYesterday, enclosureToday);
-        
+
         cal.setTime(new Date());
         cal.add(Calendar.MONTH, -1);
         int lastMonth = cal.get(Calendar.MONTH) + 1;
@@ -114,25 +111,25 @@ public class DashboardPanel extends JPanel {
         long lastMonthRevenue = DashboardService.getInvoiceRevenueByMonth(lastMonthYear, lastMonth);
         cal.setTime(new Date());
         long thisMonthRevenue = DashboardService.getInvoiceRevenueByMonth(
-            cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1);
+                cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1);
         double revenuePercentChange = DashboardService.calculatePercentChange(lastMonthRevenue, thisMonthRevenue);
-        
+
         // Create stat cards
         JPanel cardsPanel = new JPanel(new GridLayout(1, 5, 15, 0));
         cardsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         cardsPanel.setBackground(ThemeManager.getContentBackground());
-        
-        cardsPanel.add(createStatCard("Tổng khách hàng", String.valueOf(customerCount), 
-            new Color(52, 152, 219), null));
-        cardsPanel.add(createStatCard("Tổng thú cưng", String.valueOf(petCount), 
-            new Color(155, 89, 182), null));
-        cardsPanel.add(createStatCard("Lượt khám", String.valueOf(medicalCount), 
-            new Color(231, 76, 60), medicalPercentChange));
-        cardsPanel.add(createStatCard("Lượt lưu chuồng", String.valueOf(enclosureCount), 
-            new Color(241, 196, 15), enclosurePercentChange));
-        cardsPanel.add(createStatCard("Doanh thu", formatCurrency(revenue), 
-            new Color(46, 204, 113), revenuePercentChange));
-        
+
+        cardsPanel.add(createStatCard("Tổng khách hàng", String.valueOf(customerCount),
+                new Color(52, 152, 219), null));
+        cardsPanel.add(createStatCard("Tổng thú cưng", String.valueOf(petCount),
+                new Color(155, 89, 182), null));
+        cardsPanel.add(createStatCard("Lượt khám", String.valueOf(medicalCount),
+                new Color(231, 76, 60), medicalPercentChange));
+        cardsPanel.add(createStatCard("Lượt lưu chuồng", String.valueOf(enclosureCount),
+                new Color(241, 196, 15), enclosurePercentChange));
+        cardsPanel.add(createStatCard("Doanh thu", formatCurrency(revenue),
+                new Color(46, 204, 113), revenuePercentChange));
+
         // Remove old cards panel and add new one
         removeAll();
         add(cardsPanel, BorderLayout.NORTH);
@@ -150,8 +147,8 @@ public class DashboardPanel extends JPanel {
         card.setLayout(new BorderLayout());
         card.setBackground(ThemeManager.getFormBackground());
         card.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(ThemeManager.getBorderColor(), 1),
-            BorderFactory.createEmptyBorder(15, 15, 15, 15)
+                BorderFactory.createLineBorder(ThemeManager.getBorderColor(), 1),
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)
         ));
         card.setPreferredSize(new Dimension(200, 120));
 
@@ -160,16 +157,16 @@ public class DashboardPanel extends JPanel {
         titleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         titleLabel.setForeground(ThemeManager.isDarkMode() ? new Color(0xb0b0b0) : new Color(100, 100, 100));
         card.add(titleLabel, BorderLayout.NORTH);
-        
+
         // Value and percent change
         JPanel valuePanel = new JPanel(new BorderLayout());
         valuePanel.setOpaque(false);
-        
+
         JLabel valueLabel = new JLabel(value);
         valueLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
         valueLabel.setForeground(color);
         valuePanel.add(valueLabel, BorderLayout.CENTER);
-        
+
         if (percentChange != null) {
             JLabel percentLabel = new JLabel();
             percentLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
@@ -182,12 +179,12 @@ public class DashboardPanel extends JPanel {
             }
             valuePanel.add(percentLabel, BorderLayout.EAST);
         }
-        
+
         card.add(valuePanel, BorderLayout.CENTER);
-        
+
         return card;
     }
-    
+
     private JPanel createChartsPanel() {
         JPanel panel = new JPanel(new GridLayout(2, 2, 15, 15));
         panel.setBorder(BorderFactory.createEmptyBorder(0, 20, 20, 20));
@@ -232,17 +229,17 @@ public class DashboardPanel extends JPanel {
         p.setPreferredSize(new Dimension(600, 300));
         return p;
     }
-    
+
     private ChartPanel createLineChart(String title, Map<String, Integer> data) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        
+
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM");
-        
+
         // Sort by date so chart shows chronological order
         List<String> sortedKeys = new ArrayList<>(data.keySet());
         Collections.sort(sortedKeys);
-        
+
         for (String dateKey : sortedKeys) {
             Integer value = data.get(dateKey);
             if (value == null) value = 0;
@@ -254,21 +251,21 @@ public class DashboardPanel extends JPanel {
                 dataset.addValue(value, "Lượt khám", dateKey);
             }
         }
-        
+
         JFreeChart chart = ChartFactory.createLineChart(
-            title,
-            "Ngày",
-            "Số lượt",
-            dataset,
-            PlotOrientation.VERTICAL,
-            true,
-            true,
-            false
+                title,
+                "Ngày",
+                "Số lượt",
+                dataset,
+                PlotOrientation.VERTICAL,
+                true,
+                true,
+                false
         );
-        
+
         chart.getTitle().setFont(new Font("Segoe UI", Font.BOLD, 16));
         chart.setBackgroundPaint(Color.WHITE);
-        
+
         CategoryPlot plot = chart.getCategoryPlot();
         plot.setBackgroundPaint(Color.WHITE);
         plot.setRangeGridlinePaint(new Color(220, 220, 220));
@@ -284,24 +281,24 @@ public class DashboardPanel extends JPanel {
                     maxVal = Math.max(maxVal, dataset.getValue(r, c).doubleValue());
             if (maxVal <= 0) rangeAxis.setUpperBound(5);
         }
-        
+
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new Dimension(600, 300));
         chartPanel.setBackground(ThemeManager.getFormBackground());
-        
+
         return chartPanel;
     }
-    
+
     private ChartPanel createBarChart(String title, Map<String, Map<String, Integer>> data) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        
+
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM");
-        
+
         // Sort by date so chart shows chronological order
         List<String> sortedKeys = new ArrayList<>(data.keySet());
         Collections.sort(sortedKeys);
-        
+
         for (String dateKey : sortedKeys) {
             Map<String, Integer> dayData = data.get(dateKey);
             int checkin = dayData != null ? dayData.getOrDefault("checkin", 0) : 0;
@@ -316,21 +313,21 @@ public class DashboardPanel extends JPanel {
                 dataset.addValue(checkout, "Check-out", dateKey);
             }
         }
-        
+
         JFreeChart chart = ChartFactory.createBarChart(
-            title,
-            "Ngày",
-            "Số lượt",
-            dataset,
-            PlotOrientation.VERTICAL,
-            true,
-            true,
-            false
+                title,
+                "Ngày",
+                "Số lượt",
+                dataset,
+                PlotOrientation.VERTICAL,
+                true,
+                true,
+                false
         );
-        
+
         chart.getTitle().setFont(new Font("Segoe UI", Font.BOLD, 16));
         chart.setBackgroundPaint(Color.WHITE);
-        
+
         CategoryPlot plot = chart.getCategoryPlot();
         plot.setBackgroundPaint(Color.WHITE);
         plot.setRangeGridlinePaint(new Color(220, 220, 220));
@@ -347,24 +344,24 @@ public class DashboardPanel extends JPanel {
                     maxVal = Math.max(maxVal, dataset.getValue(r, c).doubleValue());
             if (maxVal <= 0) rangeAxis.setUpperBound(5);
         }
-        
+
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new Dimension(600, 300));
         chartPanel.setBackground(ThemeManager.getFormBackground());
-        
+
         return chartPanel;
     }
-    
+
     private ChartPanel createRevenueLineChart(String title, Map<String, Long> data) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        
+
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM");
         SimpleDateFormat outputFormat = new SimpleDateFormat("MM/yyyy");
-        
+
         // Sort by month so chart shows chronological order
         List<String> sortedKeys = new ArrayList<>(data.keySet());
         Collections.sort(sortedKeys);
-        
+
         for (String monthKey : sortedKeys) {
             Long value = data.get(monthKey);
             if (value == null) value = 0L;
@@ -377,21 +374,21 @@ public class DashboardPanel extends JPanel {
                 dataset.addValue(millions, "Doanh thu (triệu VNĐ)", monthKey);
             }
         }
-        
+
         JFreeChart chart = ChartFactory.createLineChart(
-            title,
-            "Tháng",
-            "Doanh thu (triệu VNĐ)",
-            dataset,
-            PlotOrientation.VERTICAL,
-            true,
-            true,
-            false
+                title,
+                "Tháng",
+                "Doanh thu (triệu VNĐ)",
+                dataset,
+                PlotOrientation.VERTICAL,
+                true,
+                true,
+                false
         );
-        
+
         chart.getTitle().setFont(new Font("Segoe UI", Font.BOLD, 16));
         chart.setBackgroundPaint(Color.WHITE);
-        
+
         CategoryPlot plot = chart.getCategoryPlot();
         plot.setBackgroundPaint(Color.WHITE);
         plot.setRangeGridlinePaint(new Color(220, 220, 220));
@@ -405,32 +402,32 @@ public class DashboardPanel extends JPanel {
         NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
         rangeAxis.setAutoRangeIncludesZero(true);
         rangeAxis.setNumberFormatOverride(new DecimalFormat("#,##0.0"));
-        
+
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new Dimension(600, 300));
         chartPanel.setBackground(ThemeManager.getFormBackground());
-        
+
         return chartPanel;
     }
-    
+
     private ChartPanel createDoughnutChart(String title, List<ServiceRevenue> data) {
         DefaultPieDataset dataset = new DefaultPieDataset();
-        
+
         for (ServiceRevenue sr : data) {
             dataset.setValue(sr.serviceName, sr.revenue);
         }
-        
+
         JFreeChart chart = ChartFactory.createRingChart(
-            title,
-            dataset,
-            true,
-            true,
-            false
+                title,
+                dataset,
+                true,
+                true,
+                false
         );
-        
+
         chart.getTitle().setFont(new Font("Segoe UI", Font.BOLD, 16));
         chart.setBackgroundPaint(Color.WHITE);
-        
+
         PiePlot plot = (PiePlot) chart.getPlot();
         plot.setBackgroundPaint(Color.WHITE);
         plot.setLabelFont(new Font("Segoe UI", Font.PLAIN, 11));
@@ -443,10 +440,10 @@ public class DashboardPanel extends JPanel {
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new Dimension(600, 300));
         chartPanel.setBackground(ThemeManager.getFormBackground());
-        
+
         return chartPanel;
     }
-    
+
     private String formatCurrency(long amount) {
         if (amount >= 1000000000) {
             return String.format("%.1fB", amount / 1000000000.0);

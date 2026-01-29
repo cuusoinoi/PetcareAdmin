@@ -1,17 +1,21 @@
 package com.petcare.util;
 
-import java.awt.Dimension;
-import javax.swing.JButton;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Hằng số và helper cho giao diện.
  */
 public final class GUIUtil {
 
-    /** Kích thước chuẩn cho nút toolbar (Thêm, Sửa, Xóa, ...) để đồng bộ giữa các trang. */
+    /**
+     * Kích thước chuẩn cho nút toolbar (Thêm, Sửa, Xóa, ...) để đồng bộ giữa các trang.
+     */
     public static final Dimension TOOLBAR_BUTTON_SIZE = new Dimension(155, 36);
 
-    /** Nút cột bên: chiều cao bằng toolbar (36), rộng vừa icon to + chữ. */
+    /**
+     * Nút cột bên: chiều cao bằng toolbar (36), rộng vừa icon to + chữ.
+     */
     public static final Dimension SIDEBAR_BUTTON_SIZE = new Dimension(145, 36);
 
     /**
@@ -36,5 +40,6 @@ public final class GUIUtil {
         }
     }
 
-    private GUIUtil() {}
+    private GUIUtil() {
+    }
 }

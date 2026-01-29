@@ -4,24 +4,15 @@ import com.petcare.gui.dialogs.AddEditMedicineDialog;
 import com.petcare.model.domain.Medicine;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.service.MedicineService;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GridLayout;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.table.DefaultTableModel;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
 import com.petcare.util.ThemeManager;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 
 /**
  * Medicine Management Panel - uses MedicineService only
@@ -54,8 +45,8 @@ public class MedicineManagementPanel extends JPanel {
         headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(ThemeManager.getHeaderBackground());
         headerPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(15, 20, 15, 20)
+                BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(15, 20, 15, 20)
         ));
 
         titleLabel = new JLabel("Quản lý Thuốc");
@@ -90,11 +81,19 @@ public class MedicineManagementPanel extends JPanel {
         searchField.putClientProperty("JTextField.placeholderText", "Tìm theo tên thuốc, đường dùng...");
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void insertUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            public void insertUpdate(DocumentEvent e) {
+                paginationPanel.setSearchText(searchField.getText().trim());
+            }
+
             @Override
-            public void removeUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            public void removeUpdate(DocumentEvent e) {
+                paginationPanel.setSearchText(searchField.getText().trim());
+            }
+
             @Override
-            public void changedUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            public void changedUpdate(DocumentEvent e) {
+                paginationPanel.setSearchText(searchField.getText().trim());
+            }
         });
         searchPanel.add(new JLabel("Tìm kiếm:"));
         searchPanel.add(searchField);
@@ -150,8 +149,8 @@ public class MedicineManagementPanel extends JPanel {
         if (headerPanel != null) {
             headerPanel.setBackground(ThemeManager.getHeaderBackground());
             headerPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
-                BorderFactory.createEmptyBorder(15, 20, 15, 20)
+                    BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
+                    BorderFactory.createEmptyBorder(15, 20, 15, 20)
             ));
         }
         if (titleLabel != null) titleLabel.setForeground(ThemeManager.getTitleForeground());
@@ -189,17 +188,17 @@ public class MedicineManagementPanel extends JPanel {
             for (Medicine m : medicineService.getAllMedicines()) {
                 String routeLabel = getRouteLabel(m.getMedicineRoute());
                 tableModel.addRow(new Object[]{
-                    m.getMedicineId(),
-                    m.getMedicineName(),
-                    routeLabel
+                        m.getMedicineId(),
+                        m.getMedicineName(),
+                        routeLabel
                 });
             }
             if (paginationPanel != null) paginationPanel.refresh();
         } catch (PetcareException ex) {
             JOptionPane.showMessageDialog(this,
-                "Lỗi khi tải dữ liệu: " + ex.getMessage(),
-                "Lỗi",
-                JOptionPane.ERROR_MESSAGE);
+                    "Lỗi khi tải dữ liệu: " + ex.getMessage(),
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -220,9 +219,9 @@ public class MedicineManagementPanel extends JPanel {
         int selectedRow = medicineTable.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this,
-                "Vui lòng chọn thuốc cần sửa!",
-                "Thông báo",
-                JOptionPane.WARNING_MESSAGE);
+                    "Vui lòng chọn thuốc cần sửa!",
+                    "Thông báo",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
         int modelRow = medicineTable.convertRowIndexToModel(selectedRow);
@@ -245,30 +244,30 @@ public class MedicineManagementPanel extends JPanel {
         int selectedRow = medicineTable.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this,
-                "Vui lòng chọn thuốc cần xóa!",
-                "Thông báo",
-                JOptionPane.WARNING_MESSAGE);
+                    "Vui lòng chọn thuốc cần xóa!",
+                    "Thông báo",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
         int modelRow = medicineTable.convertRowIndexToModel(selectedRow);
         int medicineId = (Integer) tableModel.getValueAt(modelRow, 0);
         int confirm = JOptionPane.showConfirmDialog(this,
-            "Bạn có chắc muốn xóa thuốc này?",
-            "Xác nhận xóa",
-            JOptionPane.YES_NO_OPTION);
+                "Bạn có chắc muốn xóa thuốc này?",
+                "Xác nhận xóa",
+                JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             try {
                 medicineService.deleteMedicine(medicineId);
                 JOptionPane.showMessageDialog(this,
-                    "Xóa thuốc thành công!",
-                    "Thành công",
-                    JOptionPane.INFORMATION_MESSAGE);
+                        "Xóa thuốc thành công!",
+                        "Thành công",
+                        JOptionPane.INFORMATION_MESSAGE);
                 refreshData();
             } catch (PetcareException ex) {
                 JOptionPane.showMessageDialog(this,
-                    "Lỗi khi xóa: " + ex.getMessage(),
-                    "Lỗi",
-                    JOptionPane.ERROR_MESSAGE);
+                        "Lỗi khi xóa: " + ex.getMessage(),
+                        "Lỗi",
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
     }

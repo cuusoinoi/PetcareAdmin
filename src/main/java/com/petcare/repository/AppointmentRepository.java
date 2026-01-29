@@ -4,6 +4,7 @@ import com.petcare.model.entity.AppointmentEntity;
 import com.petcare.model.entity.AppointmentListDto;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.persistence.DatabaseConnection;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -22,14 +23,14 @@ public class AppointmentRepository implements IAppointmentRepository {
     public List<AppointmentListDto> findAllForList(String statusCodeOrNull) throws PetcareException {
         List<AppointmentListDto> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-            "SELECT a.appointment_id, a.appointment_date, a.appointment_type, " +
-            "c.customer_name, p.pet_name, d.doctor_name, st.service_name, a.status " +
-            "FROM appointments a " +
-            "INNER JOIN customers c ON a.customer_id = c.customer_id " +
-            "INNER JOIN pets p ON a.pet_id = p.pet_id " +
-            "LEFT JOIN doctors d ON a.doctor_id = d.doctor_id " +
-            "LEFT JOIN service_types st ON a.service_type_id = st.service_type_id " +
-            "WHERE 1=1"
+                "SELECT a.appointment_id, a.appointment_date, a.appointment_type, " +
+                        "c.customer_name, p.pet_name, d.doctor_name, st.service_name, a.status " +
+                        "FROM appointments a " +
+                        "INNER JOIN customers c ON a.customer_id = c.customer_id " +
+                        "INNER JOIN pets p ON a.pet_id = p.pet_id " +
+                        "LEFT JOIN doctors d ON a.doctor_id = d.doctor_id " +
+                        "LEFT JOIN service_types st ON a.service_type_id = st.service_type_id " +
+                        "WHERE 1=1"
         );
         if (statusCodeOrNull != null && !statusCodeOrNull.isEmpty()) {
             sql.append(" AND a.status = ?");

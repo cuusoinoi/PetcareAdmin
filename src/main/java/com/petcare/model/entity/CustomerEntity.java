@@ -16,20 +16,20 @@ public class CustomerEntity {
     private String customerAddress;
     private String customerNote;
     private Date createdAt;
-    
+
     /**
      * Default constructor
      */
     public CustomerEntity() {
     }
-    
+
     /**
      * Constructor with all fields
      */
-    public CustomerEntity(int customerId, String customerName, 
-                         String customerPhoneNumber, String customerEmail,
-                         String customerIdentityCard, String customerAddress, 
-                         String customerNote) {
+    public CustomerEntity(int customerId, String customerName,
+                          String customerPhoneNumber, String customerEmail,
+                          String customerIdentityCard, String customerAddress,
+                          String customerNote) {
         this.customerId = customerId;
         this.customerName = customerName;
         this.customerPhoneNumber = customerPhoneNumber;
@@ -38,73 +38,73 @@ public class CustomerEntity {
         this.customerAddress = customerAddress;
         this.customerNote = customerNote;
     }
-    
+
     // Getters and Setters
-    
+
     public int getCustomerId() {
         return customerId;
     }
-    
+
     public void setCustomerId(int customerId) {
         this.customerId = customerId;
     }
-    
+
     public String getCustomerName() {
         return customerName;
     }
-    
+
     public void setCustomerName(String customerName) {
         this.customerName = customerName;
     }
-    
+
     public String getCustomerPhoneNumber() {
         return customerPhoneNumber;
     }
-    
+
     public void setCustomerPhoneNumber(String customerPhoneNumber) {
         this.customerPhoneNumber = customerPhoneNumber;
     }
-    
+
     public String getCustomerEmail() {
         return customerEmail;
     }
-    
+
     public void setCustomerEmail(String customerEmail) {
         this.customerEmail = customerEmail;
     }
-    
+
     public String getCustomerIdentityCard() {
         return customerIdentityCard;
     }
-    
+
     public void setCustomerIdentityCard(String customerIdentityCard) {
         this.customerIdentityCard = customerIdentityCard;
     }
-    
+
     public String getCustomerAddress() {
         return customerAddress;
     }
-    
+
     public void setCustomerAddress(String customerAddress) {
         this.customerAddress = customerAddress;
     }
-    
+
     public String getCustomerNote() {
         return customerNote;
     }
-    
+
     public void setCustomerNote(String customerNote) {
         this.customerNote = customerNote;
     }
-    
+
     public Date getCreatedAt() {
         return createdAt;
     }
-    
+
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
-    
+
     @Override
     public String toString() {
         return "CustomerEntity{" +

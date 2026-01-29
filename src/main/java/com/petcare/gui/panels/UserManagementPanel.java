@@ -5,24 +5,15 @@ import com.petcare.gui.dialogs.ChangePasswordDialog;
 import com.petcare.model.domain.User;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.service.UserService;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GridLayout;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.table.DefaultTableModel;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
 import com.petcare.util.ThemeManager;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 
 /**
  * User Management Panel - uses UserService only (no direct Database)
@@ -57,8 +48,8 @@ public class UserManagementPanel extends JPanel {
         headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(ThemeManager.getHeaderBackground());
         headerPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(15, 20, 15, 20)
+                BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(15, 20, 15, 20)
         ));
 
         titleLabel = new JLabel("Quản lý Người dùng");
@@ -93,11 +84,19 @@ public class UserManagementPanel extends JPanel {
         searchField.putClientProperty("JTextField.placeholderText", "Tìm theo username, họ tên, vai trò...");
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void insertUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            public void insertUpdate(DocumentEvent e) {
+                paginationPanel.setSearchText(searchField.getText().trim());
+            }
+
             @Override
-            public void removeUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            public void removeUpdate(DocumentEvent e) {
+                paginationPanel.setSearchText(searchField.getText().trim());
+            }
+
             @Override
-            public void changedUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            public void changedUpdate(DocumentEvent e) {
+                paginationPanel.setSearchText(searchField.getText().trim());
+            }
         });
         searchPanel.add(new JLabel("Tìm kiếm:"));
         searchPanel.add(searchField);
@@ -159,8 +158,8 @@ public class UserManagementPanel extends JPanel {
         if (headerPanel != null) {
             headerPanel.setBackground(ThemeManager.getHeaderBackground());
             headerPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
-                BorderFactory.createEmptyBorder(15, 20, 15, 20)
+                    BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
+                    BorderFactory.createEmptyBorder(15, 20, 15, 20)
             ));
         }
         if (titleLabel != null) titleLabel.setForeground(ThemeManager.getTitleForeground());
@@ -199,18 +198,18 @@ public class UserManagementPanel extends JPanel {
             for (User user : userService.getAllUsers()) {
                 String roleLabel = user.getRole() == User.Role.ADMIN ? "Quản trị viên" : "Nhân viên";
                 tableModel.addRow(new Object[]{
-                    user.getUserId(),
-                    user.getUsername(),
-                    user.getFullname(),
-                    roleLabel
+                        user.getUserId(),
+                        user.getUsername(),
+                        user.getFullname(),
+                        roleLabel
                 });
             }
             if (paginationPanel != null) paginationPanel.refresh();
         } catch (PetcareException ex) {
             JOptionPane.showMessageDialog(this,
-                "Lỗi khi tải dữ liệu: " + ex.getMessage(),
-                "Lỗi",
-                JOptionPane.ERROR_MESSAGE);
+                    "Lỗi khi tải dữ liệu: " + ex.getMessage(),
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -226,9 +225,9 @@ public class UserManagementPanel extends JPanel {
         int selectedRow = userTable.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this,
-                "Vui lòng chọn người dùng cần sửa!",
-                "Thông báo",
-                JOptionPane.WARNING_MESSAGE);
+                    "Vui lòng chọn người dùng cần sửa!",
+                    "Thông báo",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
         int modelRow = userTable.convertRowIndexToModel(selectedRow);
@@ -251,9 +250,9 @@ public class UserManagementPanel extends JPanel {
         int selectedRow = userTable.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this,
-                "Vui lòng chọn người dùng cần đổi mật khẩu!",
-                "Thông báo",
-                JOptionPane.WARNING_MESSAGE);
+                    "Vui lòng chọn người dùng cần đổi mật khẩu!",
+                    "Thông báo",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
         int modelRow = userTable.convertRowIndexToModel(selectedRow);
@@ -266,31 +265,31 @@ public class UserManagementPanel extends JPanel {
         int selectedRow = userTable.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this,
-                "Vui lòng chọn người dùng cần xóa!",
-                "Thông báo",
-                JOptionPane.WARNING_MESSAGE);
+                    "Vui lòng chọn người dùng cần xóa!",
+                    "Thông báo",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
         int modelRow = userTable.convertRowIndexToModel(selectedRow);
         int userId = (Integer) tableModel.getValueAt(modelRow, 0);
         String username = (String) tableModel.getValueAt(modelRow, 1);
         int confirm = JOptionPane.showConfirmDialog(this,
-            "Bạn có chắc muốn xóa người dùng \"" + username + "\"?",
-            "Xác nhận xóa",
-            JOptionPane.YES_NO_OPTION);
+                "Bạn có chắc muốn xóa người dùng \"" + username + "\"?",
+                "Xác nhận xóa",
+                JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             try {
                 userService.deleteUser(userId);
                 JOptionPane.showMessageDialog(this,
-                    "Xóa người dùng thành công!",
-                    "Thành công",
-                    JOptionPane.INFORMATION_MESSAGE);
+                        "Xóa người dùng thành công!",
+                        "Thành công",
+                        JOptionPane.INFORMATION_MESSAGE);
                 refreshData();
             } catch (PetcareException ex) {
                 JOptionPane.showMessageDialog(this,
-                    "Lỗi khi xóa: " + ex.getMessage(),
-                    "Lỗi",
-                    JOptionPane.ERROR_MESSAGE);
+                        "Lỗi khi xóa: " + ex.getMessage(),
+                        "Lỗi",
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
     }

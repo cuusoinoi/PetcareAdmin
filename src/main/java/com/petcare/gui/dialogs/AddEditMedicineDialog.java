@@ -1,24 +1,14 @@
 package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import com.petcare.util.EmojiFontHelper;
-import com.petcare.util.ThemeManager;
 import com.petcare.model.domain.Medicine;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.service.MedicineService;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.ThemeManager;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Dialog for adding/editing medicine - uses MedicineService and domain Medicine only
@@ -109,8 +99,8 @@ public class AddEditMedicineDialog extends JDialog {
         field.setBackground(ThemeManager.getTextFieldBackground());
         field.setForeground(ThemeManager.getTextFieldForeground());
         field.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+                BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         field.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         return field;
@@ -145,7 +135,7 @@ public class AddEditMedicineDialog extends JDialog {
                 newMedicine.setMedicineRoute(route);
                 medicineService.createMedicine(newMedicine);
                 JOptionPane.showMessageDialog(this, "Thêm thuốc thành công!", "Thành công",
-                    JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.INFORMATION_MESSAGE);
                 saved = true;
                 dispose();
             } else {
@@ -153,7 +143,7 @@ public class AddEditMedicineDialog extends JDialog {
                 medicine.setMedicineRoute(route);
                 medicineService.updateMedicine(medicine);
                 JOptionPane.showMessageDialog(this, "Cập nhật thuốc thành công!", "Thành công",
-                    JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.INFORMATION_MESSAGE);
                 saved = true;
                 dispose();
             }

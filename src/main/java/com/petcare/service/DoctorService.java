@@ -3,8 +3,9 @@ package com.petcare.service;
 import com.petcare.model.domain.Doctor;
 import com.petcare.model.entity.DoctorEntity;
 import com.petcare.model.exception.PetcareException;
-import com.petcare.repository.IDoctorRepository;
 import com.petcare.repository.DoctorRepository;
+import com.petcare.repository.IDoctorRepository;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,14 +16,14 @@ import java.util.stream.Collectors;
 public class DoctorService {
     private static DoctorService instance;
     private IDoctorRepository repository;
-    
+
     /**
      * Private constructor for Singleton pattern
      */
     private DoctorService() {
         this.repository = new DoctorRepository();
     }
-    
+
     /**
      * Get singleton instance
      */
@@ -32,7 +33,7 @@ public class DoctorService {
         }
         return instance;
     }
-    
+
     /**
      * Set repository (for dependency injection and testing)
      */
@@ -42,7 +43,7 @@ public class DoctorService {
         }
         this.repository = repository;
     }
-    
+
     /**
      * Get all doctors
      */
@@ -52,7 +53,7 @@ public class DoctorService {
                 .map(this::entityToDomain)
                 .collect(Collectors.toList());
     }
-    
+
     /**
      * Get doctor by ID
      */
@@ -60,7 +61,7 @@ public class DoctorService {
         DoctorEntity entity = repository.findById(id);
         return entity != null ? entityToDomain(entity) : null;
     }
-    
+
     /**
      * Get doctor by phone number
      */
@@ -68,7 +69,7 @@ public class DoctorService {
         DoctorEntity entity = repository.findByPhone(phone);
         return entity != null ? entityToDomain(entity) : null;
     }
-    
+
     /**
      * Create a new doctor
      * Business rules:
@@ -79,13 +80,13 @@ public class DoctorService {
         if (repository.existsByPhone(doctor.getDoctorPhoneNumber())) {
             throw new PetcareException("Số điện thoại đã được sử dụng bởi bác sĩ khác");
         }
-        
+
         // Convert domain model to entity
         DoctorEntity entity = domainToEntity(doctor);
-        
+
         // Insert into database
         int result = repository.insert(entity);
-        
+
         if (result > 0) {
             // Set the generated ID back to domain model
             doctor.setDoctorId(entity.getDoctorId());
@@ -93,7 +94,7 @@ public class DoctorService {
             throw new PetcareException("Không thể tạo bác sĩ mới");
         }
     }
-    
+
     /**
      * Update an existing doctor
      * Business rules:
@@ -106,25 +107,25 @@ public class DoctorService {
         if (existing == null) {
             throw new PetcareException("Không tìm thấy bác sĩ với ID: " + doctor.getDoctorId());
         }
-        
+
         // Business rule: Check if phone number is already used by another doctor
         if (!existing.getDoctorPhoneNumber().equals(doctor.getDoctorPhoneNumber())) {
             if (repository.existsByPhone(doctor.getDoctorPhoneNumber())) {
                 throw new PetcareException("Số điện thoại đã được sử dụng bởi bác sĩ khác");
             }
         }
-        
+
         // Convert domain model to entity
         DoctorEntity entity = domainToEntity(doctor);
-        
+
         // Update in database
         int result = repository.update(entity);
-        
+
         if (result == 0) {
             throw new PetcareException("Không thể cập nhật bác sĩ");
         }
     }
-    
+
     /**
      * Delete a doctor
      * Business rules:
@@ -137,26 +138,26 @@ public class DoctorService {
         if (doctor == null) {
             throw new PetcareException("Không tìm thấy bác sĩ với ID: " + id);
         }
-        
+
         // TODO: Business rule - Check if doctor has related records
         // This would require other repositories to check for related records
         // For now, we'll allow deletion (database foreign key constraints will handle it)
-        
+
         // Delete from database
         int result = repository.delete(id);
-        
+
         if (result == 0) {
             throw new PetcareException("Không thể xóa bác sĩ");
         }
     }
-    
+
     /**
      * Check if doctor exists by phone number
      */
     public boolean doctorExistsByPhone(String phone) throws PetcareException {
         return repository.existsByPhone(phone);
     }
-    
+
     /**
      * Convert Entity to Domain Model
      */
@@ -174,7 +175,7 @@ public class DoctorService {
             throw new RuntimeException("Invalid entity data: " + ex.getMessage(), ex);
         }
     }
-    
+
     /**
      * Convert Domain Model to Entity
      */

@@ -5,26 +5,17 @@ import com.petcare.gui.dialogs.CheckoutDialog;
 import com.petcare.model.entity.PetEnclosureListDto;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.service.PetEnclosureService;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.table.DefaultTableModel;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
 import com.petcare.util.ThemeManager;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 /**
  * Pet Enclosure Management Panel with Check-in/Check-out
@@ -44,12 +35,12 @@ public class PetEnclosureManagementPanel extends JPanel {
     private JButton checkoutButton;
     private JButton deleteButton;
     private JButton refreshButton;
-    
+
     public PetEnclosureManagementPanel() {
         initComponents();
         loadEnclosures();
     }
-    
+
     private void initComponents() {
         setLayout(new BorderLayout());
         setBackground(ThemeManager.getContentBackground());
@@ -57,8 +48,8 @@ public class PetEnclosureManagementPanel extends JPanel {
         headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(ThemeManager.getHeaderBackground());
         headerPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(15, 20, 15, 20)
+                BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(15, 20, 15, 20)
         ));
 
         titleLabel = new JLabel("Quản lý Lưu chuồng");
@@ -68,7 +59,7 @@ public class PetEnclosureManagementPanel extends JPanel {
         add(headerPanel, BorderLayout.NORTH);
 
         String[] columns = {"ID", "Số chuồng", "Khách hàng", "Thú cưng", "Ngày Check-in",
-                           "Ngày Check-out", "Phí/ngày", "Đặt cọc", "Trạng thái"};
+                "Ngày Check-out", "Phí/ngày", "Đặt cọc", "Trạng thái"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -94,11 +85,19 @@ public class PetEnclosureManagementPanel extends JPanel {
         searchField.putClientProperty("JTextField.placeholderText", "Tìm theo số chuồng, khách hàng, thú cưng...");
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void insertUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            public void insertUpdate(DocumentEvent e) {
+                paginationPanel.setSearchText(searchField.getText().trim());
+            }
+
             @Override
-            public void removeUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            public void removeUpdate(DocumentEvent e) {
+                paginationPanel.setSearchText(searchField.getText().trim());
+            }
+
             @Override
-            public void changedUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            public void changedUpdate(DocumentEvent e) {
+                paginationPanel.setSearchText(searchField.getText().trim());
+            }
         });
         searchPanel.add(new JLabel("Tìm kiếm:"));
         searchPanel.add(searchField);
@@ -151,7 +150,7 @@ public class PetEnclosureManagementPanel extends JPanel {
         add(centerPanel, BorderLayout.CENTER);
         add(sideButtonPanel, BorderLayout.EAST);
     }
-    
+
     public void refreshData() {
         loadEnclosures();
     }
@@ -162,8 +161,8 @@ public class PetEnclosureManagementPanel extends JPanel {
         if (headerPanel != null) {
             headerPanel.setBackground(ThemeManager.getHeaderBackground());
             headerPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
-                BorderFactory.createEmptyBorder(15, 20, 15, 20)
+                    BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
+                    BorderFactory.createEmptyBorder(15, 20, 15, 20)
             ));
         }
         if (titleLabel != null) titleLabel.setForeground(ThemeManager.getTitleForeground());
@@ -209,15 +208,15 @@ public class PetEnclosureManagementPanel extends JPanel {
                 String checkInStr = dto.getCheckInDate() != null ? sdf.format(dto.getCheckInDate()) : "";
                 String checkOutStr = dto.getCheckOutDate() != null ? dateSdf.format(dto.getCheckOutDate()) : "";
                 tableModel.addRow(new Object[]{
-                    dto.getPetEnclosureId(),
-                    dto.getPetEnclosureNumber(),
-                    dto.getCustomerName() != null ? dto.getCustomerName() : "",
-                    dto.getPetName() != null ? dto.getPetName() : "",
-                    checkInStr,
-                    checkOutStr,
-                    dto.getDailyRate(),
-                    dto.getDeposit(),
-                    dto.getPetEnclosureStatus() != null ? dto.getPetEnclosureStatus() : ""
+                        dto.getPetEnclosureId(),
+                        dto.getPetEnclosureNumber(),
+                        dto.getCustomerName() != null ? dto.getCustomerName() : "",
+                        dto.getPetName() != null ? dto.getPetName() : "",
+                        checkInStr,
+                        checkOutStr,
+                        dto.getDailyRate(),
+                        dto.getDeposit(),
+                        dto.getPetEnclosureStatus() != null ? dto.getPetEnclosureStatus() : ""
                 });
             }
             if (paginationPanel != null) paginationPanel.refresh();
@@ -225,7 +224,7 @@ public class PetEnclosureManagementPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Lỗi khi tải dữ liệu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     private void showCheckInDialog() {
         AddEditPetEnclosureDialog dialog = new AddEditPetEnclosureDialog(null, null);
         dialog.setVisible(true);
@@ -233,7 +232,7 @@ public class PetEnclosureManagementPanel extends JPanel {
             refreshData();
         }
     }
-    
+
     private void showEditEnclosureDialog() {
         int selectedRow = enclosureTable.getSelectedRow();
         if (selectedRow == -1) {
@@ -255,7 +254,7 @@ public class PetEnclosureManagementPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Lỗi: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     private void showCheckoutDialog() {
         int selectedRow = enclosureTable.getSelectedRow();
         if (selectedRow == -1) {

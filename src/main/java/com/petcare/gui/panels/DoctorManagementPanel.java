@@ -4,25 +4,16 @@ import com.petcare.gui.dialogs.AddEditDoctorDialog;
 import com.petcare.model.domain.Doctor;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.service.DoctorService;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.table.DefaultTableModel;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
 import com.petcare.util.ThemeManager;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.util.List;
 
 /**
  * Doctor Management Panel with CRUD operations
@@ -42,13 +33,13 @@ public class DoctorManagementPanel extends JPanel {
     private JButton deleteButton;
     private JButton refreshButton;
     private DoctorService doctorService;
-    
+
     public DoctorManagementPanel() {
         this.doctorService = DoctorService.getInstance();
         initComponents();
         loadDoctors();
     }
-    
+
     private void initComponents() {
         setLayout(new BorderLayout());
         setBackground(ThemeManager.getContentBackground());
@@ -56,8 +47,8 @@ public class DoctorManagementPanel extends JPanel {
         headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(ThemeManager.getHeaderBackground());
         headerPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(15, 20, 15, 20)
+                BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(15, 20, 15, 20)
         ));
 
         titleLabel = new JLabel("Quản lý Bác sĩ");
@@ -66,7 +57,7 @@ public class DoctorManagementPanel extends JPanel {
         headerPanel.add(titleLabel, BorderLayout.WEST);
 
         add(headerPanel, BorderLayout.NORTH);
-        
+
         // Table
         String[] columns = {"ID", "Tên bác sĩ", "Số điện thoại", "CMND/CCCD", "Địa chỉ"};
         tableModel = new DefaultTableModel(columns, 0) {
@@ -75,7 +66,7 @@ public class DoctorManagementPanel extends JPanel {
                 return false;
             }
         };
-        
+
         doctorTable = new JTable(tableModel);
         doctorTable.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         doctorTable.setRowHeight(30);
@@ -83,7 +74,7 @@ public class DoctorManagementPanel extends JPanel {
         doctorTable.setSelectionBackground(new Color(139, 69, 19));
         doctorTable.setSelectionForeground(Color.WHITE);
         ThemeManager.applyTableTheme(doctorTable);
-        
+
         JScrollPane scrollPane = new JScrollPane(doctorTable);
         scrollPane.setBorder(null);
         searchPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 10, 8));
@@ -128,11 +119,19 @@ public class DoctorManagementPanel extends JPanel {
         paginationPanel = new TablePaginationPanel(doctorTable);
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void insertUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            public void insertUpdate(DocumentEvent e) {
+                paginationPanel.setSearchText(searchField.getText().trim());
+            }
+
             @Override
-            public void removeUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            public void removeUpdate(DocumentEvent e) {
+                paginationPanel.setSearchText(searchField.getText().trim());
+            }
+
             @Override
-            public void changedUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            public void changedUpdate(DocumentEvent e) {
+                paginationPanel.setSearchText(searchField.getText().trim());
+            }
         });
         centerPanel.add(searchPanel, BorderLayout.NORTH);
         centerPanel.add(scrollPane, BorderLayout.CENTER);
@@ -140,7 +139,7 @@ public class DoctorManagementPanel extends JPanel {
         add(centerPanel, BorderLayout.CENTER);
         add(sideButtonPanel, BorderLayout.EAST);
     }
-    
+
     public void refreshData() {
         loadDoctors();
     }
@@ -151,8 +150,8 @@ public class DoctorManagementPanel extends JPanel {
         if (headerPanel != null) {
             headerPanel.setBackground(ThemeManager.getHeaderBackground());
             headerPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
-                BorderFactory.createEmptyBorder(15, 20, 15, 20)
+                    BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
+                    BorderFactory.createEmptyBorder(15, 20, 15, 20)
             ));
         }
         if (titleLabel != null) titleLabel.setForeground(ThemeManager.getTitleForeground());
@@ -186,30 +185,30 @@ public class DoctorManagementPanel extends JPanel {
 
     private void loadDoctors() {
         tableModel.setRowCount(0);
-        
+
         try {
             List<Doctor> doctors = doctorService.getAllDoctors();
-            
+
             for (Doctor doctor : doctors) {
                 Object[] row = {
-                    doctor.getDoctorId(),
-                    doctor.getDoctorName(),
-                    doctor.getDoctorPhoneNumber(),
-                    doctor.getDoctorIdentityCard() != null ? doctor.getDoctorIdentityCard() : "",
-                    doctor.getDoctorAddress()
+                        doctor.getDoctorId(),
+                        doctor.getDoctorName(),
+                        doctor.getDoctorPhoneNumber(),
+                        doctor.getDoctorIdentityCard() != null ? doctor.getDoctorIdentityCard() : "",
+                        doctor.getDoctorAddress()
                 };
                 tableModel.addRow(row);
             }
             if (paginationPanel != null) paginationPanel.refresh();
         } catch (PetcareException ex) {
-            JOptionPane.showMessageDialog(this, 
-                "Lỗi khi tải dữ liệu: " + ex.getMessage(), 
-                "Lỗi", 
-                JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "Lỗi khi tải dữ liệu: " + ex.getMessage(),
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
     }
-    
+
     private void showAddDoctorDialog() {
         AddEditDoctorDialog dialog = new AddEditDoctorDialog(null, null);
         dialog.setVisible(true);
@@ -217,19 +216,19 @@ public class DoctorManagementPanel extends JPanel {
             refreshData();
         }
     }
-    
+
     private void showEditDoctorDialog() {
         int selectedRow = doctorTable.getSelectedRow();
         if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, 
-                "Vui lòng chọn bác sĩ cần sửa!", 
-                "Thông báo", 
-                JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "Vui lòng chọn bác sĩ cần sửa!",
+                    "Thông báo",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
         int modelRow = doctorTable.convertRowIndexToModel(selectedRow);
         int doctorId = (Integer) tableModel.getValueAt(modelRow, 0);
-        
+
         try {
             Doctor doctor = doctorService.getDoctorById(doctorId);
             if (doctor != null) {
@@ -239,51 +238,51 @@ public class DoctorManagementPanel extends JPanel {
                     refreshData();
                 }
             } else {
-                JOptionPane.showMessageDialog(this, 
-                    "Không tìm thấy bác sĩ với ID: " + doctorId, 
-                    "Lỗi", 
-                    JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        "Không tìm thấy bác sĩ với ID: " + doctorId,
+                        "Lỗi",
+                        JOptionPane.ERROR_MESSAGE);
             }
         } catch (PetcareException ex) {
-            JOptionPane.showMessageDialog(this, 
-                "Lỗi khi tải thông tin bác sĩ: " + ex.getMessage(), 
-                "Lỗi", 
-                JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "Lỗi khi tải thông tin bác sĩ: " + ex.getMessage(),
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
     }
-    
+
     private void deleteDoctor() {
         int selectedRow = doctorTable.getSelectedRow();
         if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, 
-                "Vui lòng chọn bác sĩ cần xóa!", 
-                "Thông báo", 
-                JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "Vui lòng chọn bác sĩ cần xóa!",
+                    "Thông báo",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
         int modelRow = doctorTable.convertRowIndexToModel(selectedRow);
         int doctorId = (Integer) tableModel.getValueAt(modelRow, 0);
         String doctorName = (String) tableModel.getValueAt(modelRow, 1);
-        
-        int confirm = JOptionPane.showConfirmDialog(this, 
-            "Bạn có chắc muốn xóa bác sĩ: " + doctorName + "?", 
-            "Xác nhận xóa", 
-            JOptionPane.YES_NO_OPTION);
-        
+
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "Bạn có chắc muốn xóa bác sĩ: " + doctorName + "?",
+                "Xác nhận xóa",
+                JOptionPane.YES_NO_OPTION);
+
         if (confirm == JOptionPane.YES_OPTION) {
             try {
                 doctorService.deleteDoctor(doctorId);
-                JOptionPane.showMessageDialog(this, 
-                    "Xóa bác sĩ thành công!", 
-                    "Thành công", 
-                    JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        "Xóa bác sĩ thành công!",
+                        "Thành công",
+                        JOptionPane.INFORMATION_MESSAGE);
                 refreshData();
             } catch (PetcareException ex) {
-                JOptionPane.showMessageDialog(this, 
-                    "Lỗi khi xóa: " + ex.getMessage(), 
-                    "Lỗi", 
-                    JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        "Lỗi khi xóa: " + ex.getMessage(),
+                        "Lỗi",
+                        JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
             }
         }

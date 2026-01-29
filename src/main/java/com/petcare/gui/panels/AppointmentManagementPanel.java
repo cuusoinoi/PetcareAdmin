@@ -5,27 +5,17 @@ import com.petcare.model.domain.Appointment;
 import com.petcare.model.entity.AppointmentListDto;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.service.AppointmentService;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.table.DefaultTableModel;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
 import com.petcare.util.ThemeManager;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 /**
  * Appointment Management Panel - uses AppointmentService only
@@ -62,8 +52,8 @@ public class AppointmentManagementPanel extends JPanel {
         headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(ThemeManager.getHeaderBackground());
         headerPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(15, 20, 15, 20)
+                BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(15, 20, 15, 20)
         ));
 
         titleLabel = new JLabel("Quản lý Lịch hẹn");
@@ -105,11 +95,19 @@ public class AppointmentManagementPanel extends JPanel {
         searchField.putClientProperty("JTextField.placeholderText", "Tìm theo ngày, loại, khách hàng, thú cưng, bác sĩ...");
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void insertUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            public void insertUpdate(DocumentEvent e) {
+                paginationPanel.setSearchText(searchField.getText().trim());
+            }
+
             @Override
-            public void removeUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            public void removeUpdate(DocumentEvent e) {
+                paginationPanel.setSearchText(searchField.getText().trim());
+            }
+
             @Override
-            public void changedUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            public void changedUpdate(DocumentEvent e) {
+                paginationPanel.setSearchText(searchField.getText().trim());
+            }
         });
         searchPanel.add(new JLabel("Tìm kiếm:"));
         searchPanel.add(searchField);
@@ -173,8 +171,8 @@ public class AppointmentManagementPanel extends JPanel {
         if (headerPanel != null) {
             headerPanel.setBackground(ThemeManager.getHeaderBackground());
             headerPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
-                BorderFactory.createEmptyBorder(15, 20, 15, 20)
+                    BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
+                    BorderFactory.createEmptyBorder(15, 20, 15, 20)
             ));
         }
         if (titleLabel != null) titleLabel.setForeground(ThemeManager.getTitleForeground());
@@ -219,14 +217,14 @@ public class AppointmentManagementPanel extends JPanel {
                 String dateStr = dto.getAppointmentDate() != null ? SDF.format(dto.getAppointmentDate()) : "";
                 String statusLabel = AppointmentService.statusCodeToLabel(dto.getStatus());
                 tableModel.addRow(new Object[]{
-                    dto.getAppointmentId(),
-                    dateStr,
-                    dto.getAppointmentType(),
-                    dto.getCustomerName(),
-                    dto.getPetName(),
-                    dto.getDoctorName() != null ? dto.getDoctorName() : "",
-                    dto.getServiceName() != null ? dto.getServiceName() : "",
-                    statusLabel
+                        dto.getAppointmentId(),
+                        dateStr,
+                        dto.getAppointmentType(),
+                        dto.getCustomerName(),
+                        dto.getPetName(),
+                        dto.getDoctorName() != null ? dto.getDoctorName() : "",
+                        dto.getServiceName() != null ? dto.getServiceName() : "",
+                        statusLabel
                 });
             }
             if (paginationPanel != null) paginationPanel.refresh();
@@ -276,7 +274,7 @@ public class AppointmentManagementPanel extends JPanel {
         String currentStatus = (String) tableModel.getValueAt(modelRow, 7);
         String[] statusOptions = {"Chờ xác nhận", "Đã xác nhận", "Hoàn thành", "Đã hủy"};
         String selected = (String) JOptionPane.showInputDialog(this, "Chọn trạng thái mới:", "Cập nhật trạng thái",
-            JOptionPane.QUESTION_MESSAGE, null, statusOptions, currentStatus);
+                JOptionPane.QUESTION_MESSAGE, null, statusOptions, currentStatus);
         if (selected != null && !selected.equals(currentStatus)) {
             try {
                 appointmentService.updateStatus(appointmentId, selected);

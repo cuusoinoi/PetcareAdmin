@@ -3,8 +3,8 @@ package com.petcare.service;
 import com.petcare.model.domain.GeneralSetting;
 import com.petcare.model.entity.GeneralSettingEntity;
 import com.petcare.model.exception.PetcareException;
-import com.petcare.repository.IGeneralSettingRepository;
 import com.petcare.repository.GeneralSettingRepository;
+import com.petcare.repository.IGeneralSettingRepository;
 
 /**
  * General Setting Service - single row config; Entity ↔ Domain
@@ -30,13 +30,17 @@ public class GeneralSettingService {
         }
     }
 
-    /** Get settings or null if none (caller can use defaults). */
+    /**
+     * Get settings or null if none (caller can use defaults).
+     */
     public GeneralSetting getSettings() throws PetcareException {
         GeneralSettingEntity entity = repository.findFirst();
         return entity != null ? entityToDomain(entity) : null;
     }
 
-    /** Save or update. If no row exists, insert; else update. */
+    /**
+     * Save or update. If no row exists, insert; else update.
+     */
     public void saveSettings(GeneralSetting setting) throws PetcareException {
         setting.validate();
         GeneralSettingEntity entity = domainToEntity(setting);
@@ -56,7 +60,9 @@ public class GeneralSettingService {
         }
     }
 
-    /** For CheckoutDialog: get checkout hour (e.g. 18) and overtime fee per hour. */
+    /**
+     * For CheckoutDialog: get checkout hour (e.g. 18) and overtime fee per hour.
+     */
     public int getCheckoutHour() throws PetcareException {
         GeneralSetting s = getSettings();
         if (s == null || s.getCheckoutHour() == null) return 18;
@@ -64,7 +70,8 @@ public class GeneralSettingService {
         if (h.length() >= 2) {
             try {
                 return Integer.parseInt(h.substring(0, h.indexOf(':')));
-            } catch (Exception ignored) { }
+            } catch (Exception ignored) {
+            }
         }
         return 18;
     }

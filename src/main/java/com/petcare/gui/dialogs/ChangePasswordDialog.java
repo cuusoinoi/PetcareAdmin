@@ -1,22 +1,13 @@
 package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import com.petcare.util.EmojiFontHelper;
-import com.petcare.util.ThemeManager;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.service.UserService;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
+import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.ThemeManager;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Dialog for changing user password - uses UserService only
@@ -52,8 +43,8 @@ public class ChangePasswordDialog extends JDialog {
         newPasswordField.setBackground(ThemeManager.getTextFieldBackground());
         newPasswordField.setForeground(ThemeManager.getTextFieldForeground());
         newPasswordField.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+                BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         newPasswordField.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         formPanel.add(newPasswordField);
@@ -64,8 +55,8 @@ public class ChangePasswordDialog extends JDialog {
         confirmPasswordField.setBackground(ThemeManager.getTextFieldBackground());
         confirmPasswordField.setForeground(ThemeManager.getTextFieldForeground());
         confirmPasswordField.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+                BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         confirmPasswordField.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         formPanel.add(confirmPasswordField);
@@ -119,9 +110,9 @@ public class ChangePasswordDialog extends JDialog {
         try {
             userService.changePassword(userId, newPassword);
             JOptionPane.showMessageDialog(this,
-                "Đổi mật khẩu thành công!",
-                "Thành công",
-                JOptionPane.INFORMATION_MESSAGE);
+                    "Đổi mật khẩu thành công!",
+                    "Thành công",
+                    JOptionPane.INFORMATION_MESSAGE);
             dispose();
         } catch (PetcareException ex) {
             JOptionPane.showMessageDialog(this, "Lỗi: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);

@@ -1,13 +1,9 @@
 package com.petcare.util;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import javax.swing.ImageIcon;
 
 /**
  * Helper to display emoji in Swing components.
@@ -19,9 +15,13 @@ public final class EmojiFontHelper {
     private static final String EMOJI_FONT_WIN = "Segoe UI Emoji";
     private static final String EMOJI_FONT_MAC = "Apple Color Emoji";
     private static final String TEXT_FONT = "Segoe UI";
-    /** Kích thước hiển thị icon (Swing dùng làm kích thước nút). */
+    /**
+     * Kích thước hiển thị icon (Swing dùng làm kích thước nút).
+     */
     private static final int EMOJI_ICON_SIZE = 24;
-    /** Canvas vẽ lớn hơn một chút để emoji không bị cắt, sau đó scale về EMOJI_ICON_SIZE. */
+    /**
+     * Canvas vẽ lớn hơn một chút để emoji không bị cắt, sau đó scale về EMOJI_ICON_SIZE.
+     */
     private static final int CANVAS_SIZE = 32;
     private static final int EMOJI_FONT_SIZE = 20;
 

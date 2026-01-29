@@ -1,31 +1,20 @@
 package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import com.petcare.util.EmojiFontHelper;
-import com.petcare.util.ThemeManager;
 import com.petcare.model.domain.PetVaccination;
 import com.petcare.service.CustomerService;
 import com.petcare.service.DoctorService;
-import com.petcare.service.PetVaccinationService;
 import com.petcare.service.PetService;
+import com.petcare.service.PetVaccinationService;
 import com.petcare.service.VaccineTypeService;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
+import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.ThemeManager;
+
+import javax.swing.*;
+import java.awt.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 
 /**
  * Dialog for adding/editing pet vaccination
@@ -42,7 +31,7 @@ public class AddEditVaccinationDialog extends JDialog {
     private JButton cancelButton;
     private boolean saved = false;
     private PetVaccination vaccination;
-    
+
     public AddEditVaccinationDialog(JDialog parent, PetVaccination vaccination) {
         super(parent, true);
         this.vaccination = vaccination;
@@ -50,7 +39,7 @@ public class AddEditVaccinationDialog extends JDialog {
         loadVaccines();
         loadCustomers();
         loadDoctors();
-        
+
         if (vaccination != null) {
             loadVaccinationData();
             setTitle("Sửa bản ghi tiêm chủng");
@@ -58,18 +47,18 @@ public class AddEditVaccinationDialog extends JDialog {
             setTitle("Thêm bản ghi tiêm chủng mới");
         }
     }
-    
+
     private void initComponents() {
         setSize(600, 500);
         setLocationRelativeTo(getParent());
         setLayout(new BorderLayout());
         getContentPane().setBackground(ThemeManager.getContentBackground());
-        
+
         // Form panel
         JPanel formPanel = new JPanel(new GridLayout(0, 2, 15, 15));
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         formPanel.setBackground(ThemeManager.getContentBackground());
-        
+
         // Vaccine
         formPanel.add(createLabel("Vaccine *:"));
         vaccineCombo = new JComboBox<>();
@@ -78,7 +67,7 @@ public class AddEditVaccinationDialog extends JDialog {
         vaccineCombo.setForeground(ThemeManager.getTextFieldForeground());
         vaccineCombo.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         formPanel.add(vaccineCombo);
-        
+
         // Customer
         formPanel.add(createLabel("Khách hàng *:"));
         customerCombo = new JComboBox<>();
@@ -88,7 +77,7 @@ public class AddEditVaccinationDialog extends JDialog {
         customerCombo.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         customerCombo.addActionListener(e -> loadPetsByCustomer());
         formPanel.add(customerCombo);
-        
+
         // Pet
         formPanel.add(createLabel("Thú cưng *:"));
         petCombo = new JComboBox<>();
@@ -97,7 +86,7 @@ public class AddEditVaccinationDialog extends JDialog {
         petCombo.setForeground(ThemeManager.getTextFieldForeground());
         petCombo.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         formPanel.add(petCombo);
-        
+
         // Doctor
         formPanel.add(createLabel("Bác sĩ *:"));
         doctorCombo = new JComboBox<>();
@@ -106,19 +95,19 @@ public class AddEditVaccinationDialog extends JDialog {
         doctorCombo.setForeground(ThemeManager.getTextFieldForeground());
         doctorCombo.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         formPanel.add(doctorCombo);
-        
+
         // Vaccination Date
         formPanel.add(createLabel("Ngày tiêm * (dd/MM/yyyy):"));
         vaccinationDateField = createTextField();
         vaccinationDateField.putClientProperty("JTextField.placeholderText", "dd/MM/yyyy");
         formPanel.add(vaccinationDateField);
-        
+
         // Next Vaccination Date
         formPanel.add(createLabel("Ngày tiêm tiếp theo (dd/MM/yyyy):"));
         nextVaccinationDateField = createTextField();
         nextVaccinationDateField.putClientProperty("JTextField.placeholderText", "dd/MM/yyyy");
         formPanel.add(nextVaccinationDateField);
-        
+
         // Notes
         formPanel.add(createLabel("Ghi chú:"));
         notesArea = new JTextArea(3, 20);
@@ -126,19 +115,19 @@ public class AddEditVaccinationDialog extends JDialog {
         notesArea.setBackground(ThemeManager.getTextFieldBackground());
         notesArea.setForeground(ThemeManager.getTextFieldForeground());
         notesArea.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(5, 5, 5, 5)
+                BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)
         ));
         notesArea.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         formPanel.add(notesArea);
-        
+
         add(formPanel, BorderLayout.CENTER);
-        
+
         // Button panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
         buttonPanel.setBackground(ThemeManager.getContentBackground());
-        
+
         saveButton = new JButton(EmojiFontHelper.withEmoji("💾", "Lưu"));
         saveButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         saveButton.setBackground(new Color(139, 69, 19));
@@ -147,7 +136,7 @@ public class AddEditVaccinationDialog extends JDialog {
         saveButton.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         saveButton.addActionListener(e -> saveVaccination());
         buttonPanel.add(saveButton);
-        
+
         cancelButton = new JButton(EmojiFontHelper.withEmoji("❌", "Hủy"));
         cancelButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         cancelButton.setBackground(ThemeManager.getButtonBackground());
@@ -155,30 +144,30 @@ public class AddEditVaccinationDialog extends JDialog {
         cancelButton.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         cancelButton.addActionListener(e -> dispose());
         buttonPanel.add(cancelButton);
-        
+
         add(buttonPanel, BorderLayout.SOUTH);
     }
-    
+
     private JLabel createLabel(String text) {
         JLabel label = new JLabel(text);
         label.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         label.setForeground(ThemeManager.getTitleForeground());
         return label;
     }
-    
+
     private JTextField createTextField() {
         JTextField field = new JTextField();
         field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         field.setBackground(ThemeManager.getTextFieldBackground());
         field.setForeground(ThemeManager.getTextFieldForeground());
         field.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(5, 10, 5, 10)
+                BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         field.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         return field;
     }
-    
+
     private void loadVaccines() {
         vaccineCombo.removeAllItems();
         vaccineCombo.addItem("-- Chọn vaccine --");
@@ -229,7 +218,7 @@ public class AddEditVaccinationDialog extends JDialog {
             ex.printStackTrace();
         }
     }
-    
+
     private void loadVaccinationData() {
         if (vaccination != null) {
             // Set vaccine
@@ -240,7 +229,7 @@ public class AddEditVaccinationDialog extends JDialog {
                     break;
                 }
             }
-            
+
             // Set customer
             for (int i = 0; i < customerCombo.getItemCount(); i++) {
                 String item = customerCombo.getItemAt(i);
@@ -250,7 +239,7 @@ public class AddEditVaccinationDialog extends JDialog {
                     break;
                 }
             }
-            
+
             // Set pet
             for (int i = 0; i < petCombo.getItemCount(); i++) {
                 String item = petCombo.getItemAt(i);
@@ -259,7 +248,7 @@ public class AddEditVaccinationDialog extends JDialog {
                     break;
                 }
             }
-            
+
             // Set doctor
             for (int i = 0; i < doctorCombo.getItemCount(); i++) {
                 String item = doctorCombo.getItemAt(i);
@@ -268,7 +257,7 @@ public class AddEditVaccinationDialog extends JDialog {
                     break;
                 }
             }
-            
+
             // Set dates
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
             if (vaccination.getVaccinationDate() != null) {
@@ -277,11 +266,11 @@ public class AddEditVaccinationDialog extends JDialog {
             if (vaccination.getNextVaccinationDate() != null) {
                 nextVaccinationDateField.setText(sdf.format(vaccination.getNextVaccinationDate()));
             }
-            
+
             notesArea.setText(vaccination.getNotes() != null ? vaccination.getNotes() : "");
         }
     }
-    
+
     private void saveVaccination() {
         // Validation
         if (vaccineCombo.getSelectedIndex() == 0) {
@@ -289,69 +278,69 @@ public class AddEditVaccinationDialog extends JDialog {
             vaccineCombo.requestFocus();
             return;
         }
-        
+
         if (customerCombo.getSelectedIndex() == 0) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn khách hàng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             customerCombo.requestFocus();
             return;
         }
-        
+
         if (petCombo.getSelectedIndex() == 0) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn thú cưng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             petCombo.requestFocus();
             return;
         }
-        
+
         if (doctorCombo.getSelectedIndex() == 0) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn bác sĩ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             doctorCombo.requestFocus();
             return;
         }
-        
+
         if (vaccinationDateField.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập ngày tiêm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             vaccinationDateField.requestFocus();
             return;
         }
-        
+
         try {
             // Get IDs
             String vaccineSelected = (String) vaccineCombo.getSelectedItem();
             int vaccineId = Integer.parseInt(vaccineSelected.split(" - ")[0]);
-            
+
             String customerSelected = (String) customerCombo.getSelectedItem();
             int customerId = Integer.parseInt(customerSelected.split(" - ")[0]);
-            
+
             String petSelected = (String) petCombo.getSelectedItem();
             int petId = Integer.parseInt(petSelected.split(" - ")[0]);
-            
+
             String doctorSelected = (String) doctorCombo.getSelectedItem();
             int doctorId = Integer.parseInt(doctorSelected.split(" - ")[0]);
-            
+
             // Parse dates
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
             Date vaccinationDate;
             try {
                 vaccinationDate = sdf.parse(vaccinationDateField.getText().trim());
             } catch (ParseException ex) {
-                JOptionPane.showMessageDialog(this, "Ngày tiêm không đúng định dạng (dd/MM/yyyy)!", 
-                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Ngày tiêm không đúng định dạng (dd/MM/yyyy)!",
+                        "Lỗi", JOptionPane.ERROR_MESSAGE);
                 vaccinationDateField.requestFocus();
                 return;
             }
-            
+
             Date nextVaccinationDate = null;
             if (!nextVaccinationDateField.getText().trim().isEmpty()) {
                 try {
                     nextVaccinationDate = sdf.parse(nextVaccinationDateField.getText().trim());
                 } catch (ParseException ex) {
-                    JOptionPane.showMessageDialog(this, "Ngày tiêm tiếp theo không đúng định dạng (dd/MM/yyyy)!", 
-                        "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Ngày tiêm tiếp theo không đúng định dạng (dd/MM/yyyy)!",
+                            "Lỗi", JOptionPane.ERROR_MESSAGE);
                     nextVaccinationDateField.requestFocus();
                     return;
                 }
             }
-            
+
             PetVaccinationService service = PetVaccinationService.getInstance();
             if (vaccination == null) {
                 PetVaccination newVaccination = new PetVaccination();
@@ -384,7 +373,7 @@ public class AddEditVaccinationDialog extends JDialog {
             ex.printStackTrace();
         }
     }
-    
+
     public boolean isSaved() {
         return saved;
     }

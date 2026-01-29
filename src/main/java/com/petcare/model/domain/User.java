@@ -1,6 +1,7 @@
 package com.petcare.model.domain;
 
 import com.petcare.model.exception.PetcareException;
+
 import java.util.Objects;
 
 /**
@@ -30,7 +31,9 @@ public class User {
         this.userId = userId;
     }
 
-    /** Alias for compatibility (e.g. DashboardFrame). */
+    /**
+     * Alias for compatibility (e.g. DashboardFrame).
+     */
     public int getId() {
         return userId;
     }

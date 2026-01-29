@@ -8,7 +8,9 @@ import com.petcare.model.exception.PetcareException;
  */
 public interface IGeneralSettingRepository {
 
-    /** Get first row or null if table empty */
+    /**
+     * Get first row or null if table empty
+     */
     GeneralSettingEntity findFirst() throws PetcareException;
 
     boolean exists() throws PetcareException;

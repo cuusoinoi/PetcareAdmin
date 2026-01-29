@@ -4,26 +4,17 @@ import com.petcare.gui.dialogs.AddEditVaccinationDialog;
 import com.petcare.model.entity.PetVaccinationListDto;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.service.PetVaccinationService;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.table.DefaultTableModel;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
 import com.petcare.util.ThemeManager;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 /**
  * Vaccination Management Panel with CRUD operations
@@ -42,12 +33,12 @@ public class VaccinationManagementPanel extends JPanel {
     private JButton editButton;
     private JButton deleteButton;
     private JButton refreshButton;
-    
+
     public VaccinationManagementPanel() {
         initComponents();
         loadVaccinations();
     }
-    
+
     private void initComponents() {
         setLayout(new BorderLayout());
         setBackground(ThemeManager.getContentBackground());
@@ -55,8 +46,8 @@ public class VaccinationManagementPanel extends JPanel {
         headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(ThemeManager.getHeaderBackground());
         headerPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(15, 20, 15, 20)
+                BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(15, 20, 15, 20)
         ));
 
         titleLabel = new JLabel("Quản lý Tiêm chủng");
@@ -91,11 +82,19 @@ public class VaccinationManagementPanel extends JPanel {
         searchField.putClientProperty("JTextField.placeholderText", "Tìm theo ngày, vaccine, khách hàng, thú cưng...");
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void insertUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            public void insertUpdate(DocumentEvent e) {
+                paginationPanel.setSearchText(searchField.getText().trim());
+            }
+
             @Override
-            public void removeUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            public void removeUpdate(DocumentEvent e) {
+                paginationPanel.setSearchText(searchField.getText().trim());
+            }
+
             @Override
-            public void changedUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            public void changedUpdate(DocumentEvent e) {
+                paginationPanel.setSearchText(searchField.getText().trim());
+            }
         });
         searchPanel.add(new JLabel("Tìm kiếm:"));
         searchPanel.add(searchField);
@@ -140,7 +139,7 @@ public class VaccinationManagementPanel extends JPanel {
         add(centerPanel, BorderLayout.CENTER);
         add(sideButtonPanel, BorderLayout.EAST);
     }
-    
+
     public void refreshData() {
         loadVaccinations();
     }
@@ -151,8 +150,8 @@ public class VaccinationManagementPanel extends JPanel {
         if (headerPanel != null) {
             headerPanel.setBackground(ThemeManager.getHeaderBackground());
             headerPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
-                BorderFactory.createEmptyBorder(15, 20, 15, 20)
+                    BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
+                    BorderFactory.createEmptyBorder(15, 20, 15, 20)
             ));
         }
         if (titleLabel != null) titleLabel.setForeground(ThemeManager.getTitleForeground());
@@ -193,13 +192,13 @@ public class VaccinationManagementPanel extends JPanel {
                 String vaccinationDateStr = dto.getVaccinationDate() != null ? sdf.format(dto.getVaccinationDate()) : "";
                 String nextDateStr = dto.getNextVaccinationDate() != null ? sdf.format(dto.getNextVaccinationDate()) : "";
                 tableModel.addRow(new Object[]{
-                    dto.getPetVaccinationId(),
-                    vaccinationDateStr,
-                    dto.getVaccineName() != null ? dto.getVaccineName() : "",
-                    dto.getCustomerName() != null ? dto.getCustomerName() : "",
-                    dto.getPetName() != null ? dto.getPetName() : "",
-                    dto.getDoctorName() != null ? dto.getDoctorName() : "",
-                    nextDateStr
+                        dto.getPetVaccinationId(),
+                        vaccinationDateStr,
+                        dto.getVaccineName() != null ? dto.getVaccineName() : "",
+                        dto.getCustomerName() != null ? dto.getCustomerName() : "",
+                        dto.getPetName() != null ? dto.getPetName() : "",
+                        dto.getDoctorName() != null ? dto.getDoctorName() : "",
+                        nextDateStr
                 });
             }
             if (paginationPanel != null) paginationPanel.refresh();
@@ -207,7 +206,7 @@ public class VaccinationManagementPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Lỗi khi tải dữ liệu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     private void showAddVaccinationDialog() {
         AddEditVaccinationDialog dialog = new AddEditVaccinationDialog(null, null);
         dialog.setVisible(true);
@@ -215,7 +214,7 @@ public class VaccinationManagementPanel extends JPanel {
             refreshData();
         }
     }
-    
+
     private void showEditVaccinationDialog() {
         int selectedRow = vaccinationTable.getSelectedRow();
         if (selectedRow == -1) {
@@ -237,14 +236,14 @@ public class VaccinationManagementPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Lỗi: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     private void deleteVaccination() {
         int selectedRow = vaccinationTable.getSelectedRow();
         if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, 
-                "Vui lòng chọn bản ghi tiêm chủng cần xóa!", 
-                "Thông báo", 
-                JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "Vui lòng chọn bản ghi tiêm chủng cần xóa!",
+                    "Thông báo",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
         int modelRow = vaccinationTable.convertRowIndexToModel(selectedRow);

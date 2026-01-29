@@ -4,6 +4,7 @@ import com.petcare.model.entity.PetVaccinationEntity;
 import com.petcare.model.entity.PetVaccinationListDto;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.persistence.DatabaseConnection;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

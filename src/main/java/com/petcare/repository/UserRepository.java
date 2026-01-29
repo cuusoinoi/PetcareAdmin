@@ -3,6 +3,7 @@ package com.petcare.repository;
 import com.petcare.model.entity.UserEntity;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.persistence.DatabaseConnection;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

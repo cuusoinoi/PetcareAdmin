@@ -5,6 +5,7 @@ import com.petcare.model.entity.ServiceTypeEntity;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.repository.IServiceTypeRepository;
 import com.petcare.repository.ServiceTypeRepository;
+
 import java.util.List;
 import java.util.stream.Collectors;
 

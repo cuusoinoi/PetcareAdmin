@@ -5,26 +5,17 @@ import com.petcare.gui.dialogs.TreatmentSessionsDialog;
 import com.petcare.model.entity.TreatmentCourseListDto;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.service.TreatmentCourseService;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.table.DefaultTableModel;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
 import com.petcare.util.ThemeManager;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 /**
  * Treatment Course Management Panel with CRUD operations
@@ -45,12 +36,12 @@ public class TreatmentManagementPanel extends JPanel {
     private JButton viewSessionsButton;
     private JButton deleteButton;
     private JButton refreshButton;
-    
+
     public TreatmentManagementPanel() {
         initComponents();
         loadTreatmentCourses();
     }
-    
+
     private void initComponents() {
         setLayout(new BorderLayout());
         setBackground(ThemeManager.getContentBackground());
@@ -58,8 +49,8 @@ public class TreatmentManagementPanel extends JPanel {
         headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(ThemeManager.getHeaderBackground());
         headerPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
-            BorderFactory.createEmptyBorder(15, 20, 15, 20)
+                BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(15, 20, 15, 20)
         ));
 
         titleLabel = new JLabel("Quản lý Liệu trình điều trị");
@@ -94,11 +85,19 @@ public class TreatmentManagementPanel extends JPanel {
         searchField.putClientProperty("JTextField.placeholderText", "Tìm theo ngày, khách hàng, thú cưng, trạng thái...");
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void insertUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            public void insertUpdate(DocumentEvent e) {
+                paginationPanel.setSearchText(searchField.getText().trim());
+            }
+
             @Override
-            public void removeUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            public void removeUpdate(DocumentEvent e) {
+                paginationPanel.setSearchText(searchField.getText().trim());
+            }
+
             @Override
-            public void changedUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            public void changedUpdate(DocumentEvent e) {
+                paginationPanel.setSearchText(searchField.getText().trim());
+            }
         });
         searchPanel.add(new JLabel("Tìm kiếm:"));
         searchPanel.add(searchField);
@@ -157,7 +156,7 @@ public class TreatmentManagementPanel extends JPanel {
         add(centerPanel, BorderLayout.CENTER);
         add(sideButtonPanel, BorderLayout.EAST);
     }
-    
+
     public void refreshData() {
         loadTreatmentCourses();
     }
@@ -168,8 +167,8 @@ public class TreatmentManagementPanel extends JPanel {
         if (headerPanel != null) {
             headerPanel.setBackground(ThemeManager.getHeaderBackground());
             headerPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
-                BorderFactory.createEmptyBorder(15, 20, 15, 20)
+                    BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
+                    BorderFactory.createEmptyBorder(15, 20, 15, 20)
             ));
         }
         if (titleLabel != null) titleLabel.setForeground(ThemeManager.getTitleForeground());
@@ -215,12 +214,12 @@ public class TreatmentManagementPanel extends JPanel {
                 String endDateStr = dto.getEndDate() != null ? sdf.format(dto.getEndDate()) : "";
                 String statusLabel = TreatmentCourseService.statusCodeToLabel(dto.getStatus());
                 tableModel.addRow(new Object[]{
-                    dto.getTreatmentCourseId(),
-                    startDateStr,
-                    endDateStr,
-                    dto.getCustomerName() != null ? dto.getCustomerName() : "",
-                    dto.getPetName() != null ? dto.getPetName() : "",
-                    statusLabel
+                        dto.getTreatmentCourseId(),
+                        startDateStr,
+                        endDateStr,
+                        dto.getCustomerName() != null ? dto.getCustomerName() : "",
+                        dto.getPetName() != null ? dto.getPetName() : "",
+                        statusLabel
                 });
             }
             if (paginationPanel != null) paginationPanel.refresh();
@@ -228,7 +227,7 @@ public class TreatmentManagementPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Lỗi khi tải dữ liệu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     private void showAddTreatmentDialog() {
         AddEditTreatmentDialog dialog = new AddEditTreatmentDialog(null, null);
         dialog.setVisible(true);
@@ -236,7 +235,7 @@ public class TreatmentManagementPanel extends JPanel {
             refreshData();
         }
     }
-    
+
     private void showEditTreatmentDialog() {
         int selectedRow = treatmentTable.getSelectedRow();
         if (selectedRow == -1) {
@@ -258,14 +257,14 @@ public class TreatmentManagementPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Lỗi: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     private void showTreatmentSessions() {
         int selectedRow = treatmentTable.getSelectedRow();
         if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, 
-                "Vui lòng chọn liệu trình cần xem!", 
-                "Thông báo", 
-                JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "Vui lòng chọn liệu trình cần xem!",
+                    "Thông báo",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
         int modelRow = treatmentTable.convertRowIndexToModel(selectedRow);
@@ -273,7 +272,7 @@ public class TreatmentManagementPanel extends JPanel {
         TreatmentSessionsDialog dialog = new TreatmentSessionsDialog(null, courseId);
         dialog.setVisible(true);
     }
-    
+
     private void completeTreatment() {
         int selectedRow = treatmentTable.getSelectedRow();
         if (selectedRow == -1) {

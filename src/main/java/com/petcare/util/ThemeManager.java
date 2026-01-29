@@ -2,10 +2,10 @@ package com.petcare.util;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
-import java.awt.Color;
+
+import javax.swing.*;
+import java.awt.*;
 import java.util.prefs.Preferences;
-import javax.swing.JTable;
-import javax.swing.UIManager;
 
 /**
  * Theme Manager for switching between Light and Dark mode
@@ -16,7 +16,9 @@ public class ThemeManager {
     private static final String THEME_DARK = "dark";
     private static Preferences prefs = Preferences.userNodeForPackage(ThemeManager.class);
 
-    /** Màu nền tối sâu cho giao diện dark */
+    /**
+     * Màu nền tối sâu cho giao diện dark
+     */
     private static final Color DARK_BG = new Color(0x1a1a1a);
     private static final Color DARK_HEADER = new Color(0x252525);
     private static final Color DARK_BORDER = new Color(0x404040);
@@ -50,7 +52,9 @@ public class ThemeManager {
         }
     }
 
-    /** Áp dụng màu sáng cho các key đã ghi đè khi dark, để chuyển lại light đúng */
+    /**
+     * Áp dụng màu sáng cho các key đã ghi đè khi dark, để chuyển lại light đúng
+     */
     private static void applyLightUiDefaults() {
         UIManager.put("Panel.background", LIGHT_CONTENT);
         UIManager.put("Table.background", Color.WHITE);
@@ -68,7 +72,9 @@ public class ThemeManager {
         UIManager.put("Button.foreground", Color.BLACK);
     }
 
-    /** Áp dụng màu nền đen sâu cho toàn bộ UI khi dark mode */
+    /**
+     * Áp dụng màu nền đen sâu cho toàn bộ UI khi dark mode
+     */
     private static void applyDarkUiDefaults() {
         UIManager.put("Panel.background", DARK_BG);
         UIManager.put("Table.background", DARK_BG);
@@ -110,7 +116,9 @@ public class ThemeManager {
         return isDarkMode() ? new Color(0xe0e0e0) : Color.BLACK;
     }
 
-    /** Màu nền và chữ của bảng (JTable) theo theme */
+    /**
+     * Màu nền và chữ của bảng (JTable) theo theme
+     */
     public static Color getTableBackground() {
         return isDarkMode() ? DARK_BG : Color.WHITE;
     }
@@ -127,7 +135,9 @@ public class ThemeManager {
         return isDarkMode() ? new Color(0xe0e0e0) : Color.BLACK;
     }
 
-    /** Màu ô nhập (JTextField) theo theme */
+    /**
+     * Màu ô nhập (JTextField) theo theme
+     */
     public static Color getTextFieldBackground() {
         return isDarkMode() ? new Color(0x2d2d2d) : Color.WHITE;
     }
@@ -136,7 +146,9 @@ public class ThemeManager {
         return isDarkMode() ? new Color(0xe0e0e0) : Color.BLACK;
     }
 
-    /** Màu nút thường (JButton) theo theme */
+    /**
+     * Màu nút thường (JButton) theo theme
+     */
     public static Color getButtonBackground() {
         return isDarkMode() ? new Color(0x3d3d3d) : new Color(0xf0f0f0);
     }
@@ -145,12 +157,16 @@ public class ThemeManager {
         return isDarkMode() ? new Color(0xe0e0e0) : Color.BLACK;
     }
 
-    /** Màu icon trên nút (giao diện tối = sáng để thấy, giao diện sáng = tối) */
+    /**
+     * Màu icon trên nút (giao diện tối = sáng để thấy, giao diện sáng = tối)
+     */
     public static Color getIconColor() {
         return isDarkMode() ? new Color(0xc0c0c0) : new Color(60, 60, 60);
     }
 
-    /** Áp dụng màu theme cho bảng và header (gọi trong initComponents và updateTheme) */
+    /**
+     * Áp dụng màu theme cho bảng và header (gọi trong initComponents và updateTheme)
+     */
     public static void applyTableTheme(JTable table) {
         if (table == null) return;
         table.setBackground(getTableBackground());
@@ -158,7 +174,7 @@ public class ThemeManager {
         table.getTableHeader().setBackground(getTableHeaderBackground());
         table.getTableHeader().setForeground(getTableHeaderForeground());
     }
-    
+
     /**
      * Toggle between light and dark theme
      */
@@ -166,14 +182,14 @@ public class ThemeManager {
         String current = getCurrentTheme();
         setTheme(THEME_LIGHT.equals(current) ? THEME_DARK : THEME_LIGHT);
     }
-    
+
     /**
      * Check if dark mode is enabled
      */
     public static boolean isDarkMode() {
         return THEME_DARK.equals(getCurrentTheme());
     }
-    
+
     /**
      * Initialize theme on application start
      */

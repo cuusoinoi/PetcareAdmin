@@ -13,16 +13,51 @@ public class TreatmentCourseListDto {
     private String petName;
     private String status;
 
-    public int getTreatmentCourseId() { return treatmentCourseId; }
-    public void setTreatmentCourseId(int treatmentCourseId) { this.treatmentCourseId = treatmentCourseId; }
-    public Date getStartDate() { return startDate; }
-    public void setStartDate(Date startDate) { this.startDate = startDate; }
-    public Date getEndDate() { return endDate; }
-    public void setEndDate(Date endDate) { this.endDate = endDate; }
-    public String getCustomerName() { return customerName; }
-    public void setCustomerName(String customerName) { this.customerName = customerName; }
-    public String getPetName() { return petName; }
-    public void setPetName(String petName) { this.petName = petName; }
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public int getTreatmentCourseId() {
+        return treatmentCourseId;
+    }
+
+    public void setTreatmentCourseId(int treatmentCourseId) {
+        this.treatmentCourseId = treatmentCourseId;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public String getPetName() {
+        return petName;
+    }
+
+    public void setPetName(String petName) {
+        this.petName = petName;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

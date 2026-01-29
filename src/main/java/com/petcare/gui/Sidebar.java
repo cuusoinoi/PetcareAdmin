@@ -2,6 +2,7 @@ package com.petcare.gui;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.LogoHelper;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -57,6 +58,9 @@ public class Sidebar extends JPanel {
         headerPanel.setLayout(new BorderLayout());
         
         JLabel logoLabel = new JLabel("UIT PETCARE", JLabel.CENTER);
+        logoLabel.setIcon(LogoHelper.createLogoIcon(36));
+        logoLabel.setHorizontalTextPosition(SwingConstants.TRAILING);
+        logoLabel.setIconTextGap(10);
         logoLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
         logoLabel.setForeground(Color.WHITE);
         headerPanel.add(logoLabel, BorderLayout.CENTER);

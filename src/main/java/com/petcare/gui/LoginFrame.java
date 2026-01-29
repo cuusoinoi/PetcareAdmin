@@ -2,6 +2,7 @@ package com.petcare.gui;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.petcare.model.domain.User;
+import com.petcare.util.LogoHelper;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.service.UserService;
 import java.awt.BorderLayout;
@@ -48,6 +49,9 @@ public class LoginFrame extends JFrame {
         headerPanel.setPreferredSize(new Dimension(0, 120));
         
         JLabel titleLabel = new JLabel("UIT PETCARE", SwingConstants.CENTER);
+        titleLabel.setIcon(LogoHelper.createLogoIcon(48));
+        titleLabel.setHorizontalTextPosition(SwingConstants.TRAILING);
+        titleLabel.setIconTextGap(12);
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 32));
         titleLabel.setForeground(Color.WHITE);
         headerPanel.add(titleLabel);

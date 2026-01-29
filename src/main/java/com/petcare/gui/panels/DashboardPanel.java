@@ -27,6 +27,7 @@ import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
@@ -73,6 +74,18 @@ public class DashboardPanel extends JPanel {
     }
     
     private void loadData() {
+        try {
+            loadDataInternal();
+        } catch (Exception e) {
+            e.printStackTrace();
+            removeAll();
+            add(new JLabel("Không thể tải Dashboard. Vui lòng thử lại.", JLabel.CENTER), BorderLayout.CENTER);
+            revalidate();
+            repaint();
+        }
+    }
+
+    private void loadDataInternal() {
         // Get data
         int customerCount = DashboardService.getCustomerCount();
         int petCount = DashboardService.getPetCount();
@@ -123,15 +136,15 @@ public class DashboardPanel extends JPanel {
         // Remove old cards panel and add new one
         removeAll();
         add(cardsPanel, BorderLayout.NORTH);
-        
-        // Create charts panel
+
+        // Create charts panel (bắt lỗi từng chart để không vỡ cả màn hình)
         JPanel chartsPanel = createChartsPanel();
         add(chartsPanel, BorderLayout.CENTER);
-        
+
         revalidate();
         repaint();
     }
-    
+
     private JPanel createStatCard(String title, String value, Color color, Double percentChange) {
         JPanel card = new JPanel();
         card.setLayout(new BorderLayout());
@@ -179,40 +192,45 @@ public class DashboardPanel extends JPanel {
         JPanel panel = new JPanel(new GridLayout(2, 2, 15, 15));
         panel.setBorder(BorderFactory.createEmptyBorder(0, 20, 20, 20));
         panel.setBackground(ThemeManager.getContentBackground());
-        
-        // Chart 1: Medical Records (7 days)
-        Map<String, Integer> medicalData = DashboardService.getMedicalRecordsByDay(7);
-        ChartPanel medicalChart = createLineChart(
-            "Lượt khám (7 ngày gần nhất)",
-            medicalData
-        );
-        panel.add(medicalChart);
-        
-        // Chart 2: Check-in/Check-out (7 days)
-        Map<String, Map<String, Integer>> checkinCheckoutData = DashboardService.getCheckinCheckoutStats(7);
-        ChartPanel checkinCheckoutChart = createBarChart(
-            "Check-in / Check-out (7 ngày gần nhất)",
-            checkinCheckoutData
-        );
-        panel.add(checkinCheckoutChart);
-        
-        // Chart 3: Monthly Revenue (12 months)
-        Map<String, Long> monthlyRevenue = DashboardService.getMonthlyRevenueStats();
-        ChartPanel revenueChart = createRevenueLineChart(
-            "Doanh thu theo tháng (12 tháng)",
-            monthlyRevenue
-        );
-        panel.add(revenueChart);
-        
-        // Chart 4: Revenue by Service Type
-        List<ServiceRevenue> serviceRevenue = DashboardService.getRevenueByServiceType();
-        ChartPanel serviceChart = createDoughnutChart(
-            "Tỷ trọng doanh thu theo loại dịch vụ",
-            serviceRevenue
-        );
-        panel.add(serviceChart);
-        
+
+        try {
+            Map<String, Integer> medicalData = DashboardService.getMedicalRecordsByDay(7);
+            panel.add(createLineChart("Lượt khám (7 ngày gần nhất)", medicalData));
+        } catch (Exception e) {
+            e.printStackTrace();
+            panel.add(createPlaceholderPanel("Lượt khám"));
+        }
+        try {
+            Map<String, Map<String, Integer>> checkinCheckoutData = DashboardService.getCheckinCheckoutStats(7);
+            panel.add(createBarChart("Check-in / Check-out (7 ngày gần nhất)", checkinCheckoutData));
+        } catch (Exception e) {
+            e.printStackTrace();
+            panel.add(createPlaceholderPanel("Check-in / Check-out"));
+        }
+        try {
+            Map<String, Long> monthlyRevenue = DashboardService.getMonthlyRevenueStats();
+            panel.add(createRevenueLineChart("Doanh thu theo tháng (12 tháng)", monthlyRevenue));
+        } catch (Exception e) {
+            e.printStackTrace();
+            panel.add(createPlaceholderPanel("Doanh thu theo tháng"));
+        }
+        try {
+            List<ServiceRevenue> serviceRevenue = DashboardService.getRevenueByServiceType();
+            panel.add(createDoughnutChart("Tỷ trọng doanh thu theo loại dịch vụ", serviceRevenue));
+        } catch (Exception e) {
+            e.printStackTrace();
+            panel.add(createPlaceholderPanel("Tỷ trọng doanh thu"));
+        }
+
         return panel;
+    }
+
+    private JPanel createPlaceholderPanel(String title) {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBackground(ThemeManager.getFormBackground());
+        p.add(new JLabel(title + " – Không thể tải", JLabel.CENTER), BorderLayout.CENTER);
+        p.setPreferredSize(new Dimension(600, 300));
+        return p;
     }
     
     private ChartPanel createLineChart(String title, Map<String, Integer> data) {
@@ -415,8 +433,13 @@ public class DashboardPanel extends JPanel {
         
         PiePlot plot = (PiePlot) chart.getPlot();
         plot.setBackgroundPaint(Color.WHITE);
-        plot.setLabelFont(new Font("Segoe UI", Font.PLAIN, 10));
-        
+        plot.setLabelFont(new Font("Segoe UI", Font.PLAIN, 11));
+        try {
+            plot.setLabelGenerator(new StandardPieSectionLabelGenerator("{0}: {1} ({2})"));
+        } catch (Exception ignored) {
+            // Giữ mặc định nếu format lỗi
+        }
+
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new Dimension(600, 300));
         chartPanel.setBackground(ThemeManager.getFormBackground());

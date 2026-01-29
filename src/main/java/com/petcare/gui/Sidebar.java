@@ -159,8 +159,9 @@ public class Sidebar extends JPanel {
         settingsBtn.addActionListener(e -> dashboard.showSettingsManagement());
         menuPanel.add(settingsBtn);
         
-        // Scroll pane for menu
+        // Scroll pane for menu (chỉ cuộn dọc, không cuộn ngang)
         JScrollPane scrollPane = new JScrollPane(menuPanel);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setBorder(null);
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);

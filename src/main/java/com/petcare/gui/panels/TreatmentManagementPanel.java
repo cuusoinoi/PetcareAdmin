@@ -20,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.GUIUtil;
 
 /**
  * Treatment Course Management Panel with CRUD operations
@@ -27,6 +28,7 @@ import com.petcare.util.EmojiFontHelper;
 public class TreatmentManagementPanel extends JPanel {
     private JTable treatmentTable;
     private DefaultTableModel tableModel;
+    private TablePaginationPanel paginationPanel;
     private JButton addButton;
     private JButton editButton;
     private JButton completeButton;
@@ -60,21 +62,25 @@ public class TreatmentManagementPanel extends JPanel {
         
         addButton = new JButton(EmojiFontHelper.withEmoji("➕", "Thêm"));
         addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(addButton);
         addButton.addActionListener(e -> showAddTreatmentDialog());
         buttonPanel.add(addButton);
         
         editButton = new JButton(EmojiFontHelper.withEmoji("✏️", "Sửa"));
         editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(editButton);
         editButton.addActionListener(e -> showEditTreatmentDialog());
         buttonPanel.add(editButton);
         
         viewSessionsButton = new JButton(EmojiFontHelper.withEmoji("📋", "Xem buổi điều trị"));
         viewSessionsButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(viewSessionsButton);
         viewSessionsButton.addActionListener(e -> showTreatmentSessions());
         buttonPanel.add(viewSessionsButton);
         
         completeButton = new JButton(EmojiFontHelper.withEmoji("✅", "Kết thúc"));
         completeButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(completeButton);
         completeButton.setBackground(new Color(40, 167, 69));
         completeButton.setForeground(Color.WHITE);
         completeButton.addActionListener(e -> completeTreatment());
@@ -82,11 +88,13 @@ public class TreatmentManagementPanel extends JPanel {
         
         deleteButton = new JButton(EmojiFontHelper.withEmoji("🗑️", "Xóa"));
         deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(deleteButton);
         deleteButton.addActionListener(e -> deleteTreatment());
         buttonPanel.add(deleteButton);
         
         refreshButton = new JButton(EmojiFontHelper.withEmoji("🔄", "Làm mới"));
         refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(refreshButton);
         refreshButton.addActionListener(e -> refreshData());
         buttonPanel.add(refreshButton);
         
@@ -112,6 +120,9 @@ public class TreatmentManagementPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(treatmentTable);
         scrollPane.setBorder(null);
         add(scrollPane, BorderLayout.CENTER);
+
+        paginationPanel = new TablePaginationPanel(treatmentTable);
+        add(paginationPanel, BorderLayout.SOUTH);
     }
     
     public void refreshData() {
@@ -136,6 +147,7 @@ public class TreatmentManagementPanel extends JPanel {
                     statusLabel
                 });
             }
+            if (paginationPanel != null) paginationPanel.refresh();
         } catch (PetcareException ex) {
             JOptionPane.showMessageDialog(this, "Lỗi khi tải dữ liệu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
@@ -155,7 +167,8 @@ public class TreatmentManagementPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn liệu trình cần sửa!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        int courseId = (Integer) tableModel.getValueAt(selectedRow, 0);
+        int modelRow = treatmentTable.convertRowIndexToModel(selectedRow);
+        int courseId = (Integer) tableModel.getValueAt(modelRow, 0);
         try {
             com.petcare.model.domain.TreatmentCourse course = TreatmentCourseService.getInstance().getCourseById(courseId);
             if (course != null) {
@@ -179,8 +192,8 @@ public class TreatmentManagementPanel extends JPanel {
                 JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
-        int courseId = (Integer) tableModel.getValueAt(selectedRow, 0);
+        int modelRow = treatmentTable.convertRowIndexToModel(selectedRow);
+        int courseId = (Integer) tableModel.getValueAt(modelRow, 0);
         TreatmentSessionsDialog dialog = new TreatmentSessionsDialog(null, courseId);
         dialog.setVisible(true);
     }
@@ -191,8 +204,9 @@ public class TreatmentManagementPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn liệu trình cần kết thúc!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        int courseId = (Integer) tableModel.getValueAt(selectedRow, 0);
-        String status = (String) tableModel.getValueAt(selectedRow, 5);
+        int modelRow = treatmentTable.convertRowIndexToModel(selectedRow);
+        int courseId = (Integer) tableModel.getValueAt(modelRow, 0);
+        String status = (String) tableModel.getValueAt(modelRow, 5);
         if ("Kết thúc".equals(status)) {
             JOptionPane.showMessageDialog(this, "Liệu trình này đã kết thúc rồi!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
@@ -215,7 +229,8 @@ public class TreatmentManagementPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn liệu trình cần xóa!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        int courseId = (Integer) tableModel.getValueAt(selectedRow, 0);
+        int modelRow = treatmentTable.convertRowIndexToModel(selectedRow);
+        int courseId = (Integer) tableModel.getValueAt(modelRow, 0);
         int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc muốn xóa liệu trình này?", "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             try {

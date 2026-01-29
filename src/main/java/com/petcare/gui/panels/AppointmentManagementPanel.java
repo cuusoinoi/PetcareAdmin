@@ -21,6 +21,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.GUIUtil;
 
 /**
  * Appointment Management Panel - uses AppointmentService only
@@ -28,6 +29,7 @@ import com.petcare.util.EmojiFontHelper;
 public class AppointmentManagementPanel extends JPanel {
     private JTable appointmentTable;
     private DefaultTableModel tableModel;
+    private TablePaginationPanel paginationPanel;
     private JButton addButton;
     private JButton editButton;
     private JButton updateStatusButton;
@@ -69,24 +71,29 @@ public class AppointmentManagementPanel extends JPanel {
         JPanel buttonPanel = new JPanel(new GridLayout(1, 5, 10, 0));
         addButton = new JButton(EmojiFontHelper.withEmoji("➕", "Thêm"));
         addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(addButton);
         addButton.addActionListener(e -> showAddAppointmentDialog());
         buttonPanel.add(addButton);
         editButton = new JButton(EmojiFontHelper.withEmoji("✏️", "Sửa"));
         editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(editButton);
         editButton.addActionListener(e -> showEditAppointmentDialog());
         buttonPanel.add(editButton);
         updateStatusButton = new JButton(EmojiFontHelper.withEmoji("✅", "Cập nhật trạng thái"));
         updateStatusButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(updateStatusButton);
         updateStatusButton.setBackground(new Color(40, 167, 69));
         updateStatusButton.setForeground(Color.WHITE);
         updateStatusButton.addActionListener(e -> showUpdateStatusDialog());
         buttonPanel.add(updateStatusButton);
         deleteButton = new JButton(EmojiFontHelper.withEmoji("🗑️", "Xóa"));
         deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(deleteButton);
         deleteButton.addActionListener(e -> deleteAppointment());
         buttonPanel.add(deleteButton);
         refreshButton = new JButton(EmojiFontHelper.withEmoji("🔄", "Làm mới"));
         refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(refreshButton);
         refreshButton.addActionListener(e -> refreshData());
         buttonPanel.add(refreshButton);
         headerPanel.add(buttonPanel, BorderLayout.EAST);
@@ -108,6 +115,9 @@ public class AppointmentManagementPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(appointmentTable);
         scrollPane.setBorder(null);
         add(scrollPane, BorderLayout.CENTER);
+
+        paginationPanel = new TablePaginationPanel(appointmentTable);
+        add(paginationPanel, BorderLayout.SOUTH);
     }
 
     public void refreshData() {
@@ -133,6 +143,7 @@ public class AppointmentManagementPanel extends JPanel {
                     statusLabel
                 });
             }
+            if (paginationPanel != null) paginationPanel.refresh();
         } catch (PetcareException ex) {
             JOptionPane.showMessageDialog(this, "Lỗi khi tải dữ liệu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
@@ -152,7 +163,8 @@ public class AppointmentManagementPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn lịch hẹn cần sửa!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        int appointmentId = (Integer) tableModel.getValueAt(selectedRow, 0);
+        int modelRow = appointmentTable.convertRowIndexToModel(selectedRow);
+        int appointmentId = (Integer) tableModel.getValueAt(modelRow, 0);
         try {
             Appointment appointment = appointmentService.getAppointmentById(appointmentId);
             if (appointment != null) {
@@ -173,8 +185,9 @@ public class AppointmentManagementPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn lịch hẹn cần cập nhật!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        int appointmentId = (Integer) tableModel.getValueAt(selectedRow, 0);
-        String currentStatus = (String) tableModel.getValueAt(selectedRow, 7);
+        int modelRow = appointmentTable.convertRowIndexToModel(selectedRow);
+        int appointmentId = (Integer) tableModel.getValueAt(modelRow, 0);
+        String currentStatus = (String) tableModel.getValueAt(modelRow, 7);
         String[] statusOptions = {"Chờ xác nhận", "Đã xác nhận", "Hoàn thành", "Đã hủy"};
         String selected = (String) JOptionPane.showInputDialog(this, "Chọn trạng thái mới:", "Cập nhật trạng thái",
             JOptionPane.QUESTION_MESSAGE, null, statusOptions, currentStatus);
@@ -195,7 +208,8 @@ public class AppointmentManagementPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn lịch hẹn cần xóa!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        int appointmentId = (Integer) tableModel.getValueAt(selectedRow, 0);
+        int modelRow = appointmentTable.convertRowIndexToModel(selectedRow);
+        int appointmentId = (Integer) tableModel.getValueAt(modelRow, 0);
         int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc muốn xóa lịch hẹn này?", "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             try {

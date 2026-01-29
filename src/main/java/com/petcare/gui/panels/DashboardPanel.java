@@ -7,8 +7,12 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +22,9 @@ import javax.swing.JPanel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.PlotOrientation;
@@ -31,6 +38,11 @@ public class DashboardPanel extends JPanel {
     
     public DashboardPanel() {
         initComponents();
+        loadData();
+    }
+    
+    /** Gọi khi bấm menu Dashboard để cập nhật lại thẻ thống kê và biểu đồ. */
+    public void refreshData() {
         loadData();
     }
     
@@ -203,13 +215,19 @@ public class DashboardPanel extends JPanel {
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM");
         
-        for (Map.Entry<String, Integer> entry : data.entrySet()) {
+        // Sort by date so chart shows chronological order
+        List<String> sortedKeys = new ArrayList<>(data.keySet());
+        Collections.sort(sortedKeys);
+        
+        for (String dateKey : sortedKeys) {
+            Integer value = data.get(dateKey);
+            if (value == null) value = 0;
             try {
-                Date date = inputFormat.parse(entry.getKey());
+                Date date = inputFormat.parse(dateKey);
                 String label = outputFormat.format(date);
-                dataset.addValue(entry.getValue(), "Lượt khám", label);
+                dataset.addValue(value, "Lượt khám", label);
             } catch (Exception ex) {
-                dataset.addValue(entry.getValue(), "Lượt khám", entry.getKey());
+                dataset.addValue(value, "Lượt khám", dateKey);
             }
         }
         
@@ -231,6 +249,17 @@ public class DashboardPanel extends JPanel {
         plot.setBackgroundPaint(Color.WHITE);
         plot.setRangeGridlinePaint(new Color(220, 220, 220));
         plot.getRenderer().setSeriesPaint(0, new Color(220, 53, 69));
+        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+        rangeAxis.setAutoRangeIncludesZero(true);
+        rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+        rangeAxis.setNumberFormatOverride(NumberFormat.getIntegerInstance());
+        if (dataset.getRowCount() > 0 && dataset.getColumnCount() > 0) {
+            double maxVal = 0;
+            for (int r = 0; r < dataset.getRowCount(); r++)
+                for (int c = 0; c < dataset.getColumnCount(); c++)
+                    maxVal = Math.max(maxVal, dataset.getValue(r, c).doubleValue());
+            if (maxVal <= 0) rangeAxis.setUpperBound(5);
+        }
         
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new Dimension(600, 300));
@@ -245,18 +274,22 @@ public class DashboardPanel extends JPanel {
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM");
         
-        for (Map.Entry<String, Map<String, Integer>> entry : data.entrySet()) {
+        // Sort by date so chart shows chronological order
+        List<String> sortedKeys = new ArrayList<>(data.keySet());
+        Collections.sort(sortedKeys);
+        
+        for (String dateKey : sortedKeys) {
+            Map<String, Integer> dayData = data.get(dateKey);
+            int checkin = dayData != null ? dayData.getOrDefault("checkin", 0) : 0;
+            int checkout = dayData != null ? dayData.getOrDefault("checkout", 0) : 0;
             try {
-                Date date = inputFormat.parse(entry.getKey());
+                Date date = inputFormat.parse(dateKey);
                 String label = outputFormat.format(date);
-                Map<String, Integer> dayData = entry.getValue();
-                dataset.addValue(dayData.get("checkin"), "Check-in", label);
-                dataset.addValue(dayData.get("checkout"), "Check-out", label);
+                dataset.addValue(checkin, "Check-in", label);
+                dataset.addValue(checkout, "Check-out", label);
             } catch (Exception ex) {
-                String label = entry.getKey();
-                Map<String, Integer> dayData = entry.getValue();
-                dataset.addValue(dayData.get("checkin"), "Check-in", label);
-                dataset.addValue(dayData.get("checkout"), "Check-out", label);
+                dataset.addValue(checkin, "Check-in", dateKey);
+                dataset.addValue(checkout, "Check-out", dateKey);
             }
         }
         
@@ -279,6 +312,17 @@ public class DashboardPanel extends JPanel {
         plot.setRangeGridlinePaint(new Color(220, 220, 220));
         plot.getRenderer().setSeriesPaint(0, new Color(255, 193, 7));
         plot.getRenderer().setSeriesPaint(1, new Color(40, 167, 69));
+        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+        rangeAxis.setAutoRangeIncludesZero(true);
+        rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+        rangeAxis.setNumberFormatOverride(NumberFormat.getIntegerInstance());
+        if (dataset.getRowCount() > 0 && dataset.getColumnCount() > 0) {
+            double maxVal = 0;
+            for (int r = 0; r < dataset.getRowCount(); r++)
+                for (int c = 0; c < dataset.getColumnCount(); c++)
+                    maxVal = Math.max(maxVal, dataset.getValue(r, c).doubleValue());
+            if (maxVal <= 0) rangeAxis.setUpperBound(5);
+        }
         
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new Dimension(600, 300));
@@ -293,13 +337,20 @@ public class DashboardPanel extends JPanel {
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM");
         SimpleDateFormat outputFormat = new SimpleDateFormat("MM/yyyy");
         
-        for (Map.Entry<String, Long> entry : data.entrySet()) {
+        // Sort by month so chart shows chronological order
+        List<String> sortedKeys = new ArrayList<>(data.keySet());
+        Collections.sort(sortedKeys);
+        
+        for (String monthKey : sortedKeys) {
+            Long value = data.get(monthKey);
+            if (value == null) value = 0L;
+            double millions = value / 1000000.0;
             try {
-                Date date = inputFormat.parse(entry.getKey());
+                Date date = inputFormat.parse(monthKey);
                 String label = outputFormat.format(date);
-                dataset.addValue(entry.getValue() / 1000000.0, "Doanh thu (triệu VNĐ)", label);
+                dataset.addValue(millions, "Doanh thu (triệu VNĐ)", label);
             } catch (Exception ex) {
-                dataset.addValue(entry.getValue() / 1000000.0, "Doanh thu (triệu VNĐ)", entry.getKey());
+                dataset.addValue(millions, "Doanh thu (triệu VNĐ)", monthKey);
             }
         }
         
@@ -321,6 +372,15 @@ public class DashboardPanel extends JPanel {
         plot.setBackgroundPaint(Color.WHITE);
         plot.setRangeGridlinePaint(new Color(220, 220, 220));
         plot.getRenderer().setSeriesPaint(0, new Color(23, 162, 184));
+        // Trục tháng (domain): hiển thị đúng nhãn MM/yyyy (01/2025, 02/2025...)
+        CategoryAxis domainAxis = (CategoryAxis) plot.getDomainAxis();
+        domainAxis.setTickLabelFont(new Font("Segoe UI", Font.PLAIN, 11));
+        domainAxis.setMaximumCategoryLabelLines(2);
+        domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_45);
+        // Trục doanh thu (range): hiển thị số thập phân (triệu VNĐ) đúng
+        NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+        rangeAxis.setAutoRangeIncludesZero(true);
+        rangeAxis.setNumberFormatOverride(new DecimalFormat("#,##0.0"));
         
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new Dimension(600, 300));

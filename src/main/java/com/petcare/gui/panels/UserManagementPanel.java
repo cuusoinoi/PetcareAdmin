@@ -18,6 +18,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.GUIUtil;
 
 /**
  * User Management Panel - uses UserService only (no direct Database)
@@ -25,6 +26,7 @@ import com.petcare.util.EmojiFontHelper;
 public class UserManagementPanel extends JPanel {
     private JTable userTable;
     private DefaultTableModel tableModel;
+    private TablePaginationPanel paginationPanel;
     private JButton addButton;
     private JButton editButton;
     private JButton changePasswordButton;
@@ -57,26 +59,31 @@ public class UserManagementPanel extends JPanel {
 
         addButton = new JButton(EmojiFontHelper.withEmoji("➕", "Thêm"));
         addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(addButton);
         addButton.addActionListener(e -> showAddUserDialog());
         buttonPanel.add(addButton);
 
         editButton = new JButton(EmojiFontHelper.withEmoji("✏️", "Sửa"));
         editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(editButton);
         editButton.addActionListener(e -> showEditUserDialog());
         buttonPanel.add(editButton);
 
         changePasswordButton = new JButton(EmojiFontHelper.withEmoji("🔑", "Đổi mật khẩu"));
         changePasswordButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(changePasswordButton);
         changePasswordButton.addActionListener(e -> showChangePasswordDialog());
         buttonPanel.add(changePasswordButton);
 
         deleteButton = new JButton(EmojiFontHelper.withEmoji("🗑️", "Xóa"));
         deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(deleteButton);
         deleteButton.addActionListener(e -> deleteUser());
         buttonPanel.add(deleteButton);
 
         refreshButton = new JButton(EmojiFontHelper.withEmoji("🔄", "Làm mới"));
         refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(refreshButton);
         refreshButton.addActionListener(e -> refreshData());
         buttonPanel.add(refreshButton);
 
@@ -101,6 +108,9 @@ public class UserManagementPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(userTable);
         scrollPane.setBorder(null);
         add(scrollPane, BorderLayout.CENTER);
+
+        paginationPanel = new TablePaginationPanel(userTable);
+        add(paginationPanel, BorderLayout.SOUTH);
     }
 
     public void refreshData() {
@@ -119,6 +129,7 @@ public class UserManagementPanel extends JPanel {
                     roleLabel
                 });
             }
+            if (paginationPanel != null) paginationPanel.refresh();
         } catch (PetcareException ex) {
             JOptionPane.showMessageDialog(this,
                 "Lỗi khi tải dữ liệu: " + ex.getMessage(),
@@ -144,7 +155,8 @@ public class UserManagementPanel extends JPanel {
                 JOptionPane.WARNING_MESSAGE);
             return;
         }
-        int userId = (Integer) tableModel.getValueAt(selectedRow, 0);
+        int modelRow = userTable.convertRowIndexToModel(selectedRow);
+        int userId = (Integer) tableModel.getValueAt(modelRow, 0);
         try {
             User user = userService.getUserById(userId);
             if (user != null) {
@@ -168,7 +180,8 @@ public class UserManagementPanel extends JPanel {
                 JOptionPane.WARNING_MESSAGE);
             return;
         }
-        int userId = (Integer) tableModel.getValueAt(selectedRow, 0);
+        int modelRow = userTable.convertRowIndexToModel(selectedRow);
+        int userId = (Integer) tableModel.getValueAt(modelRow, 0);
         ChangePasswordDialog dialog = new ChangePasswordDialog(null, userId);
         dialog.setVisible(true);
     }
@@ -182,8 +195,9 @@ public class UserManagementPanel extends JPanel {
                 JOptionPane.WARNING_MESSAGE);
             return;
         }
-        int userId = (Integer) tableModel.getValueAt(selectedRow, 0);
-        String username = (String) tableModel.getValueAt(selectedRow, 1);
+        int modelRow = userTable.convertRowIndexToModel(selectedRow);
+        int userId = (Integer) tableModel.getValueAt(modelRow, 0);
+        String username = (String) tableModel.getValueAt(modelRow, 1);
         int confirm = JOptionPane.showConfirmDialog(this,
             "Bạn có chắc muốn xóa người dùng \"" + username + "\"?",
             "Xác nhận xóa",

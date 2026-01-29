@@ -17,6 +17,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.GUIUtil;
 
 /**
  * Vaccine Type Management Panel - uses VaccineTypeService only
@@ -24,6 +25,7 @@ import com.petcare.util.EmojiFontHelper;
 public class VaccineTypeManagementPanel extends JPanel {
     private JTable vaccineTable;
     private DefaultTableModel tableModel;
+    private TablePaginationPanel paginationPanel;
     private JButton addButton;
     private JButton editButton;
     private JButton deleteButton;
@@ -54,21 +56,25 @@ public class VaccineTypeManagementPanel extends JPanel {
 
 addButton = new JButton(EmojiFontHelper.withEmoji("➕", "Thêm"));
         addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(addButton);
         addButton.addActionListener(e -> showAddVaccineDialog());
         buttonPanel.add(addButton);
         
         editButton = new JButton(EmojiFontHelper.withEmoji("✏️", "Sửa"));
         editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(editButton);
         editButton.addActionListener(e -> showEditVaccineDialog());
         buttonPanel.add(editButton);
         
         deleteButton = new JButton(EmojiFontHelper.withEmoji("🗑️", "Xóa"));
         deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(deleteButton);
         deleteButton.addActionListener(e -> deleteVaccine());
         buttonPanel.add(deleteButton);
         
         refreshButton = new JButton(EmojiFontHelper.withEmoji("🔄", "Làm mới"));
         refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(refreshButton);
         refreshButton.addActionListener(e -> refreshData());
         buttonPanel.add(refreshButton);
 
@@ -93,6 +99,9 @@ addButton = new JButton(EmojiFontHelper.withEmoji("➕", "Thêm"));
         JScrollPane scrollPane = new JScrollPane(vaccineTable);
         scrollPane.setBorder(null);
         add(scrollPane, BorderLayout.CENTER);
+
+        paginationPanel = new TablePaginationPanel(vaccineTable);
+        add(paginationPanel, BorderLayout.SOUTH);
     }
 
     public void refreshData() {
@@ -113,6 +122,7 @@ addButton = new JButton(EmojiFontHelper.withEmoji("➕", "Thêm"));
                     description != null ? description : ""
                 });
             }
+            if (paginationPanel != null) paginationPanel.refresh();
         } catch (PetcareException ex) {
             JOptionPane.showMessageDialog(this,
                 "Lỗi khi tải dữ liệu: " + ex.getMessage(),
@@ -138,7 +148,8 @@ addButton = new JButton(EmojiFontHelper.withEmoji("➕", "Thêm"));
                 JOptionPane.WARNING_MESSAGE);
             return;
         }
-        int vaccineId = (Integer) tableModel.getValueAt(selectedRow, 0);
+        int modelRow = vaccineTable.convertRowIndexToModel(selectedRow);
+        int vaccineId = (Integer) tableModel.getValueAt(modelRow, 0);
         try {
             VaccineType vaccine = vaccineTypeService.getVaccineTypeById(vaccineId);
             if (vaccine != null) {
@@ -162,7 +173,8 @@ addButton = new JButton(EmojiFontHelper.withEmoji("➕", "Thêm"));
                 JOptionPane.WARNING_MESSAGE);
             return;
         }
-        int vaccineId = (Integer) tableModel.getValueAt(selectedRow, 0);
+        int modelRow = vaccineTable.convertRowIndexToModel(selectedRow);
+        int vaccineId = (Integer) tableModel.getValueAt(modelRow, 0);
         int confirm = JOptionPane.showConfirmDialog(this,
             "Bạn có chắc muốn xóa vaccine này?",
             "Xác nhận xóa",

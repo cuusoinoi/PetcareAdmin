@@ -20,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.GUIUtil;
 
 /**
  * Pet Enclosure Management Panel with Check-in/Check-out
@@ -27,6 +28,7 @@ import com.petcare.util.EmojiFontHelper;
 public class PetEnclosureManagementPanel extends JPanel {
     private JTable enclosureTable;
     private DefaultTableModel tableModel;
+    private TablePaginationPanel paginationPanel;
     private JButton addButton;
     private JButton editButton;
     private JButton checkoutButton;
@@ -59,16 +61,19 @@ public class PetEnclosureManagementPanel extends JPanel {
         
         addButton = new JButton(EmojiFontHelper.withEmoji("➕", "Check-in"));
         addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(addButton);
         addButton.addActionListener(e -> showCheckInDialog());
         buttonPanel.add(addButton);
         
         editButton = new JButton(EmojiFontHelper.withEmoji("✏️", "Sửa"));
         editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(editButton);
         editButton.addActionListener(e -> showEditEnclosureDialog());
         buttonPanel.add(editButton);
         
         checkoutButton = new JButton(EmojiFontHelper.withEmoji("✅", "Check-out"));
         checkoutButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(checkoutButton);
         checkoutButton.setBackground(new Color(40, 167, 69));
         checkoutButton.setForeground(Color.WHITE);
         checkoutButton.addActionListener(e -> showCheckoutDialog());
@@ -76,11 +81,13 @@ public class PetEnclosureManagementPanel extends JPanel {
         
         deleteButton = new JButton(EmojiFontHelper.withEmoji("🗑️", "Xóa"));
         deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(deleteButton);
         deleteButton.addActionListener(e -> deleteEnclosure());
         buttonPanel.add(deleteButton);
         
         refreshButton = new JButton(EmojiFontHelper.withEmoji("🔄", "Làm mới"));
         refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(refreshButton);
         refreshButton.addActionListener(e -> refreshData());
         buttonPanel.add(refreshButton);
         
@@ -107,6 +114,9 @@ public class PetEnclosureManagementPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(enclosureTable);
         scrollPane.setBorder(null);
         add(scrollPane, BorderLayout.CENTER);
+
+        paginationPanel = new TablePaginationPanel(enclosureTable);
+        add(paginationPanel, BorderLayout.SOUTH);
     }
     
     public void refreshData() {
@@ -134,6 +144,7 @@ public class PetEnclosureManagementPanel extends JPanel {
                     dto.getPetEnclosureStatus() != null ? dto.getPetEnclosureStatus() : ""
                 });
             }
+            if (paginationPanel != null) paginationPanel.refresh();
         } catch (PetcareException ex) {
             JOptionPane.showMessageDialog(this, "Lỗi khi tải dữ liệu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
@@ -153,7 +164,8 @@ public class PetEnclosureManagementPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn lưu chuồng cần sửa!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        int enclosureId = (Integer) tableModel.getValueAt(selectedRow, 0);
+        int modelRow = enclosureTable.convertRowIndexToModel(selectedRow);
+        int enclosureId = (Integer) tableModel.getValueAt(modelRow, 0);
         try {
             com.petcare.model.domain.PetEnclosure enclosure = PetEnclosureService.getInstance().getEnclosureById(enclosureId);
             if (enclosure != null) {
@@ -174,8 +186,9 @@ public class PetEnclosureManagementPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn lưu chuồng cần checkout!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        int enclosureId = (Integer) tableModel.getValueAt(selectedRow, 0);
-        String status = (String) tableModel.getValueAt(selectedRow, 8);
+        int modelRow = enclosureTable.convertRowIndexToModel(selectedRow);
+        int enclosureId = (Integer) tableModel.getValueAt(modelRow, 0);
+        String status = (String) tableModel.getValueAt(modelRow, 8);
         if ("Check Out".equals(status)) {
             JOptionPane.showMessageDialog(this, "Lưu chuồng này đã được checkout rồi!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
@@ -200,7 +213,8 @@ public class PetEnclosureManagementPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn lưu chuồng cần xóa!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        int enclosureId = (Integer) tableModel.getValueAt(selectedRow, 0);
+        int modelRow = enclosureTable.convertRowIndexToModel(selectedRow);
+        int enclosureId = (Integer) tableModel.getValueAt(modelRow, 0);
         int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc muốn xóa lưu chuồng này?", "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             try {

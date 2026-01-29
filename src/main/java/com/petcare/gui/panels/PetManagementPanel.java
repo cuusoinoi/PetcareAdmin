@@ -21,6 +21,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.GUIUtil;
 
 /**
  * Pet Management Panel with CRUD operations
@@ -28,6 +29,7 @@ import com.petcare.util.EmojiFontHelper;
 public class PetManagementPanel extends JPanel {
     private JTable petTable;
     private DefaultTableModel tableModel;
+    private TablePaginationPanel paginationPanel;
     private JButton addButton;
     private JButton editButton;
     private JButton deleteButton;
@@ -63,21 +65,25 @@ public class PetManagementPanel extends JPanel {
         
         addButton = new JButton(EmojiFontHelper.withEmoji("➕", "Thêm"));
         addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(addButton);
         addButton.addActionListener(e -> showAddPetDialog());
         buttonPanel.add(addButton);
         
         editButton = new JButton(EmojiFontHelper.withEmoji("✏️", "Sửa"));
         editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(editButton);
         editButton.addActionListener(e -> showEditPetDialog());
         buttonPanel.add(editButton);
         
         deleteButton = new JButton(EmojiFontHelper.withEmoji("🗑️", "Xóa"));
         deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(deleteButton);
         deleteButton.addActionListener(e -> deletePet());
         buttonPanel.add(deleteButton);
         
         refreshButton = new JButton(EmojiFontHelper.withEmoji("🔄", "Làm mới"));
         refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(refreshButton);
         refreshButton.addActionListener(e -> refreshData());
         buttonPanel.add(refreshButton);
         
@@ -104,6 +110,9 @@ public class PetManagementPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(petTable);
         scrollPane.setBorder(null);
         add(scrollPane, BorderLayout.CENTER);
+
+        paginationPanel = new TablePaginationPanel(petTable);
+        add(paginationPanel, BorderLayout.SOUTH);
     }
     
     public void refreshData() {
@@ -165,6 +174,7 @@ public class PetManagementPanel extends JPanel {
                 };
                 tableModel.addRow(row);
             }
+            if (paginationPanel != null) paginationPanel.refresh();
         } catch (PetcareException ex) {
             JOptionPane.showMessageDialog(this, 
                 "Lỗi khi tải dữ liệu: " + ex.getMessage(), 
@@ -191,8 +201,8 @@ public class PetManagementPanel extends JPanel {
                 JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
-        int petId = (Integer) tableModel.getValueAt(selectedRow, 0);
+        int modelRow = petTable.convertRowIndexToModel(selectedRow);
+        int petId = (Integer) tableModel.getValueAt(modelRow, 0);
         
         try {
             Pet pet = petService.getPetById(petId);
@@ -226,9 +236,9 @@ public class PetManagementPanel extends JPanel {
                 JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
-        int petId = (Integer) tableModel.getValueAt(selectedRow, 0);
-        String petName = (String) tableModel.getValueAt(selectedRow, 1);
+        int modelRow = petTable.convertRowIndexToModel(selectedRow);
+        int petId = (Integer) tableModel.getValueAt(modelRow, 0);
+        String petName = (String) tableModel.getValueAt(modelRow, 1);
         
         int confirm = JOptionPane.showConfirmDialog(this, 
             "Bạn có chắc muốn xóa thú cưng: " + petName + "?", 

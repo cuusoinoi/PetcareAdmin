@@ -116,6 +116,7 @@ public class DashboardFrame extends JFrame {
     
     // Navigation methods
     public void showDashboard() {
+        dashboardPanel.refreshData();
         cardLayout.show(contentPanel, "DASHBOARD");
         sidebar.setSelectedButton(sidebar.dashboardBtn);
     }

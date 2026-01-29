@@ -18,6 +18,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.GUIUtil;
 
 /**
  * Doctor Management Panel with CRUD operations
@@ -25,6 +26,7 @@ import com.petcare.util.EmojiFontHelper;
 public class DoctorManagementPanel extends JPanel {
     private JTable doctorTable;
     private DefaultTableModel tableModel;
+    private TablePaginationPanel paginationPanel;
     private JButton addButton;
     private JButton editButton;
     private JButton deleteButton;
@@ -58,21 +60,25 @@ public class DoctorManagementPanel extends JPanel {
         
         addButton = new JButton(EmojiFontHelper.withEmoji("➕", "Thêm"));
         addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(addButton);
         addButton.addActionListener(e -> showAddDoctorDialog());
         buttonPanel.add(addButton);
         
         editButton = new JButton(EmojiFontHelper.withEmoji("✏️", "Sửa"));
         editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(editButton);
         editButton.addActionListener(e -> showEditDoctorDialog());
         buttonPanel.add(editButton);
         
         deleteButton = new JButton(EmojiFontHelper.withEmoji("🗑️", "Xóa"));
         deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(deleteButton);
         deleteButton.addActionListener(e -> deleteDoctor());
         buttonPanel.add(deleteButton);
         
         refreshButton = new JButton(EmojiFontHelper.withEmoji("🔄", "Làm mới"));
         refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(refreshButton);
         refreshButton.addActionListener(e -> refreshData());
         buttonPanel.add(refreshButton);
         
@@ -98,6 +104,9 @@ public class DoctorManagementPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(doctorTable);
         scrollPane.setBorder(null);
         add(scrollPane, BorderLayout.CENTER);
+
+        paginationPanel = new TablePaginationPanel(doctorTable);
+        add(paginationPanel, BorderLayout.SOUTH);
     }
     
     public void refreshData() {
@@ -120,6 +129,7 @@ public class DoctorManagementPanel extends JPanel {
                 };
                 tableModel.addRow(row);
             }
+            if (paginationPanel != null) paginationPanel.refresh();
         } catch (PetcareException ex) {
             JOptionPane.showMessageDialog(this, 
                 "Lỗi khi tải dữ liệu: " + ex.getMessage(), 
@@ -146,8 +156,8 @@ public class DoctorManagementPanel extends JPanel {
                 JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
-        int doctorId = (Integer) tableModel.getValueAt(selectedRow, 0);
+        int modelRow = doctorTable.convertRowIndexToModel(selectedRow);
+        int doctorId = (Integer) tableModel.getValueAt(modelRow, 0);
         
         try {
             Doctor doctor = doctorService.getDoctorById(doctorId);
@@ -181,9 +191,9 @@ public class DoctorManagementPanel extends JPanel {
                 JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
-        int doctorId = (Integer) tableModel.getValueAt(selectedRow, 0);
-        String doctorName = (String) tableModel.getValueAt(selectedRow, 1);
+        int modelRow = doctorTable.convertRowIndexToModel(selectedRow);
+        int doctorId = (Integer) tableModel.getValueAt(modelRow, 0);
+        String doctorName = (String) tableModel.getValueAt(modelRow, 1);
         
         int confirm = JOptionPane.showConfirmDialog(this, 
             "Bạn có chắc muốn xóa bác sĩ: " + doctorName + "?", 

@@ -20,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.GUIUtil;
 
 /**
  * Invoice Management Panel with CRUD operations
@@ -27,6 +28,7 @@ import com.petcare.util.EmojiFontHelper;
 public class InvoiceManagementPanel extends JPanel {
     private JTable invoiceTable;
     private DefaultTableModel tableModel;
+    private TablePaginationPanel paginationPanel;
     private JButton addButton;
     private JButton viewButton;
     private JButton deleteButton;
@@ -58,21 +60,25 @@ public class InvoiceManagementPanel extends JPanel {
         
         addButton = new JButton(EmojiFontHelper.withEmoji("➕", "Thêm"));
         addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(addButton);
         addButton.addActionListener(e -> showAddInvoiceDialog());
         buttonPanel.add(addButton);
         
         viewButton = new JButton(EmojiFontHelper.withEmoji("👁️", "Xem chi tiết"));
         viewButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(viewButton);
         viewButton.addActionListener(e -> showInvoiceDetails());
         buttonPanel.add(viewButton);
         
         deleteButton = new JButton(EmojiFontHelper.withEmoji("🗑️", "Xóa"));
         deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(deleteButton);
         deleteButton.addActionListener(e -> deleteInvoice());
         buttonPanel.add(deleteButton);
         
         refreshButton = new JButton(EmojiFontHelper.withEmoji("🔄", "Làm mới"));
         refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(refreshButton);
         refreshButton.addActionListener(e -> refreshData());
         buttonPanel.add(refreshButton);
         
@@ -98,6 +104,9 @@ public class InvoiceManagementPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(invoiceTable);
         scrollPane.setBorder(null);
         add(scrollPane, BorderLayout.CENTER);
+
+        paginationPanel = new TablePaginationPanel(invoiceTable);
+        add(paginationPanel, BorderLayout.SOUTH);
     }
     
     public void refreshData() {
@@ -122,6 +131,7 @@ public class InvoiceManagementPanel extends JPanel {
                     formatCurrency(dto.getTotalAmount())
                 });
             }
+            if (paginationPanel != null) paginationPanel.refresh();
         } catch (PetcareException ex) {
             JOptionPane.showMessageDialog(this, "Lỗi khi tải dữ liệu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
@@ -144,8 +154,8 @@ public class InvoiceManagementPanel extends JPanel {
                 JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
-        int invoiceId = (Integer) tableModel.getValueAt(selectedRow, 0);
+        int modelRow = invoiceTable.convertRowIndexToModel(selectedRow);
+        int invoiceId = (Integer) tableModel.getValueAt(modelRow, 0);
         InvoiceDetailsDialog dialog = new InvoiceDetailsDialog(null, invoiceId);
         dialog.setVisible(true);
     }
@@ -159,8 +169,8 @@ public class InvoiceManagementPanel extends JPanel {
                 JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
-        int invoiceId = (Integer) tableModel.getValueAt(selectedRow, 0);
+        int modelRow = invoiceTable.convertRowIndexToModel(selectedRow);
+        int invoiceId = (Integer) tableModel.getValueAt(modelRow, 0);
         
         int confirm = JOptionPane.showConfirmDialog(this, 
             "Bạn có chắc muốn xóa hóa đơn #" + invoiceId + "?", 

@@ -2,6 +2,7 @@ package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.ThemeManager;
 import com.petcare.model.domain.PetVaccination;
 import com.petcare.service.CustomerService;
 import com.petcare.service.DoctorService;
@@ -62,16 +63,19 @@ public class AddEditVaccinationDialog extends JDialog {
         setSize(600, 500);
         setLocationRelativeTo(getParent());
         setLayout(new BorderLayout());
+        getContentPane().setBackground(ThemeManager.getContentBackground());
         
         // Form panel
         JPanel formPanel = new JPanel(new GridLayout(0, 2, 15, 15));
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        formPanel.setBackground(Color.WHITE);
+        formPanel.setBackground(ThemeManager.getContentBackground());
         
         // Vaccine
         formPanel.add(createLabel("Vaccine *:"));
         vaccineCombo = new JComboBox<>();
         vaccineCombo.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        vaccineCombo.setBackground(ThemeManager.getTextFieldBackground());
+        vaccineCombo.setForeground(ThemeManager.getTextFieldForeground());
         vaccineCombo.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         formPanel.add(vaccineCombo);
         
@@ -79,6 +83,8 @@ public class AddEditVaccinationDialog extends JDialog {
         formPanel.add(createLabel("Khách hàng *:"));
         customerCombo = new JComboBox<>();
         customerCombo.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        customerCombo.setBackground(ThemeManager.getTextFieldBackground());
+        customerCombo.setForeground(ThemeManager.getTextFieldForeground());
         customerCombo.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         customerCombo.addActionListener(e -> loadPetsByCustomer());
         formPanel.add(customerCombo);
@@ -87,6 +93,8 @@ public class AddEditVaccinationDialog extends JDialog {
         formPanel.add(createLabel("Thú cưng *:"));
         petCombo = new JComboBox<>();
         petCombo.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        petCombo.setBackground(ThemeManager.getTextFieldBackground());
+        petCombo.setForeground(ThemeManager.getTextFieldForeground());
         petCombo.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         formPanel.add(petCombo);
         
@@ -94,6 +102,8 @@ public class AddEditVaccinationDialog extends JDialog {
         formPanel.add(createLabel("Bác sĩ *:"));
         doctorCombo = new JComboBox<>();
         doctorCombo.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        doctorCombo.setBackground(ThemeManager.getTextFieldBackground());
+        doctorCombo.setForeground(ThemeManager.getTextFieldForeground());
         doctorCombo.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         formPanel.add(doctorCombo);
         
@@ -113,8 +123,10 @@ public class AddEditVaccinationDialog extends JDialog {
         formPanel.add(createLabel("Ghi chú:"));
         notesArea = new JTextArea(3, 20);
         notesArea.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        notesArea.setBackground(ThemeManager.getTextFieldBackground());
+        notesArea.setForeground(ThemeManager.getTextFieldForeground());
         notesArea.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(220, 220, 220)),
+            BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
             BorderFactory.createEmptyBorder(5, 5, 5, 5)
         ));
         notesArea.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
@@ -125,7 +137,7 @@ public class AddEditVaccinationDialog extends JDialog {
         // Button panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
-        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setBackground(ThemeManager.getContentBackground());
         
         saveButton = new JButton(EmojiFontHelper.withEmoji("💾", "Lưu"));
         saveButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -138,6 +150,8 @@ public class AddEditVaccinationDialog extends JDialog {
         
         cancelButton = new JButton(EmojiFontHelper.withEmoji("❌", "Hủy"));
         cancelButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        cancelButton.setBackground(ThemeManager.getButtonBackground());
+        cancelButton.setForeground(ThemeManager.getButtonForeground());
         cancelButton.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         cancelButton.addActionListener(e -> dispose());
         buttonPanel.add(cancelButton);
@@ -148,14 +162,17 @@ public class AddEditVaccinationDialog extends JDialog {
     private JLabel createLabel(String text) {
         JLabel label = new JLabel(text);
         label.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        label.setForeground(ThemeManager.getTitleForeground());
         return label;
     }
     
     private JTextField createTextField() {
         JTextField field = new JTextField();
         field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        field.setBackground(ThemeManager.getTextFieldBackground());
+        field.setForeground(ThemeManager.getTextFieldForeground());
         field.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(220, 220, 220)),
+            BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
             BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         field.putClientProperty(FlatClientProperties.STYLE, "arc: 5");

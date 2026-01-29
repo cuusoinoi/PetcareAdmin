@@ -4,6 +4,7 @@ import com.formdev.flatlaf.FlatClientProperties;
 import com.petcare.model.entity.TreatmentCourseInfoDto;
 import com.petcare.model.entity.TreatmentSessionListDto;
 import com.petcare.service.TreatmentCourseService;
+import com.petcare.util.ThemeManager;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -32,14 +33,15 @@ public class TreatmentSessionsDialog extends JDialog {
         setLocationRelativeTo(getParent());
         setLayout(new BorderLayout());
         setTitle("Buổi điều trị - Liệu trình #" + courseId);
+        getContentPane().setBackground(ThemeManager.getContentBackground());
         
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(Color.WHITE);
+        mainPanel.setBackground(ThemeManager.getContentBackground());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
         // Info panel
         JPanel infoPanel = new JPanel(new java.awt.GridLayout(0, 2, 15, 10));
-        infoPanel.setBackground(Color.WHITE);
+        infoPanel.setBackground(ThemeManager.getContentBackground());
         SimpleDateFormat sdfDate = new SimpleDateFormat("dd/MM/yyyy");
         try {
             TreatmentCourseInfoDto courseInfo = TreatmentCourseService.getInstance().getCourseInfoForSessions(courseId);
@@ -88,8 +90,10 @@ public class TreatmentSessionsDialog extends JDialog {
         sessionsTable.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         sessionsTable.setRowHeight(30);
         sessionsTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+        ThemeManager.applyTableTheme(sessionsTable);
         
         JScrollPane scrollPane = new JScrollPane(sessionsTable);
+        scrollPane.setBackground(ThemeManager.getContentBackground());
         scrollPane.setBorder(BorderFactory.createTitledBorder("Danh sách buổi điều trị"));
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         
@@ -98,7 +102,7 @@ public class TreatmentSessionsDialog extends JDialog {
         // Close button
         JPanel buttonPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
-        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setBackground(ThemeManager.getContentBackground());
         
         javax.swing.JButton closeButton = new javax.swing.JButton("Đóng");
         closeButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -112,12 +116,14 @@ public class TreatmentSessionsDialog extends JDialog {
     private JLabel createInfoLabel(String text) {
         JLabel label = new JLabel(text);
         label.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        label.setForeground(ThemeManager.getTitleForeground());
         return label;
     }
     
     private JLabel createInfoValue(String text) {
         JLabel label = new JLabel(text != null ? text : "");
         label.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        label.setForeground(ThemeManager.getTableForeground());
         return label;
     }
 }

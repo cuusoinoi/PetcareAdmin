@@ -2,6 +2,7 @@ package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.ThemeManager;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.service.UserService;
 import java.awt.BorderLayout;
@@ -39,16 +40,19 @@ public class ChangePasswordDialog extends JDialog {
         setSize(400, 200);
         setLocationRelativeTo(getParent());
         setLayout(new BorderLayout());
+        getContentPane().setBackground(ThemeManager.getContentBackground());
 
         JPanel formPanel = new JPanel(new GridLayout(0, 2, 15, 15));
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        formPanel.setBackground(Color.WHITE);
+        formPanel.setBackground(ThemeManager.getContentBackground());
 
         formPanel.add(createLabel("Mật khẩu mới *:"));
         newPasswordField = new JPasswordField();
         newPasswordField.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        newPasswordField.setBackground(ThemeManager.getTextFieldBackground());
+        newPasswordField.setForeground(ThemeManager.getTextFieldForeground());
         newPasswordField.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(220, 220, 220)),
+            BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
             BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         newPasswordField.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
@@ -57,8 +61,10 @@ public class ChangePasswordDialog extends JDialog {
         formPanel.add(createLabel("Xác nhận mật khẩu *:"));
         confirmPasswordField = new JPasswordField();
         confirmPasswordField.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        confirmPasswordField.setBackground(ThemeManager.getTextFieldBackground());
+        confirmPasswordField.setForeground(ThemeManager.getTextFieldForeground());
         confirmPasswordField.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(220, 220, 220)),
+            BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
             BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         confirmPasswordField.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
@@ -68,7 +74,7 @@ public class ChangePasswordDialog extends JDialog {
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
-        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setBackground(ThemeManager.getContentBackground());
 
         saveButton = new JButton(EmojiFontHelper.withEmoji("💾", "Lưu"));
         saveButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -81,6 +87,8 @@ public class ChangePasswordDialog extends JDialog {
 
         cancelButton = new JButton(EmojiFontHelper.withEmoji("❌", "Hủy"));
         cancelButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        cancelButton.setBackground(ThemeManager.getButtonBackground());
+        cancelButton.setForeground(ThemeManager.getButtonForeground());
         cancelButton.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         cancelButton.addActionListener(e -> dispose());
         buttonPanel.add(cancelButton);
@@ -91,6 +99,7 @@ public class ChangePasswordDialog extends JDialog {
     private JLabel createLabel(String text) {
         JLabel label = new JLabel(text);
         label.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        label.setForeground(ThemeManager.getTitleForeground());
         return label;
     }
 

@@ -4,6 +4,7 @@ import com.formdev.flatlaf.FlatClientProperties;
 import com.petcare.model.entity.InvoiceDetailListDto;
 import com.petcare.model.entity.InvoiceInfoDto;
 import com.petcare.service.InvoiceService;
+import com.petcare.util.ThemeManager;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -32,14 +33,15 @@ public class InvoiceDetailsDialog extends JDialog {
         setLocationRelativeTo(getParent());
         setLayout(new BorderLayout());
         setTitle("Chi tiết Hóa đơn #" + invoiceId);
+        getContentPane().setBackground(ThemeManager.getContentBackground());
         
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(Color.WHITE);
+        mainPanel.setBackground(ThemeManager.getContentBackground());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
         // Invoice info
         JPanel infoPanel = new JPanel(new java.awt.GridLayout(0, 2, 15, 10));
-        infoPanel.setBackground(Color.WHITE);
+        infoPanel.setBackground(ThemeManager.getContentBackground());
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         try {
             InvoiceInfoDto invoiceInfo = InvoiceService.getInstance().getInvoiceInfo(invoiceId);
@@ -66,7 +68,7 @@ public class InvoiceDetailsDialog extends JDialog {
                 infoPanel.add(createInfoLabel("Thành tiền:"));
                 JLabel totalLabel = createInfoValue(formatCurrency(invoiceInfo.getTotalAmount()));
                 totalLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
-                totalLabel.setForeground(new Color(139, 69, 19));
+                totalLabel.setForeground(ThemeManager.isDarkMode() ? new Color(255, 180, 100) : new Color(139, 69, 19));
                 infoPanel.add(totalLabel);
             }
         } catch (Exception ex) {
@@ -100,8 +102,10 @@ public class InvoiceDetailsDialog extends JDialog {
         detailsTable.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         detailsTable.setRowHeight(30);
         detailsTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+        ThemeManager.applyTableTheme(detailsTable);
         
         JScrollPane scrollPane = new JScrollPane(detailsTable);
+        scrollPane.setBackground(ThemeManager.getContentBackground());
         scrollPane.setBorder(BorderFactory.createTitledBorder("Chi tiết dịch vụ"));
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         
@@ -110,7 +114,7 @@ public class InvoiceDetailsDialog extends JDialog {
         // Close button
         JPanel buttonPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
-        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setBackground(ThemeManager.getContentBackground());
         
         javax.swing.JButton closeButton = new javax.swing.JButton("Đóng");
         closeButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -124,12 +128,14 @@ public class InvoiceDetailsDialog extends JDialog {
     private JLabel createInfoLabel(String text) {
         JLabel label = new JLabel(text);
         label.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        label.setForeground(ThemeManager.getTitleForeground());
         return label;
     }
     
     private JLabel createInfoValue(String text) {
         JLabel label = new JLabel(text != null ? text : "");
         label.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        label.setForeground(ThemeManager.getTableForeground());
         return label;
     }
     

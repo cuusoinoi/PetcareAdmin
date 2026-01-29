@@ -2,6 +2,7 @@ package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.ThemeManager;
 import com.petcare.model.domain.InvoiceDetailItem;
 import com.petcare.model.domain.ServiceType;
 import com.petcare.service.CustomerService;
@@ -63,11 +64,12 @@ public class AddInvoiceDialog extends JDialog {
         setLocationRelativeTo(getParent());
         setLayout(new BorderLayout());
         setTitle("Thêm hóa đơn mới");
+        getContentPane().setBackground(ThemeManager.getContentBackground());
         
         // Form panel
         JPanel formPanel = new JPanel(new GridLayout(0, 2, 15, 15));
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        formPanel.setBackground(Color.WHITE);
+        formPanel.setBackground(ThemeManager.getContentBackground());
         
         // Customer
         formPanel.add(createLabel("Khách hàng *:"));
@@ -87,11 +89,11 @@ public class AddInvoiceDialog extends JDialog {
         // Services section
         JPanel servicesPanel = new JPanel(new BorderLayout());
         servicesPanel.setBorder(BorderFactory.createTitledBorder("Dịch vụ"));
-        servicesPanel.setBackground(Color.WHITE);
+        servicesPanel.setBackground(ThemeManager.getContentBackground());
         
         // Add service panel
         JPanel addServicePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        addServicePanel.setBackground(Color.WHITE);
+        addServicePanel.setBackground(ThemeManager.getContentBackground());
         
         serviceCombo = new JComboBox<>();
         serviceCombo.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -125,6 +127,7 @@ public class AddInvoiceDialog extends JDialog {
         serviceTable.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         serviceTable.setRowHeight(25);
         serviceTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        ThemeManager.applyTableTheme(serviceTable);
         
         removeServiceButton = new JButton(EmojiFontHelper.withEmoji("➖", "Xóa dịch vụ đã chọn"));
         removeServiceButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
@@ -140,11 +143,11 @@ public class AddInvoiceDialog extends JDialog {
         });
         
         JPanel tableButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        tableButtonPanel.setBackground(Color.WHITE);
+        tableButtonPanel.setBackground(ThemeManager.getContentBackground());
         tableButtonPanel.add(removeServiceButton);
         
         JPanel tablePanel = new JPanel(new BorderLayout());
-        tablePanel.setBackground(Color.WHITE);
+        tablePanel.setBackground(ThemeManager.getContentBackground());
         tablePanel.add(new JScrollPane(serviceTable), BorderLayout.CENTER);
         tablePanel.add(tableButtonPanel, BorderLayout.SOUTH);
         
@@ -153,7 +156,7 @@ public class AddInvoiceDialog extends JDialog {
         // Summary panel
         JPanel summaryPanel = new JPanel(new GridLayout(0, 2, 15, 10));
         summaryPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
-        summaryPanel.setBackground(Color.WHITE);
+        summaryPanel.setBackground(ThemeManager.getContentBackground());
         
         summaryPanel.add(createLabel("Giảm giá (VNĐ):"));
         discountField = new JTextField("0");
@@ -172,17 +175,18 @@ public class AddInvoiceDialog extends JDialog {
         summaryPanel.add(createLabel("Tổng tiền (VNĐ):"));
         subtotalLabel = new JLabel("0");
         subtotalLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        subtotalLabel.setForeground(ThemeManager.getTableForeground());
         summaryPanel.add(subtotalLabel);
         
         summaryPanel.add(createLabel("Thành tiền (VNĐ):"));
         totalLabel = new JLabel("0");
         totalLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        totalLabel.setForeground(new Color(139, 69, 19));
+        totalLabel.setForeground(ThemeManager.isDarkMode() ? new Color(255, 180, 100) : new Color(139, 69, 19));
         summaryPanel.add(totalLabel);
         
         // Main panel
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(Color.WHITE);
+        mainPanel.setBackground(ThemeManager.getContentBackground());
         mainPanel.add(formPanel, BorderLayout.NORTH);
         mainPanel.add(servicesPanel, BorderLayout.CENTER);
         mainPanel.add(summaryPanel, BorderLayout.SOUTH);
@@ -192,12 +196,12 @@ public class AddInvoiceDialog extends JDialog {
         // Button panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
-        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setBackground(ThemeManager.getContentBackground());
         
         saveButton = new JButton(EmojiFontHelper.withEmoji("💾", "Lưu"));
         saveButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         saveButton.setBackground(new Color(139, 69, 19));
-        saveButton.setForeground(Color.WHITE);
+        saveButton.setForeground(Color.WHITE); // nút Lưu màu nâu, chữ trắng
         saveButton.setBorderPainted(false);
         saveButton.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         saveButton.addActionListener(e -> saveInvoice());
@@ -205,6 +209,8 @@ public class AddInvoiceDialog extends JDialog {
         
         cancelButton = new JButton(EmojiFontHelper.withEmoji("❌", "Hủy"));
         cancelButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        cancelButton.setBackground(ThemeManager.getButtonBackground());
+        cancelButton.setForeground(ThemeManager.getButtonForeground());
         cancelButton.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         cancelButton.addActionListener(e -> dispose());
         buttonPanel.add(cancelButton);
@@ -215,6 +221,7 @@ public class AddInvoiceDialog extends JDialog {
     private JLabel createLabel(String text) {
         JLabel label = new JLabel(text);
         label.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        label.setForeground(ThemeManager.getTitleForeground());
         return label;
     }
     

@@ -19,6 +19,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
@@ -36,6 +39,7 @@ public class AppointmentManagementPanel extends JPanel {
     private JPanel centerPanel;
     private JPanel sideButtonPanel;
     private JLabel titleLabel;
+    private JTextField searchField;
     private JButton addButton;
     private JButton editButton;
     private JButton updateStatusButton;
@@ -92,6 +96,22 @@ public class AppointmentManagementPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(appointmentTable);
         scrollPane.setBorder(null);
 
+        JPanel searchPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 10, 8));
+        searchPanel.setBackground(ThemeManager.getContentBackground());
+        searchField = new JTextField(25);
+        searchField.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        searchField.putClientProperty("JTextField.placeholderText", "Tìm theo ngày, loại, khách hàng, thú cưng, bác sĩ...");
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            @Override
+            public void removeUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            @Override
+            public void changedUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+        });
+        searchPanel.add(new JLabel("Tìm kiếm:"));
+        searchPanel.add(searchField);
+
         sideButtonPanel = new JPanel(new GridLayout(0, 1, 0, 6));
         sideButtonPanel.setBackground(ThemeManager.getSideButtonPanelBackground());
         sideButtonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -133,6 +153,7 @@ public class AppointmentManagementPanel extends JPanel {
 
         centerPanel = new JPanel(new BorderLayout());
         centerPanel.setBackground(ThemeManager.getContentBackground());
+        centerPanel.add(searchPanel, BorderLayout.NORTH);
         centerPanel.add(scrollPane, BorderLayout.CENTER);
         paginationPanel = new TablePaginationPanel(appointmentTable);
         centerPanel.add(paginationPanel, BorderLayout.SOUTH);

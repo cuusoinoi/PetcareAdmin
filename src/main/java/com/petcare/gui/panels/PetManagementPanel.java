@@ -19,6 +19,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
@@ -35,6 +38,7 @@ public class PetManagementPanel extends JPanel {
     private JPanel centerPanel;
     private JPanel sideButtonPanel;
     private JLabel titleLabel;
+    private JTextField searchField;
     private JButton addButton;
     private JButton editButton;
     private JButton deleteButton;
@@ -86,6 +90,23 @@ public class PetManagementPanel extends JPanel {
         
         JScrollPane scrollPane = new JScrollPane(petTable);
         scrollPane.setBorder(null);
+
+        JPanel searchPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 10, 8));
+        searchPanel.setBackground(ThemeManager.getContentBackground());
+        searchField = new JTextField(25);
+        searchField.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        searchField.putClientProperty("JTextField.placeholderText", "Tìm theo tên thú cưng, khách hàng, loài, giống...");
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            @Override
+            public void removeUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+            @Override
+            public void changedUpdate(DocumentEvent e) { paginationPanel.setSearchText(searchField.getText().trim()); }
+        });
+        searchPanel.add(new JLabel("Tìm kiếm:"));
+        searchPanel.add(searchField);
+
         java.awt.Color iconColor = ThemeManager.isDarkMode() ? new Color(0xc0c0c0) : new Color(60, 60, 60);
         sideButtonPanel = new JPanel(new GridLayout(0, 1, 0, 6));
         sideButtonPanel.setBackground(ThemeManager.getSideButtonPanelBackground());
@@ -118,6 +139,7 @@ public class PetManagementPanel extends JPanel {
         sideButtonPanel.add(refreshButton);
         centerPanel = new JPanel(new BorderLayout());
         centerPanel.setBackground(ThemeManager.getContentBackground());
+        centerPanel.add(searchPanel, BorderLayout.NORTH);
         centerPanel.add(scrollPane, BorderLayout.CENTER);
         paginationPanel = new TablePaginationPanel(petTable);
         centerPanel.add(paginationPanel, BorderLayout.SOUTH);

@@ -71,9 +71,8 @@ public class LoginFrame extends JFrame {
         // Username field
         usernameField = new JTextField();
         usernameField.setBounds(50, 80, 350, 40);
-        usernameField.putClientProperty(FlatClientProperties.STYLE, 
-            "arc: 10; " +
-            "placeholderText: Nhập tên đăng nhập");
+        usernameField.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
+        usernameField.putClientProperty("JTextField.placeholderText", "Nhập tên đăng nhập");
         usernameField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         formPanel.add(usernameField);
         
@@ -86,9 +85,8 @@ public class LoginFrame extends JFrame {
         // Password field
         passwordField = new JPasswordField();
         passwordField.setBounds(50, 170, 350, 40);
-        passwordField.putClientProperty(FlatClientProperties.STYLE, 
-            "arc: 10; " +
-            "placeholderText: Nhập mật khẩu");
+        passwordField.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
+        passwordField.putClientProperty("JTextField.placeholderText", "Nhập mật khẩu");
         passwordField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         formPanel.add(passwordField);
         

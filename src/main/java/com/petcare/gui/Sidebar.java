@@ -176,8 +176,6 @@ public class Sidebar extends JPanel {
         verticalBar.putClientProperty(FlatClientProperties.STYLE, ""
             + "track:#5C3A0F;"
             + "thumb:#D4C4A8;"
-            + "thumbHover:#E8DCC8;"
-            + "thumbPressed:#C4B498;"
             + "trackArc:6;"
             + "thumbArc:6;"
             + "width:12");

@@ -1,6 +1,6 @@
 package com.petcare.util;
 
-import com.petcare.model.Database;
+import com.petcare.persistence.Database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;

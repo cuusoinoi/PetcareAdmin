@@ -2,15 +2,15 @@ package com.petcare.gui.panels;
 
 import com.petcare.gui.dialogs.AddEditPetEnclosureDialog;
 import com.petcare.gui.dialogs.CheckoutDialog;
-import com.petcare.model.Database;
-import com.petcare.model.PetEnclosure;
+import com.petcare.model.entity.PetEnclosureListDto;
+import com.petcare.model.exception.PetcareException;
+import com.petcare.service.PetEnclosureService;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -114,50 +114,27 @@ public class PetEnclosureManagementPanel extends JPanel {
     
     private void loadEnclosures() {
         tableModel.setRowCount(0);
-        
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        SimpleDateFormat dateSdf = new SimpleDateFormat("dd/MM/yyyy");
         try {
-            String query = "SELECT pe.pet_enclosure_id, pe.pet_enclosure_number, c.customer_name, " +
-                          "p.pet_name, pe.check_in_date, pe.check_out_date, pe.daily_rate, " +
-                          "pe.deposit, pe.pet_enclosure_status " +
-                          "FROM pet_enclosures pe " +
-                          "INNER JOIN customers c ON pe.customer_id = c.customer_id " +
-                          "INNER JOIN pets p ON pe.pet_id = p.pet_id " +
-                          "ORDER BY pe.pet_enclosure_id DESC";
-            
-            ResultSet rs = Database.executeQuery(query);
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-            SimpleDateFormat dateSdf = new SimpleDateFormat("dd/MM/yyyy");
-            
-            while (rs != null && rs.next()) {
-                String checkIn = "";
-                if (rs.getTimestamp("check_in_date") != null) {
-                    checkIn = sdf.format(rs.getTimestamp("check_in_date"));
-                }
-                
-                String checkOut = "";
-                if (rs.getTimestamp("check_out_date") != null) {
-                    checkOut = dateSdf.format(rs.getTimestamp("check_out_date"));
-                }
-                
-                Object[] row = {
-                    rs.getInt("pet_enclosure_id"),
-                    rs.getInt("pet_enclosure_number"),
-                    rs.getString("customer_name"),
-                    rs.getString("pet_name"),
-                    checkIn,
-                    checkOut,
-                    rs.getInt("daily_rate"),
-                    rs.getInt("deposit"),
-                    rs.getString("pet_enclosure_status")
-                };
-                tableModel.addRow(row);
+            List<PetEnclosureListDto> list = PetEnclosureService.getInstance().getEnclosuresForList();
+            for (PetEnclosureListDto dto : list) {
+                String checkInStr = dto.getCheckInDate() != null ? sdf.format(dto.getCheckInDate()) : "";
+                String checkOutStr = dto.getCheckOutDate() != null ? dateSdf.format(dto.getCheckOutDate()) : "";
+                tableModel.addRow(new Object[]{
+                    dto.getPetEnclosureId(),
+                    dto.getPetEnclosureNumber(),
+                    dto.getCustomerName() != null ? dto.getCustomerName() : "",
+                    dto.getPetName() != null ? dto.getPetName() : "",
+                    checkInStr,
+                    checkOutStr,
+                    dto.getDailyRate(),
+                    dto.getDeposit(),
+                    dto.getPetEnclosureStatus() != null ? dto.getPetEnclosureStatus() : ""
+                });
             }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, 
-                "Lỗi khi tải dữ liệu: " + ex.getMessage(), 
-                "Lỗi", 
-                JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
+        } catch (PetcareException ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi tải dữ liệu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -172,138 +149,66 @@ public class PetEnclosureManagementPanel extends JPanel {
     private void showEditEnclosureDialog() {
         int selectedRow = enclosureTable.getSelectedRow();
         if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, 
-                "Vui lòng chọn lưu chuồng cần sửa!", 
-                "Thông báo", 
-                JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn lưu chuồng cần sửa!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
         int enclosureId = (Integer) tableModel.getValueAt(selectedRow, 0);
-        PetEnclosure enclosure = getEnclosureById(enclosureId);
-        
-        if (enclosure != null) {
-            AddEditPetEnclosureDialog dialog = new AddEditPetEnclosureDialog(null, enclosure);
-            dialog.setVisible(true);
-            if (dialog.isSaved()) {
-                refreshData();
+        try {
+            com.petcare.model.domain.PetEnclosure enclosure = PetEnclosureService.getInstance().getEnclosureById(enclosureId);
+            if (enclosure != null) {
+                AddEditPetEnclosureDialog dialog = new AddEditPetEnclosureDialog(null, enclosure);
+                dialog.setVisible(true);
+                if (dialog.isSaved()) {
+                    refreshData();
+                }
             }
+        } catch (PetcareException ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
     
     private void showCheckoutDialog() {
         int selectedRow = enclosureTable.getSelectedRow();
         if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, 
-                "Vui lòng chọn lưu chuồng cần checkout!", 
-                "Thông báo", 
-                JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn lưu chuồng cần checkout!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
         int enclosureId = (Integer) tableModel.getValueAt(selectedRow, 0);
         String status = (String) tableModel.getValueAt(selectedRow, 8);
-        
         if ("Check Out".equals(status)) {
-            JOptionPane.showMessageDialog(this, 
-                "Lưu chuồng này đã được checkout rồi!", 
-                "Thông báo", 
-                JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Lưu chuồng này đã được checkout rồi!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
-        PetEnclosure enclosure = getEnclosureById(enclosureId);
-        
-        if (enclosure != null) {
-            CheckoutDialog dialog = new CheckoutDialog(null, enclosure);
-            dialog.setVisible(true);
-            if (dialog.isSaved()) {
-                refreshData();
+        try {
+            com.petcare.model.domain.PetEnclosure enclosure = PetEnclosureService.getInstance().getEnclosureById(enclosureId);
+            if (enclosure != null) {
+                CheckoutDialog dialog = new CheckoutDialog(null, enclosure);
+                dialog.setVisible(true);
+                if (dialog.isSaved()) {
+                    refreshData();
+                }
             }
+        } catch (PetcareException ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     private void deleteEnclosure() {
         int selectedRow = enclosureTable.getSelectedRow();
         if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, 
-                "Vui lòng chọn lưu chuồng cần xóa!", 
-                "Thông báo", 
-                JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn lưu chuồng cần xóa!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
         int enclosureId = (Integer) tableModel.getValueAt(selectedRow, 0);
-        
-        int confirm = JOptionPane.showConfirmDialog(this, 
-            "Bạn có chắc muốn xóa lưu chuồng này?", 
-            "Xác nhận xóa", 
-            JOptionPane.YES_NO_OPTION);
-        
+        int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc muốn xóa lưu chuồng này?", "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                String query = "DELETE FROM pet_enclosures WHERE pet_enclosure_id = ?";
-                int result = Database.executeUpdate(query, enclosureId);
-                
-                if (result > 0) {
-                    JOptionPane.showMessageDialog(this, 
-                        "Xóa lưu chuồng thành công!", 
-                        "Thành công", 
-                        JOptionPane.INFORMATION_MESSAGE);
-                    refreshData();
-                } else {
-                    JOptionPane.showMessageDialog(this, 
-                        "Không thể xóa lưu chuồng.", 
-                        "Lỗi", 
-                        JOptionPane.ERROR_MESSAGE);
-                }
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, 
-                    "Lỗi khi xóa: " + ex.getMessage(), 
-                    "Lỗi", 
-                    JOptionPane.ERROR_MESSAGE);
-                ex.printStackTrace();
+                PetEnclosureService.getInstance().deleteEnclosure(enclosureId);
+                JOptionPane.showMessageDialog(this, "Xóa lưu chuồng thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                refreshData();
+            } catch (PetcareException ex) {
+                JOptionPane.showMessageDialog(this, "Lỗi khi xóa: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         }
-    }
-    
-    private PetEnclosure getEnclosureById(int enclosureId) {
-        try {
-            String query = "SELECT * FROM pet_enclosures WHERE pet_enclosure_id = ?";
-            ResultSet rs = Database.executeQuery(query, enclosureId);
-            
-            if (rs != null && rs.next()) {
-                PetEnclosure enclosure = new PetEnclosure();
-                enclosure.setPetEnclosureId(rs.getInt("pet_enclosure_id"));
-                enclosure.setCustomerId(rs.getInt("customer_id"));
-                enclosure.setPetId(rs.getInt("pet_id"));
-                enclosure.setPetEnclosureNumber(rs.getInt("pet_enclosure_number"));
-                
-                if (rs.getTimestamp("check_in_date") != null) {
-                    enclosure.setCheckInDate(new java.util.Date(
-                        rs.getTimestamp("check_in_date").getTime()));
-                }
-                
-                if (rs.getTimestamp("check_out_date") != null) {
-                    enclosure.setCheckOutDate(new java.util.Date(
-                        rs.getTimestamp("check_out_date").getTime()));
-                }
-                
-                enclosure.setDailyRate(rs.getInt("daily_rate"));
-                enclosure.setDeposit(rs.getInt("deposit"));
-                enclosure.setEmergencyLimit(rs.getInt("emergency_limit"));
-                enclosure.setPetEnclosureNote(rs.getString("pet_enclosure_note"));
-                
-                String statusStr = rs.getString("pet_enclosure_status");
-                if (statusStr != null) {
-                    enclosure.setPetEnclosureStatus(PetEnclosure.Status.fromLabel(statusStr));
-                }
-                
-                return enclosure;
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return null;
     }
 }

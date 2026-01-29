@@ -191,11 +191,6 @@ public class PetRepository implements IPetRepository {
         entity.setPetSterilization(rs.getString("pet_sterilization"));
         entity.setPetCharacteristic(rs.getString("pet_characteristic"));
         entity.setPetDrugAllergy(rs.getString("pet_drug_allergy"));
-        
-        if (rs.getTimestamp("created_at") != null) {
-            entity.setCreatedAt(new java.util.Date(rs.getTimestamp("created_at").getTime()));
-        }
-        
         return entity;
     }
 }

@@ -219,12 +219,6 @@ public class CustomerRepository implements ICustomerRepository {
         entity.setCustomerIdentityCard(rs.getString("customer_identity_card"));
         entity.setCustomerAddress(rs.getString("customer_address"));
         entity.setCustomerNote(rs.getString("customer_note"));
-        
-        // Handle created_at if exists
-        if (rs.getTimestamp("created_at") != null) {
-            entity.setCreatedAt(new java.util.Date(rs.getTimestamp("created_at").getTime()));
-        }
-        
         return entity;
     }
 }

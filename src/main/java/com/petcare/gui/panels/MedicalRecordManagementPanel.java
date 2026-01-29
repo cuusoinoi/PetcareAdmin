@@ -1,15 +1,15 @@
 package com.petcare.gui.panels;
 
 import com.petcare.gui.dialogs.AddEditMedicalRecordDialog;
-import com.petcare.model.Database;
-import com.petcare.model.MedicalRecord;
+import com.petcare.model.entity.MedicalRecordListDto;
+import com.petcare.model.exception.PetcareException;
+import com.petcare.service.MedicalRecordService;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -104,48 +104,30 @@ public class MedicalRecordManagementPanel extends JPanel {
     
     private void loadMedicalRecords() {
         tableModel.setRowCount(0);
-        
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         try {
-            String query = "SELECT mr.medical_record_id, mr.medical_record_visit_date, " +
-                          "mr.medical_record_type, c.customer_name, p.pet_name, d.doctor_name, " +
-                          "mr.medical_record_summary " +
-                          "FROM medical_records mr " +
-                          "INNER JOIN customers c ON mr.customer_id = c.customer_id " +
-                          "INNER JOIN pets p ON mr.pet_id = p.pet_id " +
-                          "INNER JOIN doctors d ON mr.doctor_id = d.doctor_id " +
-                          "ORDER BY mr.medical_record_id DESC";
-            
-            ResultSet rs = Database.executeQuery(query);
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-            
-            while (rs != null && rs.next()) {
-                String visitDate = "";
-                if (rs.getDate("medical_record_visit_date") != null) {
-                    visitDate = sdf.format(rs.getDate("medical_record_visit_date"));
-                }
-                
-                String summary = rs.getString("medical_record_summary");
+            List<MedicalRecordListDto> list = MedicalRecordService.getInstance().getRecordsForList();
+            for (MedicalRecordListDto dto : list) {
+                String visitDateStr = dto.getVisitDate() != null ? sdf.format(dto.getVisitDate()) : "";
+                String summary = dto.getSummary();
                 if (summary != null && summary.length() > 50) {
                     summary = summary.substring(0, 50) + "...";
                 }
-                
-                Object[] row = {
-                    rs.getInt("medical_record_id"),
-                    visitDate,
-                    rs.getString("medical_record_type"),
-                    rs.getString("customer_name"),
-                    rs.getString("pet_name"),
-                    rs.getString("doctor_name"),
+                tableModel.addRow(new Object[]{
+                    dto.getMedicalRecordId(),
+                    visitDateStr,
+                    dto.getMedicalRecordType() != null ? dto.getMedicalRecordType() : "",
+                    dto.getCustomerName() != null ? dto.getCustomerName() : "",
+                    dto.getPetName() != null ? dto.getPetName() : "",
+                    dto.getDoctorName() != null ? dto.getDoctorName() : "",
                     summary != null ? summary : ""
-                };
-                tableModel.addRow(row);
+                });
             }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, 
-                "Lỗi khi tải dữ liệu: " + ex.getMessage(), 
-                "Lỗi", 
+        } catch (PetcareException ex) {
+            JOptionPane.showMessageDialog(this,
+                "Lỗi khi tải dữ liệu: " + ex.getMessage(),
+                "Lỗi",
                 JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
         }
     }
     
@@ -160,99 +142,49 @@ public class MedicalRecordManagementPanel extends JPanel {
     private void showEditRecordDialog() {
         int selectedRow = recordTable.getSelectedRow();
         if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, 
-                "Vui lòng chọn hồ sơ cần sửa!", 
-                "Thông báo", 
+            JOptionPane.showMessageDialog(this,
+                "Vui lòng chọn hồ sơ cần sửa!",
+                "Thông báo",
                 JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
         int recordId = (Integer) tableModel.getValueAt(selectedRow, 0);
-        MedicalRecord record = getMedicalRecordById(recordId);
-        
-        if (record != null) {
-            AddEditMedicalRecordDialog dialog = new AddEditMedicalRecordDialog(null, record);
-            dialog.setVisible(true);
-            if (dialog.isSaved()) {
-                refreshData();
+        try {
+            com.petcare.model.domain.MedicalRecord record = MedicalRecordService.getInstance().getRecordById(recordId);
+            if (record != null) {
+                AddEditMedicalRecordDialog dialog = new AddEditMedicalRecordDialog(null, record);
+                dialog.setVisible(true);
+                if (dialog.isSaved()) {
+                    refreshData();
+                }
             }
+        } catch (PetcareException ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
     
     private void deleteRecord() {
         int selectedRow = recordTable.getSelectedRow();
         if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, 
-                "Vui lòng chọn hồ sơ cần xóa!", 
-                "Thông báo", 
+            JOptionPane.showMessageDialog(this,
+                "Vui lòng chọn hồ sơ cần xóa!",
+                "Thông báo",
                 JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
         int recordId = (Integer) tableModel.getValueAt(selectedRow, 0);
-        
-        int confirm = JOptionPane.showConfirmDialog(this, 
-            "Bạn có chắc muốn xóa hồ sơ này?", 
-            "Xác nhận xóa", 
+        int confirm = JOptionPane.showConfirmDialog(this,
+            "Bạn có chắc muốn xóa hồ sơ này?",
+            "Xác nhận xóa",
             JOptionPane.YES_NO_OPTION);
-        
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                String query = "DELETE FROM medical_records WHERE medical_record_id = ?";
-                int result = Database.executeUpdate(query, recordId);
-                
-                if (result > 0) {
-                    JOptionPane.showMessageDialog(this, 
-                        "Xóa hồ sơ thành công!", 
-                        "Thành công", 
-                        JOptionPane.INFORMATION_MESSAGE);
-                    refreshData();
-                } else {
-                    JOptionPane.showMessageDialog(this, 
-                        "Không thể xóa hồ sơ.", 
-                        "Lỗi", 
-                        JOptionPane.ERROR_MESSAGE);
-                }
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, 
-                    "Lỗi khi xóa: " + ex.getMessage(), 
-                    "Lỗi", 
-                    JOptionPane.ERROR_MESSAGE);
-                ex.printStackTrace();
+                MedicalRecordService.getInstance().deleteRecord(recordId);
+                JOptionPane.showMessageDialog(this, "Xóa hồ sơ thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                refreshData();
+            } catch (PetcareException ex) {
+                JOptionPane.showMessageDialog(this, "Lỗi khi xóa: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         }
-    }
-    
-    private MedicalRecord getMedicalRecordById(int recordId) {
-        try {
-            String query = "SELECT * FROM medical_records WHERE medical_record_id = ?";
-            ResultSet rs = Database.executeQuery(query, recordId);
-            
-            if (rs != null && rs.next()) {
-                MedicalRecord record = new MedicalRecord();
-                record.setMedicalRecordId(rs.getInt("medical_record_id"));
-                record.setCustomerId(rs.getInt("customer_id"));
-                record.setPetId(rs.getInt("pet_id"));
-                record.setDoctorId(rs.getInt("doctor_id"));
-                
-                String typeStr = rs.getString("medical_record_type");
-                if (typeStr != null) {
-                    record.setMedicalRecordType(MedicalRecord.RecordType.fromLabel(typeStr));
-                }
-                
-                if (rs.getDate("medical_record_visit_date") != null) {
-                    record.setMedicalRecordVisitDate(new java.util.Date(
-                        rs.getDate("medical_record_visit_date").getTime()));
-                }
-                
-                record.setMedicalRecordSummary(rs.getString("medical_record_summary"));
-                record.setMedicalRecordDetails(rs.getString("medical_record_details"));
-                
-                return record;
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return null;
     }
 }

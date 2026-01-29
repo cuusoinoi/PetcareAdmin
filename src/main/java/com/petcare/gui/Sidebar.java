@@ -67,7 +67,7 @@ public class Sidebar extends JPanel {
         menuPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
         // Dashboard
-        dashboardBtn = createMenuButton("📊 Dashboard", true);
+        dashboardBtn = createMenuButton("Dashboard", true);
         dashboardBtn.addActionListener(e -> dashboard.showDashboard());
         menuPanel.add(dashboardBtn);
         
@@ -75,17 +75,17 @@ public class Sidebar extends JPanel {
         menuPanel.add(createSeparator("QUẢN LÝ CHÍNH"));
         
         // Customer
-        customerBtn = createMenuButton("👥 Khách hàng", false);
+        customerBtn = createMenuButton("Khách hàng", false);
         customerBtn.addActionListener(e -> dashboard.showCustomerManagement());
         menuPanel.add(customerBtn);
         
         // Pet
-        petBtn = createMenuButton("🐾 Thú cưng", false);
+        petBtn = createMenuButton("Thú cưng", false);
         petBtn.addActionListener(e -> dashboard.showPetManagement());
         menuPanel.add(petBtn);
         
         // Doctor
-        doctorBtn = createMenuButton("👨‍⚕️ Bác sĩ", false);
+        doctorBtn = createMenuButton("Bác sĩ", false);
         doctorBtn.addActionListener(e -> dashboard.showDoctorManagement());
         menuPanel.add(doctorBtn);
         
@@ -93,17 +93,17 @@ public class Sidebar extends JPanel {
         menuPanel.add(createSeparator("KHÁM & ĐIỀU TRỊ"));
         
         // Medical Record
-        medicalRecordBtn = createMenuButton("📋 Hồ sơ khám bệnh", false);
+        medicalRecordBtn = createMenuButton("Hồ sơ khám bệnh", false);
         medicalRecordBtn.addActionListener(e -> dashboard.showMedicalRecordManagement());
         menuPanel.add(medicalRecordBtn);
         
         // Vaccination
-        vaccinationBtn = createMenuButton("💉 Tiêm chủng", false);
+        vaccinationBtn = createMenuButton("Tiêm chủng", false);
         vaccinationBtn.addActionListener(e -> dashboard.showVaccinationManagement());
         menuPanel.add(vaccinationBtn);
         
         // Treatment
-        treatmentBtn = createMenuButton("🏥 Liệu trình điều trị", false);
+        treatmentBtn = createMenuButton("Liệu trình điều trị", false);
         treatmentBtn.addActionListener(e -> dashboard.showTreatmentManagement());
         menuPanel.add(treatmentBtn);
         
@@ -111,17 +111,17 @@ public class Sidebar extends JPanel {
         menuPanel.add(createSeparator("DỊCH VỤ"));
         
         // Pet Enclosure
-        enclosureBtn = createMenuButton("🏠 Lưu chuồng", false);
+        enclosureBtn = createMenuButton("Lưu chuồng", false);
         enclosureBtn.addActionListener(e -> dashboard.showEnclosureManagement());
         menuPanel.add(enclosureBtn);
         
         // Appointment
-        appointmentBtn = createMenuButton("📅 Lịch hẹn", false);
+        appointmentBtn = createMenuButton("Lịch hẹn", false);
         appointmentBtn.addActionListener(e -> dashboard.showAppointmentManagement());
         menuPanel.add(appointmentBtn);
         
         // Invoice
-        invoiceBtn = createMenuButton("🧾 Hóa đơn", false);
+        invoiceBtn = createMenuButton("Hóa đơn", false);
         invoiceBtn.addActionListener(e -> dashboard.showInvoiceManagement());
         menuPanel.add(invoiceBtn);
         
@@ -129,17 +129,17 @@ public class Sidebar extends JPanel {
         menuPanel.add(createSeparator("DANH MỤC"));
         
         // Service Types
-        serviceTypeBtn = createMenuButton("🛎️ Dịch vụ", false);
+        serviceTypeBtn = createMenuButton("Dịch vụ", false);
         serviceTypeBtn.addActionListener(e -> dashboard.showServiceTypeManagement());
         menuPanel.add(serviceTypeBtn);
         
         // Medicines
-        medicineBtn = createMenuButton("💊 Thuốc", false);
+        medicineBtn = createMenuButton("Thuốc", false);
         medicineBtn.addActionListener(e -> dashboard.showMedicineManagement());
         menuPanel.add(medicineBtn);
         
         // Vaccine Types
-        vaccineTypeBtn = createMenuButton("💉 Vaccine", false);
+        vaccineTypeBtn = createMenuButton("Vaccine", false);
         vaccineTypeBtn.addActionListener(e -> dashboard.showVaccineTypeManagement());
         menuPanel.add(vaccineTypeBtn);
         
@@ -147,12 +147,12 @@ public class Sidebar extends JPanel {
         menuPanel.add(createSeparator("HỆ THỐNG"));
         
         // Users
-        userBtn = createMenuButton("👤 Người dùng", false);
+        userBtn = createMenuButton("Người dùng", false);
         userBtn.addActionListener(e -> dashboard.showUserManagement());
         menuPanel.add(userBtn);
         
         // Settings
-        settingsBtn = createMenuButton("⚙️ Cài đặt", false);
+        settingsBtn = createMenuButton("Cài đặt", false);
         settingsBtn.addActionListener(e -> dashboard.showSettingsManagement());
         menuPanel.add(settingsBtn);
         
@@ -171,7 +171,7 @@ public class Sidebar extends JPanel {
         footerPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
         // Theme toggle button
-        JButton themeToggleBtn = new JButton("🌙 Giao diện tối");
+        JButton themeToggleBtn = new JButton("Giao diện tối");
         themeToggleBtn.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         themeToggleBtn.setBackground(new Color(108, 117, 125));
         themeToggleBtn.setForeground(Color.WHITE);
@@ -188,7 +188,7 @@ public class Sidebar extends JPanel {
         footerPanel.add(themeToggleBtn);
         
         // Logout button
-        JButton logoutBtn = new JButton("🚪 Đăng xuất");
+        JButton logoutBtn = new JButton("Đăng xuất");
         logoutBtn.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         logoutBtn.setBackground(new Color(220, 53, 69));
         logoutBtn.setForeground(Color.WHITE);
@@ -288,9 +288,9 @@ public class Sidebar extends JPanel {
     private void updateThemeButton(JButton btn) {
         boolean isDark = com.petcare.util.ThemeManager.isDarkMode();
         if (isDark) {
-            btn.setText("☀️ Giao diện sáng");
+            btn.setText("Giao diện sáng");
         } else {
-            btn.setText("🌙 Giao diện tối");
+            btn.setText("Giao diện tối");
         }
     }
 }

@@ -1,16 +1,19 @@
 package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import com.petcare.model.Appointment;
-import com.petcare.model.Database;
-import com.petcare.model.ServiceType;
+import com.petcare.model.domain.Appointment;
+import com.petcare.model.domain.ServiceType;
+import com.petcare.model.exception.PetcareException;
+import com.petcare.service.AppointmentService;
+import com.petcare.service.CustomerService;
+import com.petcare.service.DoctorService;
+import com.petcare.service.PetService;
+import com.petcare.service.ServiceTypeService;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -189,57 +192,38 @@ public class AddEditAppointmentDialog extends JDialog {
     private void loadCustomers() {
         customerCombo.removeAllItems();
         customerCombo.addItem("-- Chọn khách hàng --");
-        
         try {
-            String query = "SELECT customer_id, customer_name FROM customers ORDER BY customer_name";
-            ResultSet rs = Database.executeQuery(query);
-            
-            while (rs != null && rs.next()) {
-                String display = rs.getInt("customer_id") + " - " + rs.getString("customer_name");
-                customerCombo.addItem(display);
+            for (com.petcare.model.domain.Customer c : CustomerService.getInstance().getAllCustomers()) {
+                customerCombo.addItem(c.getCustomerId() + " - " + c.getCustomerName());
             }
-        } catch (SQLException ex) {
+        } catch (PetcareException ex) {
             ex.printStackTrace();
         }
     }
-    
+
     private void loadPetsByCustomer() {
         petCombo.removeAllItems();
         petCombo.addItem("-- Chọn thú cưng --");
-        
-        if (customerCombo.getSelectedIndex() == 0) {
-            return;
-        }
-        
+        if (customerCombo.getSelectedIndex() == 0) return;
         try {
             String selected = (String) customerCombo.getSelectedItem();
             int customerId = Integer.parseInt(selected.split(" - ")[0]);
-            
-            String query = "SELECT pet_id, pet_name FROM pets WHERE customer_id = ? ORDER BY pet_name";
-            ResultSet rs = Database.executeQuery(query, customerId);
-            
-            while (rs != null && rs.next()) {
-                String display = rs.getInt("pet_id") + " - " + rs.getString("pet_name");
-                petCombo.addItem(display);
+            for (com.petcare.model.domain.Pet p : PetService.getInstance().getPetsByCustomerId(customerId)) {
+                petCombo.addItem(p.getPetId() + " - " + p.getPetName());
             }
-        } catch (SQLException ex) {
+        } catch (PetcareException ex) {
             ex.printStackTrace();
         }
     }
-    
+
     private void loadDoctors() {
         doctorCombo.removeAllItems();
         doctorCombo.addItem("-- Chọn bác sĩ (tùy chọn) --");
-        
         try {
-            String query = "SELECT doctor_id, doctor_name FROM doctors ORDER BY doctor_name";
-            ResultSet rs = Database.executeQuery(query);
-            
-            while (rs != null && rs.next()) {
-                String display = rs.getInt("doctor_id") + " - " + rs.getString("doctor_name");
-                doctorCombo.addItem(display);
+            for (com.petcare.model.domain.Doctor d : DoctorService.getInstance().getAllDoctors()) {
+                doctorCombo.addItem(d.getDoctorId() + " - " + d.getDoctorName());
             }
-        } catch (SQLException ex) {
+        } catch (PetcareException ex) {
             ex.printStackTrace();
         }
     }
@@ -247,16 +231,11 @@ public class AddEditAppointmentDialog extends JDialog {
     private void loadServiceTypes() {
         serviceCombo.removeAllItems();
         serviceCombo.addItem("-- Chọn dịch vụ (tùy chọn) --");
-        
         try {
-            String query = "SELECT service_type_id, service_name FROM service_types ORDER BY service_name";
-            ResultSet rs = Database.executeQuery(query);
-            
-            while (rs != null && rs.next()) {
-                String display = rs.getInt("service_type_id") + " - " + rs.getString("service_name");
-                serviceCombo.addItem(display);
+            for (ServiceType s : ServiceTypeService.getInstance().getAllServiceTypes()) {
+                serviceCombo.addItem(s.getServiceTypeId() + " - " + s.getServiceName());
             }
-        } catch (SQLException ex) {
+        } catch (com.petcare.model.exception.PetcareException ex) {
             ex.printStackTrace();
         }
     }
@@ -406,64 +385,36 @@ public class AddEditAppointmentDialog extends JDialog {
                 return;
             }
             
+            Appointment app = appointment != null ? appointment : new Appointment();
+            app.setCustomerId(customerId);
+            app.setPetId(petId);
+            app.setDoctorId(doctorId);
+            app.setServiceTypeId(serviceTypeId);
+            app.setAppointmentDate(appointmentDate);
+            app.setAppointmentType(Appointment.AppointmentType.fromLabel(typeStr));
+            app.setStatus(Appointment.Status.fromCode(statusCode));
+            app.setNotes(notesArea.getText().trim().isEmpty() ? null : notesArea.getText().trim());
+
             if (appointment == null) {
-                // Insert
-                String query = "INSERT INTO appointments (customer_id, pet_id, doctor_id, service_type_id, " +
-                              "appointment_date, appointment_type, status, notes) " +
-                              "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-                
-                java.sql.Timestamp sqlTimestamp = new java.sql.Timestamp(appointmentDate.getTime());
-                
-                int result = Database.executeUpdate(query,
-                    customerId,
-                    petId,
-                    doctorId,
-                    serviceTypeId,
-                    sqlTimestamp,
-                    typeStr,
-                    statusCode,
-                    notesArea.getText().trim().isEmpty() ? null : notesArea.getText().trim()
-                );
-                
-                if (result > 0) {
-                    JOptionPane.showMessageDialog(this, "Thêm lịch hẹn thành công!", "Thành công", 
-                        JOptionPane.INFORMATION_MESSAGE);
-                    saved = true;
-                    dispose();
-                }
+                AppointmentService.getInstance().createAppointment(app);
+                JOptionPane.showMessageDialog(this, "Thêm lịch hẹn thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                saved = true;
+                dispose();
             } else {
-                // Update
-                String query = "UPDATE appointments SET customer_id = ?, pet_id = ?, doctor_id = ?, " +
-                              "service_type_id = ?, appointment_date = ?, appointment_type = ?, " +
-                              "status = ?, notes = ? WHERE appointment_id = ?";
-                
-                java.sql.Timestamp sqlTimestamp = new java.sql.Timestamp(appointmentDate.getTime());
-                
-                int result = Database.executeUpdate(query,
-                    customerId,
-                    petId,
-                    doctorId,
-                    serviceTypeId,
-                    sqlTimestamp,
-                    typeStr,
-                    statusCode,
-                    notesArea.getText().trim().isEmpty() ? null : notesArea.getText().trim(),
-                    appointment.getAppointmentId()
-                );
-                
-                if (result > 0) {
-                    JOptionPane.showMessageDialog(this, "Cập nhật lịch hẹn thành công!", "Thành công", 
-                        JOptionPane.INFORMATION_MESSAGE);
-                    saved = true;
-                    dispose();
-                }
+                app.setAppointmentId(appointment.getAppointmentId());
+                AppointmentService.getInstance().updateAppointment(app);
+                JOptionPane.showMessageDialog(this, "Cập nhật lịch hẹn thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                saved = true;
+                dispose();
             }
+        } catch (PetcareException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Lỗi: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
     }
-    
+
     private String getStatusCodeFromLabel(String label) {
         switch (label) {
             case "Chờ xác nhận": return "pending";

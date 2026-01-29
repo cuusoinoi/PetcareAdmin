@@ -1,15 +1,15 @@
 package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import com.petcare.model.Database;
-import com.petcare.model.TreatmentCourse;
+import com.petcare.model.domain.TreatmentCourse;
+import com.petcare.service.CustomerService;
+import com.petcare.service.PetService;
+import com.petcare.service.TreatmentCourseService;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -142,40 +142,26 @@ public class AddEditTreatmentDialog extends JDialog {
     private void loadCustomers() {
         customerCombo.removeAllItems();
         customerCombo.addItem("-- Chọn khách hàng --");
-        
         try {
-            String query = "SELECT customer_id, customer_name FROM customers ORDER BY customer_name";
-            ResultSet rs = Database.executeQuery(query);
-            
-            while (rs != null && rs.next()) {
-                String display = rs.getInt("customer_id") + " - " + rs.getString("customer_name");
-                customerCombo.addItem(display);
-            }
-        } catch (SQLException ex) {
+            CustomerService.getInstance().getAllCustomers().forEach(c -> {
+                customerCombo.addItem(c.getCustomerId() + " - " + c.getCustomerName());
+            });
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
-    
+
     private void loadPetsByCustomer() {
         petCombo.removeAllItems();
         petCombo.addItem("-- Chọn thú cưng --");
-        
-        if (customerCombo.getSelectedIndex() == 0) {
-            return;
-        }
-        
+        if (customerCombo.getSelectedIndex() == 0) return;
         try {
             String selected = (String) customerCombo.getSelectedItem();
             int customerId = Integer.parseInt(selected.split(" - ")[0]);
-            
-            String query = "SELECT pet_id, pet_name FROM pets WHERE customer_id = ? ORDER BY pet_name";
-            ResultSet rs = Database.executeQuery(query, customerId);
-            
-            while (rs != null && rs.next()) {
-                String display = rs.getInt("pet_id") + " - " + rs.getString("pet_name");
-                petCombo.addItem(display);
-            }
-        } catch (SQLException ex) {
+            PetService.getInstance().getPetsByCustomerId(customerId).forEach(p -> {
+                petCombo.addItem(p.getPetId() + " - " + p.getPetName());
+            });
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -270,53 +256,29 @@ public class AddEditTreatmentDialog extends JDialog {
             }
             
             String statusLabel = (String) statusCombo.getSelectedItem();
-            String statusCode = "Đang điều trị".equals(statusLabel) ? "1" : "0";
-            
+            TreatmentCourse.Status status = "Đang điều trị".equals(statusLabel) ? TreatmentCourse.Status.ACTIVE : TreatmentCourse.Status.COMPLETED;
+            TreatmentCourseService service = TreatmentCourseService.getInstance();
             if (course == null) {
-                // Insert
-                String query = "INSERT INTO treatment_courses (customer_id, pet_id, start_date, end_date, status) " +
-                              "VALUES (?, ?, ?, ?, ?)";
-                
-                java.sql.Date sqlStartDate = new java.sql.Date(startDate.getTime());
-                java.sql.Date sqlEndDate = endDate != null ? new java.sql.Date(endDate.getTime()) : null;
-                
-                int result = Database.executeUpdate(query,
-                    customerId,
-                    petId,
-                    sqlStartDate,
-                    sqlEndDate,
-                    statusCode
-                );
-                
-                if (result > 0) {
-                    JOptionPane.showMessageDialog(this, "Thêm liệu trình thành công!", "Thành công", 
-                        JOptionPane.INFORMATION_MESSAGE);
-                    saved = true;
-                    dispose();
-                }
+                TreatmentCourse newCourse = new TreatmentCourse();
+                newCourse.setCustomerId(customerId);
+                newCourse.setPetId(petId);
+                newCourse.setStartDate(startDate);
+                newCourse.setEndDate(endDate);
+                newCourse.setStatus(status);
+                service.createCourse(newCourse);
+                JOptionPane.showMessageDialog(this, "Thêm liệu trình thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                saved = true;
+                dispose();
             } else {
-                // Update
-                String query = "UPDATE treatment_courses SET customer_id = ?, pet_id = ?, start_date = ?, " +
-                              "end_date = ?, status = ? WHERE treatment_course_id = ?";
-                
-                java.sql.Date sqlStartDate = new java.sql.Date(startDate.getTime());
-                java.sql.Date sqlEndDate = endDate != null ? new java.sql.Date(endDate.getTime()) : null;
-                
-                int result = Database.executeUpdate(query,
-                    customerId,
-                    petId,
-                    sqlStartDate,
-                    sqlEndDate,
-                    statusCode,
-                    course.getTreatmentCourseId()
-                );
-                
-                if (result > 0) {
-                    JOptionPane.showMessageDialog(this, "Cập nhật liệu trình thành công!", "Thành công", 
-                        JOptionPane.INFORMATION_MESSAGE);
-                    saved = true;
-                    dispose();
-                }
+                course.setCustomerId(customerId);
+                course.setPetId(petId);
+                course.setStartDate(startDate);
+                course.setEndDate(endDate);
+                course.setStatus(status);
+                service.updateCourse(course);
+                JOptionPane.showMessageDialog(this, "Cập nhật liệu trình thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                saved = true;
+                dispose();
             }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Lỗi: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);

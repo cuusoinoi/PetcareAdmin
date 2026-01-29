@@ -1,16 +1,17 @@
 package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import com.petcare.model.Database;
-import com.petcare.model.ServiceType;
+import com.petcare.model.domain.InvoiceDetailItem;
+import com.petcare.model.domain.ServiceType;
+import com.petcare.service.CustomerService;
+import com.petcare.service.InvoiceService;
+import com.petcare.service.PetService;
+import com.petcare.service.ServiceTypeService;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -47,7 +48,7 @@ public class AddInvoiceDialog extends JDialog {
     private JButton saveButton;
     private JButton cancelButton;
     private boolean saved = false;
-    private List<ServiceType> serviceTypes;
+    private List<ServiceType> serviceTypes; // domain ServiceType from ServiceTypeService
     
     public AddInvoiceDialog(JDialog parent) {
         super(parent, true);
@@ -219,40 +220,26 @@ public class AddInvoiceDialog extends JDialog {
     private void loadCustomers() {
         customerCombo.removeAllItems();
         customerCombo.addItem("-- Chọn khách hàng --");
-        
         try {
-            String query = "SELECT customer_id, customer_name FROM customers ORDER BY customer_name";
-            ResultSet rs = Database.executeQuery(query);
-            
-            while (rs != null && rs.next()) {
-                String display = rs.getInt("customer_id") + " - " + rs.getString("customer_name");
-                customerCombo.addItem(display);
-            }
-        } catch (SQLException ex) {
+            CustomerService.getInstance().getAllCustomers().forEach(c -> {
+                customerCombo.addItem(c.getCustomerId() + " - " + c.getCustomerName());
+            });
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
-    
+
     private void loadPetsByCustomer() {
         petCombo.removeAllItems();
         petCombo.addItem("-- Chọn thú cưng --");
-        
-        if (customerCombo.getSelectedIndex() == 0) {
-            return;
-        }
-        
+        if (customerCombo.getSelectedIndex() == 0) return;
         try {
             String selected = (String) customerCombo.getSelectedItem();
             int customerId = Integer.parseInt(selected.split(" - ")[0]);
-            
-            String query = "SELECT pet_id, pet_name FROM pets WHERE customer_id = ? ORDER BY pet_name";
-            ResultSet rs = Database.executeQuery(query, customerId);
-            
-            while (rs != null && rs.next()) {
-                String display = rs.getInt("pet_id") + " - " + rs.getString("pet_name");
-                petCombo.addItem(display);
-            }
-        } catch (SQLException ex) {
+            PetService.getInstance().getPetsByCustomerId(customerId).forEach(p -> {
+                petCombo.addItem(p.getPetId() + " - " + p.getPetName());
+            });
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -261,21 +248,12 @@ public class AddInvoiceDialog extends JDialog {
         serviceCombo.removeAllItems();
         serviceCombo.addItem("-- Chọn dịch vụ --");
         serviceTypes = new ArrayList<>();
-        
         try {
-            String query = "SELECT service_type_id, service_name, price FROM service_types ORDER BY service_name";
-            ResultSet rs = Database.executeQuery(query);
-            
-            while (rs != null && rs.next()) {
-                ServiceType st = new ServiceType();
-                st.setServiceTypeId(rs.getInt("service_type_id"));
-                st.setServiceName(rs.getString("service_name"));
-                st.setPrice(rs.getDouble("price"));
+            for (ServiceType st : ServiceTypeService.getInstance().getAllServiceTypes()) {
                 serviceTypes.add(st);
-                
-                serviceCombo.addItem(st.getServiceName() + " - " + formatCurrency((int)st.getPrice()));
+                serviceCombo.addItem(st.getServiceName() + " - " + formatCurrency((int) st.getPrice()));
             }
-        } catch (SQLException ex) {
+        } catch (com.petcare.model.exception.PetcareException ex) {
             ex.printStackTrace();
         }
     }
@@ -383,56 +361,34 @@ public class AddInvoiceDialog extends JDialog {
             
             int totalAmount = subtotal - discount - deposit;
             if (totalAmount < 0) totalAmount = 0;
-            
-            // Create invoice
-            Date invoiceDate = new Date();
-            String invoiceQuery = "INSERT INTO invoices (customer_id, pet_id, invoice_date, " +
-                                "discount, subtotal, deposit, total_amount) VALUES (?, ?, ?, ?, ?, ?, ?)";
-            
-            java.sql.Timestamp sqlDate = new java.sql.Timestamp(invoiceDate.getTime());
-            
-            // Get generated invoice ID
-            java.sql.Connection conn = Database.getConnection();
-            java.sql.PreparedStatement ps = conn.prepareStatement(invoiceQuery, 
-                java.sql.Statement.RETURN_GENERATED_KEYS);
-            ps.setInt(1, customerId);
-            ps.setInt(2, petId);
-            ps.setTimestamp(3, sqlDate);
-            ps.setInt(4, discount);
-            ps.setInt(5, subtotal);
-            ps.setInt(6, deposit);
-            ps.setInt(7, totalAmount);
-            ps.executeUpdate();
-            
-            ResultSet generatedKeys = ps.getGeneratedKeys();
-            int invoiceId = 0;
-            if (generatedKeys.next()) {
-                invoiceId = generatedKeys.getInt(1);
-            }
-            
-            // Add invoice details
+
+            List<InvoiceDetailItem> details = new ArrayList<>();
             for (int i = 0; i < serviceTableModel.getRowCount(); i++) {
                 String serviceName = (String) serviceTableModel.getValueAt(i, 0);
                 int quantity = (Integer) serviceTableModel.getValueAt(i, 1);
                 int unitPrice = (Integer) serviceTableModel.getValueAt(i, 2);
                 int totalPrice = (Integer) serviceTableModel.getValueAt(i, 3);
-                
-                // Find service_type_id by name
                 int serviceTypeId = findServiceTypeIdByName(serviceName);
                 if (serviceTypeId > 0) {
-                    String detailQuery = "INSERT INTO invoice_details (invoice_id, service_type_id, quantity, " +
-                                       "unit_price, total_price) VALUES (?, ?, ?, ?, ?)";
-                    Database.executeUpdate(detailQuery, invoiceId, serviceTypeId, quantity, unitPrice, totalPrice);
+                    InvoiceDetailItem item = new InvoiceDetailItem();
+                    item.setServiceTypeId(serviceTypeId);
+                    item.setQuantity(quantity);
+                    item.setUnitPrice(unitPrice);
+                    item.setTotalPrice(totalPrice);
+                    details.add(item);
                 }
             }
-            
-            JOptionPane.showMessageDialog(this, 
-                "Tạo hóa đơn thành công! Hóa đơn #" + invoiceId, 
-                "Thành công", 
-                JOptionPane.INFORMATION_MESSAGE);
+            if (details.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Không tìm thấy dịch vụ hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            int invoiceId = InvoiceService.getInstance().createInvoice(
+                customerId, petId, null, new Date(),
+                discount, subtotal, deposit, totalAmount, details);
+            JOptionPane.showMessageDialog(this, "Tạo hóa đơn thành công! Hóa đơn #" + invoiceId, "Thành công", JOptionPane.INFORMATION_MESSAGE);
             saved = true;
             dispose();
-            
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Lỗi: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
@@ -441,12 +397,9 @@ public class AddInvoiceDialog extends JDialog {
     
     private int findServiceTypeIdByName(String serviceName) {
         try {
-            String query = "SELECT service_type_id FROM service_types WHERE service_name = ? LIMIT 1";
-            ResultSet rs = Database.executeQuery(query, serviceName);
-            if (rs != null && rs.next()) {
-                return rs.getInt("service_type_id");
-            }
-        } catch (SQLException ex) {
+            ServiceType s = ServiceTypeService.getInstance().getServiceTypeByName(serviceName);
+            return s != null ? s.getServiceTypeId() : 0;
+        } catch (com.petcare.model.exception.PetcareException ex) {
             ex.printStackTrace();
         }
         return 0;

@@ -1,15 +1,16 @@
 package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import com.petcare.model.Database;
-import com.petcare.model.MedicalRecord;
+import com.petcare.model.domain.MedicalRecord;
+import com.petcare.service.CustomerService;
+import com.petcare.service.DoctorService;
+import com.petcare.service.MedicalRecordService;
+import com.petcare.service.PetService;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -169,57 +170,38 @@ public class AddEditMedicalRecordDialog extends JDialog {
     private void loadCustomers() {
         customerCombo.removeAllItems();
         customerCombo.addItem("-- Chọn khách hàng --");
-        
         try {
-            String query = "SELECT customer_id, customer_name FROM customers ORDER BY customer_name";
-            ResultSet rs = Database.executeQuery(query);
-            
-            while (rs != null && rs.next()) {
-                String display = rs.getInt("customer_id") + " - " + rs.getString("customer_name");
-                customerCombo.addItem(display);
-            }
-        } catch (SQLException ex) {
+            CustomerService.getInstance().getAllCustomers().forEach(c -> {
+                customerCombo.addItem(c.getCustomerId() + " - " + c.getCustomerName());
+            });
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
-    
+
     private void loadPetsByCustomer() {
         petCombo.removeAllItems();
         petCombo.addItem("-- Chọn thú cưng --");
-        
-        if (customerCombo.getSelectedIndex() == 0) {
-            return;
-        }
-        
+        if (customerCombo.getSelectedIndex() == 0) return;
         try {
             String selected = (String) customerCombo.getSelectedItem();
             int customerId = Integer.parseInt(selected.split(" - ")[0]);
-            
-            String query = "SELECT pet_id, pet_name FROM pets WHERE customer_id = ? ORDER BY pet_name";
-            ResultSet rs = Database.executeQuery(query, customerId);
-            
-            while (rs != null && rs.next()) {
-                String display = rs.getInt("pet_id") + " - " + rs.getString("pet_name");
-                petCombo.addItem(display);
-            }
-        } catch (SQLException ex) {
+            PetService.getInstance().getPetsByCustomerId(customerId).forEach(p -> {
+                petCombo.addItem(p.getPetId() + " - " + p.getPetName());
+            });
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
-    
+
     private void loadDoctors() {
         doctorCombo.removeAllItems();
         doctorCombo.addItem("-- Chọn bác sĩ --");
-        
         try {
-            String query = "SELECT doctor_id, doctor_name FROM doctors ORDER BY doctor_name";
-            ResultSet rs = Database.executeQuery(query);
-            
-            while (rs != null && rs.next()) {
-                String display = rs.getInt("doctor_id") + " - " + rs.getString("doctor_name");
-                doctorCombo.addItem(display);
-            }
-        } catch (SQLException ex) {
+            DoctorService.getInstance().getAllDoctors().forEach(d -> {
+                doctorCombo.addItem(d.getDoctorId() + " - " + d.getDoctorName());
+            });
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -327,56 +309,32 @@ public class AddEditMedicalRecordDialog extends JDialog {
                 return;
             }
             
+            MedicalRecordService service = MedicalRecordService.getInstance();
             if (record == null) {
-                // Insert
-                String query = "INSERT INTO medical_records (customer_id, pet_id, doctor_id, " +
-                              "medical_record_type, medical_record_visit_date, medical_record_summary, " +
-                              "medical_record_details) VALUES (?, ?, ?, ?, ?, ?, ?)";
-                
-                java.sql.Date sqlDate = new java.sql.Date(visitDate.getTime());
-                
-                int result = Database.executeUpdate(query,
-                    customerId,
-                    petId,
-                    doctorId,
-                    typeStr,
-                    sqlDate,
-                    summaryArea.getText().trim().isEmpty() ? null : summaryArea.getText().trim(),
-                    detailsArea.getText().trim().isEmpty() ? null : detailsArea.getText().trim()
-                );
-                
-                if (result > 0) {
-                    JOptionPane.showMessageDialog(this, "Thêm hồ sơ khám bệnh thành công!", "Thành công", 
-                        JOptionPane.INFORMATION_MESSAGE);
-                    saved = true;
-                    dispose();
-                }
+                MedicalRecord newRecord = new MedicalRecord();
+                newRecord.setCustomerId(customerId);
+                newRecord.setPetId(petId);
+                newRecord.setDoctorId(doctorId);
+                newRecord.setMedicalRecordType(MedicalRecord.RecordType.fromLabel(typeStr));
+                newRecord.setMedicalRecordVisitDate(visitDate);
+                newRecord.setMedicalRecordSummary(summaryArea.getText().trim().isEmpty() ? null : summaryArea.getText().trim());
+                newRecord.setMedicalRecordDetails(detailsArea.getText().trim().isEmpty() ? null : detailsArea.getText().trim());
+                service.createRecord(newRecord);
+                JOptionPane.showMessageDialog(this, "Thêm hồ sơ khám bệnh thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                saved = true;
+                dispose();
             } else {
-                // Update
-                String query = "UPDATE medical_records SET customer_id = ?, pet_id = ?, doctor_id = ?, " +
-                              "medical_record_type = ?, medical_record_visit_date = ?, " +
-                              "medical_record_summary = ?, medical_record_details = ? " +
-                              "WHERE medical_record_id = ?";
-                
-                java.sql.Date sqlDate = new java.sql.Date(visitDate.getTime());
-                
-                int result = Database.executeUpdate(query,
-                    customerId,
-                    petId,
-                    doctorId,
-                    typeStr,
-                    sqlDate,
-                    summaryArea.getText().trim().isEmpty() ? null : summaryArea.getText().trim(),
-                    detailsArea.getText().trim().isEmpty() ? null : detailsArea.getText().trim(),
-                    record.getMedicalRecordId()
-                );
-                
-                if (result > 0) {
-                    JOptionPane.showMessageDialog(this, "Cập nhật hồ sơ khám bệnh thành công!", "Thành công", 
-                        JOptionPane.INFORMATION_MESSAGE);
-                    saved = true;
-                    dispose();
-                }
+                record.setCustomerId(customerId);
+                record.setPetId(petId);
+                record.setDoctorId(doctorId);
+                record.setMedicalRecordType(MedicalRecord.RecordType.fromLabel(typeStr));
+                record.setMedicalRecordVisitDate(visitDate);
+                record.setMedicalRecordSummary(summaryArea.getText().trim().isEmpty() ? null : summaryArea.getText().trim());
+                record.setMedicalRecordDetails(detailsArea.getText().trim().isEmpty() ? null : detailsArea.getText().trim());
+                service.updateRecord(record);
+                JOptionPane.showMessageDialog(this, "Cập nhật hồ sơ khám bệnh thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                saved = true;
+                dispose();
             }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Lỗi: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);

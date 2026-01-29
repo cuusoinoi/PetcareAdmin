@@ -1,13 +1,14 @@
 package com.petcare.gui.dialogs;
 
-import com.petcare.model.Database;
+import com.formdev.flatlaf.FlatClientProperties;
+import com.petcare.model.entity.TreatmentCourseInfoDto;
+import com.petcare.model.entity.TreatmentSessionListDto;
+import com.petcare.service.TreatmentCourseService;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import com.formdev.flatlaf.FlatClientProperties;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -39,38 +40,23 @@ public class TreatmentSessionsDialog extends JDialog {
         // Info panel
         JPanel infoPanel = new JPanel(new java.awt.GridLayout(0, 2, 15, 10));
         infoPanel.setBackground(Color.WHITE);
-        
+        SimpleDateFormat sdfDate = new SimpleDateFormat("dd/MM/yyyy");
         try {
-            String query = "SELECT tc.treatment_course_id, tc.start_date, c.customer_name, p.pet_name " +
-                          "FROM treatment_courses tc " +
-                          "INNER JOIN customers c ON tc.customer_id = c.customer_id " +
-                          "INNER JOIN pets p ON tc.pet_id = p.pet_id " +
-                          "WHERE tc.treatment_course_id = ?";
-            
-            ResultSet rs = Database.executeQuery(query, courseId);
-            
-            if (rs != null && rs.next()) {
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-                String startDate = "";
-                if (rs.getDate("start_date") != null) {
-                    startDate = sdf.format(rs.getDate("start_date"));
-                }
-                
+            TreatmentCourseInfoDto courseInfo = TreatmentCourseService.getInstance().getCourseInfoForSessions(courseId);
+            if (courseInfo != null) {
+                String startDateStr = courseInfo.getStartDate() != null ? sdfDate.format(courseInfo.getStartDate()) : "";
                 infoPanel.add(createInfoLabel("Khách hàng:"));
-                infoPanel.add(createInfoValue(rs.getString("customer_name")));
-                
+                infoPanel.add(createInfoValue(courseInfo.getCustomerName()));
                 infoPanel.add(createInfoLabel("Thú cưng:"));
-                infoPanel.add(createInfoValue(rs.getString("pet_name")));
-                
+                infoPanel.add(createInfoValue(courseInfo.getPetName()));
                 infoPanel.add(createInfoLabel("Ngày bắt đầu:"));
-                infoPanel.add(createInfoValue(startDate));
+                infoPanel.add(createInfoValue(startDateStr));
             }
-        } catch (SQLException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
-        
         mainPanel.add(infoPanel, BorderLayout.NORTH);
-        
+
         // Sessions table
         String[] columns = {"ID", "Ngày giờ", "Bác sĩ", "Nhiệt độ", "Cân nặng", "Nhịp tim", "Nhịp thở"};
         DefaultTableModel tableModel = new DefaultTableModel(columns, 0) {
@@ -79,36 +65,22 @@ public class TreatmentSessionsDialog extends JDialog {
                 return false;
             }
         };
-        
+        SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         try {
-            String query = "SELECT ts.treatment_session_id, ts.treatment_session_datetime, " +
-                          "d.doctor_name, ts.temperature, ts.weight, ts.pulse_rate, ts.respiratory_rate " +
-                          "FROM treatment_sessions ts " +
-                          "INNER JOIN doctors d ON ts.doctor_id = d.doctor_id " +
-                          "WHERE ts.treatment_course_id = ? " +
-                          "ORDER BY ts.treatment_session_datetime DESC";
-            
-            ResultSet rs = Database.executeQuery(query, courseId);
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-            
-            while (rs != null && rs.next()) {
-                String datetime = "";
-                if (rs.getTimestamp("treatment_session_datetime") != null) {
-                    datetime = sdf.format(rs.getTimestamp("treatment_session_datetime"));
-                }
-                
-                Object[] row = {
-                    rs.getInt("treatment_session_id"),
-                    datetime,
-                    rs.getString("doctor_name"),
-                    rs.getDouble("temperature") + "°C",
-                    rs.getDouble("weight") + " kg",
-                    rs.getInt("pulse_rate") != 0 ? String.valueOf(rs.getInt("pulse_rate")) : "",
-                    rs.getInt("respiratory_rate") != 0 ? String.valueOf(rs.getInt("respiratory_rate")) : ""
-                };
-                tableModel.addRow(row);
+            List<TreatmentSessionListDto> sessions = TreatmentCourseService.getInstance().getSessionsByCourseId(courseId);
+            for (TreatmentSessionListDto dto : sessions) {
+                String datetimeStr = dto.getTreatmentSessionDatetime() != null ? sdfDateTime.format(dto.getTreatmentSessionDatetime()) : "";
+                tableModel.addRow(new Object[]{
+                    dto.getTreatmentSessionId(),
+                    datetimeStr,
+                    dto.getDoctorName() != null ? dto.getDoctorName() : "",
+                    dto.getTemperature() + "°C",
+                    dto.getWeight() + " kg",
+                    dto.getPulseRate() != null && dto.getPulseRate() != 0 ? String.valueOf(dto.getPulseRate()) : "",
+                    dto.getRespiratoryRate() != null && dto.getRespiratoryRate() != 0 ? String.valueOf(dto.getRespiratoryRate()) : ""
+                });
             }
-        } catch (SQLException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         

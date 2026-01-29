@@ -1,15 +1,13 @@
 package com.petcare.gui;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import com.petcare.model.Database;
-import com.petcare.model.User;
+import com.petcare.model.domain.User;
+import com.petcare.model.exception.PetcareException;
+import com.petcare.service.UserService;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.security.MessageDigest;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -145,85 +143,27 @@ public class LoginFrame extends JFrame {
             return;
         }
         
-        // Authenticate user
-        User user = authenticateUser(username, password);
-        
-        if (user != null) {
-            // Close login frame
-            this.dispose();
-            
-            // Open dashboard
-            SwingUtilities.invokeLater(() -> {
-                DashboardFrame dashboard = new DashboardFrame(user);
-                dashboard.setVisible(true);
-            });
-        } else {
-            JOptionPane.showMessageDialog(this, 
-                "Sai tên đăng nhập hoặc mật khẩu!", 
-                "Lỗi đăng nhập", 
-                JOptionPane.ERROR_MESSAGE);
-            passwordField.setText("");
-            passwordField.requestFocus();
-        }
-    }
-    
-    private User authenticateUser(String username, String password) {
         try {
-            // Hash password with MD5 (matching PHP implementation)
-            String hashedPassword = md5(password);
-            
-            // Query with PreparedStatement (safe from SQL Injection)
-            String query = "SELECT id, username, fullname, avatar, role " +
-                          "FROM users " +
-                          "WHERE username = ? AND password = ? AND role IN ('admin', 'staff')";
-            
-            ResultSet rs = Database.executeQuery(query, username, hashedPassword);
-            
-            if (rs != null && rs.next()) {
-                User user = new User();
-                user.setId(rs.getInt("id"));
-                user.setUsername(rs.getString("username"));
-                user.setFullname(rs.getString("fullname"));
-                user.setAvatar(rs.getString("avatar"));
-                
-                String roleStr = rs.getString("role");
-                if ("admin".equalsIgnoreCase(roleStr)) {
-                    user.setRole(User.Role.ADMIN);
-                } else {
-                    user.setRole(User.Role.STAFF);
-                }
-                
-                return user;
+            User user = UserService.getInstance().authenticate(username, password);
+            if (user != null) {
+                this.dispose();
+                SwingUtilities.invokeLater(() -> {
+                    DashboardFrame dashboard = new DashboardFrame(user);
+                    dashboard.setVisible(true);
+                });
+            } else {
+                JOptionPane.showMessageDialog(this,
+                    "Sai tên đăng nhập hoặc mật khẩu!",
+                    "Lỗi đăng nhập",
+                    JOptionPane.ERROR_MESSAGE);
+                passwordField.setText("");
+                passwordField.requestFocus();
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, 
-                "Lỗi kết nối database: " + ex.getMessage(), 
-                "Lỗi", 
+        } catch (PetcareException ex) {
+            JOptionPane.showMessageDialog(this,
+                "Lỗi: " + ex.getMessage(),
+                "Lỗi",
                 JOptionPane.ERROR_MESSAGE);
-        }
-        
-        return null;
-    }
-    
-    /**
-     * MD5 hash function (matching PHP md5())
-     */
-    private String md5(String input) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] messageDigest = md.digest(input.getBytes());
-            StringBuilder hexString = new StringBuilder();
-            for (byte b : messageDigest) {
-                String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) {
-                    hexString.append('0');
-                }
-                hexString.append(hex);
-            }
-            return hexString.toString();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
         }
     }
 }

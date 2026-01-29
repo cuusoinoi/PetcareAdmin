@@ -1,9 +1,15 @@
 package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import com.petcare.model.Database;
-import com.petcare.model.PetEnclosure;
-import com.petcare.model.ServiceType;
+import com.petcare.model.domain.InvoiceDetailItem;
+import com.petcare.model.domain.PetEnclosure;
+import com.petcare.service.CustomerService;
+import com.petcare.service.GeneralSettingService;
+import com.petcare.service.InvoiceService;
+import com.petcare.service.PetEnclosureService;
+import com.petcare.service.PetService;
+import com.petcare.model.domain.ServiceType;
+import com.petcare.service.ServiceTypeService;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -51,7 +57,7 @@ public class CheckoutDialog extends JDialog {
     private JButton checkoutButton;
     private JButton cancelButton;
     private boolean saved = false;
-    private List<ServiceType> serviceTypes;
+    private List<ServiceType> serviceTypes; // domain ServiceType from ServiceTypeService
     private int checkoutHour = 18; // Default 18:00
     private int overtimeFeePerHour = 25000; // Default
     
@@ -66,17 +72,9 @@ public class CheckoutDialog extends JDialog {
     
     private void loadSettings() {
         try {
-            String query = "SELECT checkout_hour, overtime_fee_per_hour FROM general_settings LIMIT 1";
-            ResultSet rs = Database.executeQuery(query);
-            
-            if (rs != null && rs.next()) {
-                String checkoutHourStr = rs.getString("checkout_hour");
-                if (checkoutHourStr != null) {
-                    checkoutHour = Integer.parseInt(checkoutHourStr.split(":")[0]);
-                }
-                overtimeFeePerHour = rs.getInt("overtime_fee_per_hour");
-            }
-        } catch (SQLException ex) {
+            checkoutHour = GeneralSettingService.getInstance().getCheckoutHour();
+            overtimeFeePerHour = GeneralSettingService.getInstance().getOvertimeFeePerHour();
+        } catch (com.petcare.model.exception.PetcareException ex) {
             ex.printStackTrace();
         }
     }
@@ -250,17 +248,11 @@ public class CheckoutDialog extends JDialog {
     
     private void loadCustomerAndPetInfo() {
         try {
-            String query = "SELECT c.customer_name, p.pet_name " +
-                          "FROM customers c, pets p " +
-                          "WHERE c.customer_id = ? AND p.pet_id = ?";
-            ResultSet rs = Database.executeQuery(query, 
-                enclosure.getCustomerId(), enclosure.getPetId());
-            
-            if (rs != null && rs.next()) {
-                customerLabel.setText(rs.getString("customer_name"));
-                petLabel.setText(rs.getString("pet_name"));
-            }
-        } catch (SQLException ex) {
+            com.petcare.model.domain.Customer c = CustomerService.getInstance().getCustomerById(enclosure.getCustomerId());
+            com.petcare.model.domain.Pet p = PetService.getInstance().getPetById(enclosure.getPetId());
+            if (c != null) customerLabel.setText(c.getCustomerName());
+            if (p != null) petLabel.setText(p.getPetName());
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -322,21 +314,12 @@ public class CheckoutDialog extends JDialog {
         serviceCombo.removeAllItems();
         serviceCombo.addItem("-- Chọn dịch vụ --");
         serviceTypes = new ArrayList<>();
-        
         try {
-            String query = "SELECT service_type_id, service_name, price FROM service_types ORDER BY service_name";
-            ResultSet rs = Database.executeQuery(query);
-            
-            while (rs != null && rs.next()) {
-                ServiceType st = new ServiceType();
-                st.setServiceTypeId(rs.getInt("service_type_id"));
-                st.setServiceName(rs.getString("service_name"));
-                st.setPrice(rs.getDouble("price"));
+            for (ServiceType st : ServiceTypeService.getInstance().getAllServiceTypes()) {
                 serviceTypes.add(st);
-                
-                serviceCombo.addItem(st.getServiceName() + " - " + formatCurrency((int)st.getPrice()));
+                serviceCombo.addItem(st.getServiceName() + " - " + formatCurrency((int) st.getPrice()));
             }
-        } catch (SQLException ex) {
+        } catch (com.petcare.model.exception.PetcareException ex) {
             ex.printStackTrace();
         }
     }
@@ -408,53 +391,29 @@ public class CheckoutDialog extends JDialog {
             
             // Update enclosure status
             Date checkOutDate = new Date();
-            String updateQuery = "UPDATE pet_enclosures SET check_out_date = ?, pet_enclosure_status = 'Check Out' " +
-                               "WHERE pet_enclosure_id = ?";
-            Database.executeUpdate(updateQuery, new java.sql.Timestamp(checkOutDate.getTime()), 
-                enclosure.getPetEnclosureId());
-            
-            // Create invoice
-            String invoiceQuery = "INSERT INTO invoices (customer_id, pet_id, pet_enclosure_id, invoice_date, " +
-                                "discount, subtotal, deposit, total_amount) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-            
-            java.sql.Timestamp invoiceDate = new java.sql.Timestamp(checkOutDate.getTime());
-            
-            // Get generated invoice ID
-            java.sql.Connection conn = Database.getConnection();
-            java.sql.PreparedStatement ps = conn.prepareStatement(invoiceQuery, 
-                java.sql.Statement.RETURN_GENERATED_KEYS);
-            ps.setInt(1, enclosure.getCustomerId());
-            ps.setInt(2, enclosure.getPetId());
-            ps.setInt(3, enclosure.getPetEnclosureId());
-            ps.setTimestamp(4, invoiceDate);
-            ps.setInt(5, discount);
-            ps.setInt(6, subtotal);
-            ps.setInt(7, enclosure.getDeposit());
-            ps.setInt(8, totalAmount);
-            ps.executeUpdate();
-            
-            ResultSet generatedKeys = ps.getGeneratedKeys();
-            int invoiceId = 0;
-            if (generatedKeys.next()) {
-                invoiceId = generatedKeys.getInt(1);
-            }
-            
-            // Add invoice details
+            PetEnclosureService.getInstance().updateCheckOut(enclosure.getPetEnclosureId(), checkOutDate);
+
+            // Build invoice details
+            List<InvoiceDetailItem> details = new ArrayList<>();
             for (int i = 0; i < serviceTableModel.getRowCount(); i++) {
                 String serviceName = (String) serviceTableModel.getValueAt(i, 0);
                 int quantity = (Integer) serviceTableModel.getValueAt(i, 1);
                 int unitPrice = (Integer) serviceTableModel.getValueAt(i, 2);
                 int totalPrice = (Integer) serviceTableModel.getValueAt(i, 3);
-                
-                // Find service_type_id by name
                 int serviceTypeId = findServiceTypeIdByName(serviceName);
                 if (serviceTypeId > 0) {
-                    String detailQuery = "INSERT INTO invoice_details (invoice_id, service_type_id, quantity, " +
-                                       "unit_price, total_price) VALUES (?, ?, ?, ?, ?)";
-                    Database.executeUpdate(detailQuery, invoiceId, serviceTypeId, quantity, unitPrice, totalPrice);
+                    InvoiceDetailItem item = new InvoiceDetailItem();
+                    item.setServiceTypeId(serviceTypeId);
+                    item.setQuantity(quantity);
+                    item.setUnitPrice(unitPrice);
+                    item.setTotalPrice(totalPrice);
+                    details.add(item);
                 }
             }
-            
+            int invoiceId = InvoiceService.getInstance().createInvoice(
+                enclosure.getCustomerId(), enclosure.getPetId(), enclosure.getPetEnclosureId(),
+                checkOutDate, discount, subtotal, enclosure.getDeposit(), totalAmount, details);
+
             JOptionPane.showMessageDialog(this, 
                 "Check-out thành công! Hóa đơn #" + invoiceId + " đã được tạo.", 
                 "Thành công", 
@@ -470,27 +429,15 @@ public class CheckoutDialog extends JDialog {
     
     private int findServiceTypeIdByName(String serviceName) {
         try {
-            // Handle special service names
-            if (serviceName.startsWith("Lưu chuồng")) {
-                String query = "SELECT service_type_id FROM service_types WHERE service_name LIKE 'Lưu chuồng%' LIMIT 1";
-                ResultSet rs = Database.executeQuery(query);
-                if (rs != null && rs.next()) {
-                    return rs.getInt("service_type_id");
-                }
-            } else if (serviceName.startsWith("Phụ thu trễ giờ")) {
-                String query = "SELECT service_type_id FROM service_types WHERE service_name LIKE 'Phụ thu trễ giờ%' LIMIT 1";
-                ResultSet rs = Database.executeQuery(query);
-                if (rs != null && rs.next()) {
-                    return rs.getInt("service_type_id");
-                }
-            } else {
-                String query = "SELECT service_type_id FROM service_types WHERE service_name = ? LIMIT 1";
-                ResultSet rs = Database.executeQuery(query, serviceName);
-                if (rs != null && rs.next()) {
-                    return rs.getInt("service_type_id");
-                }
+            ServiceTypeService svc = ServiceTypeService.getInstance();
+            ServiceType s = svc.getServiceTypeByName(serviceName);
+            if (s == null && serviceName.startsWith("Lưu chuồng")) {
+                s = svc.getServiceTypeByNamePrefix("Lưu chuồng");
+            } else if (s == null && serviceName.startsWith("Phụ thu trễ giờ")) {
+                s = svc.getServiceTypeByNamePrefix("Phụ thu trễ giờ");
             }
-        } catch (SQLException ex) {
+            return s != null ? s.getServiceTypeId() : 0;
+        } catch (com.petcare.model.exception.PetcareException ex) {
             ex.printStackTrace();
         }
         return 0;

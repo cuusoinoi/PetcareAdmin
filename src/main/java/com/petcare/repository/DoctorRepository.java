@@ -174,11 +174,6 @@ public class DoctorRepository implements IDoctorRepository {
         entity.setDoctorIdentityCard(rs.getString("doctor_identity_card"));
         entity.setDoctorAddress(rs.getString("doctor_address"));
         entity.setDoctorNote(rs.getString("doctor_note"));
-        
-        if (rs.getTimestamp("created_at") != null) {
-            entity.setCreatedAt(new java.util.Date(rs.getTimestamp("created_at").getTime()));
-        }
-        
         return entity;
     }
 }

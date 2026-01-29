@@ -1,15 +1,15 @@
 package com.petcare.gui.panels;
 
 import com.petcare.gui.dialogs.AddEditVaccinationDialog;
-import com.petcare.model.Database;
-import com.petcare.model.PetVaccination;
+import com.petcare.model.entity.PetVaccinationListDto;
+import com.petcare.model.exception.PetcareException;
+import com.petcare.service.PetVaccinationService;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -104,48 +104,24 @@ public class VaccinationManagementPanel extends JPanel {
     
     private void loadVaccinations() {
         tableModel.setRowCount(0);
-        
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         try {
-            String query = "SELECT pv.pet_vaccination_id, pv.vaccination_date, pv.next_vaccination_date, " +
-                          "v.vaccine_name, c.customer_name, p.pet_name, d.doctor_name " +
-                          "FROM pet_vaccinations pv " +
-                          "INNER JOIN vaccines v ON pv.vaccine_id = v.vaccine_id " +
-                          "INNER JOIN customers c ON pv.customer_id = c.customer_id " +
-                          "INNER JOIN pets p ON pv.pet_id = p.pet_id " +
-                          "INNER JOIN doctors d ON pv.doctor_id = d.doctor_id " +
-                          "ORDER BY pv.pet_vaccination_id DESC";
-            
-            ResultSet rs = Database.executeQuery(query);
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-            
-            while (rs != null && rs.next()) {
-                String vaccinationDate = "";
-                if (rs.getDate("vaccination_date") != null) {
-                    vaccinationDate = sdf.format(rs.getDate("vaccination_date"));
-                }
-                
-                String nextDate = "";
-                if (rs.getDate("next_vaccination_date") != null) {
-                    nextDate = sdf.format(rs.getDate("next_vaccination_date"));
-                }
-                
-                Object[] row = {
-                    rs.getInt("pet_vaccination_id"),
-                    vaccinationDate,
-                    rs.getString("vaccine_name"),
-                    rs.getString("customer_name"),
-                    rs.getString("pet_name"),
-                    rs.getString("doctor_name"),
-                    nextDate
-                };
-                tableModel.addRow(row);
+            List<PetVaccinationListDto> list = PetVaccinationService.getInstance().getVaccinationsForList();
+            for (PetVaccinationListDto dto : list) {
+                String vaccinationDateStr = dto.getVaccinationDate() != null ? sdf.format(dto.getVaccinationDate()) : "";
+                String nextDateStr = dto.getNextVaccinationDate() != null ? sdf.format(dto.getNextVaccinationDate()) : "";
+                tableModel.addRow(new Object[]{
+                    dto.getPetVaccinationId(),
+                    vaccinationDateStr,
+                    dto.getVaccineName() != null ? dto.getVaccineName() : "",
+                    dto.getCustomerName() != null ? dto.getCustomerName() : "",
+                    dto.getPetName() != null ? dto.getPetName() : "",
+                    dto.getDoctorName() != null ? dto.getDoctorName() : "",
+                    nextDateStr
+                });
             }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, 
-                "Lỗi khi tải dữ liệu: " + ex.getMessage(), 
-                "Lỗi", 
-                JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
+        } catch (PetcareException ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi tải dữ liệu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -160,22 +136,21 @@ public class VaccinationManagementPanel extends JPanel {
     private void showEditVaccinationDialog() {
         int selectedRow = vaccinationTable.getSelectedRow();
         if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, 
-                "Vui lòng chọn bản ghi tiêm chủng cần sửa!", 
-                "Thông báo", 
-                JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn bản ghi tiêm chủng cần sửa!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
         int vaccinationId = (Integer) tableModel.getValueAt(selectedRow, 0);
-        PetVaccination vaccination = getVaccinationById(vaccinationId);
-        
-        if (vaccination != null) {
-            AddEditVaccinationDialog dialog = new AddEditVaccinationDialog(null, vaccination);
-            dialog.setVisible(true);
-            if (dialog.isSaved()) {
-                refreshData();
+        try {
+            com.petcare.model.domain.PetVaccination vaccination = PetVaccinationService.getInstance().getVaccinationById(vaccinationId);
+            if (vaccination != null) {
+                AddEditVaccinationDialog dialog = new AddEditVaccinationDialog(null, vaccination);
+                dialog.setVisible(true);
+                if (dialog.isSaved()) {
+                    refreshData();
+                }
             }
+        } catch (PetcareException ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -190,69 +165,15 @@ public class VaccinationManagementPanel extends JPanel {
         }
         
         int vaccinationId = (Integer) tableModel.getValueAt(selectedRow, 0);
-        
-        int confirm = JOptionPane.showConfirmDialog(this, 
-            "Bạn có chắc muốn xóa bản ghi tiêm chủng này?", 
-            "Xác nhận xóa", 
-            JOptionPane.YES_NO_OPTION);
-        
+        int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc muốn xóa bản ghi tiêm chủng này?", "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                String query = "DELETE FROM pet_vaccinations WHERE pet_vaccination_id = ?";
-                int result = Database.executeUpdate(query, vaccinationId);
-                
-                if (result > 0) {
-                    JOptionPane.showMessageDialog(this, 
-                        "Xóa bản ghi tiêm chủng thành công!", 
-                        "Thành công", 
-                        JOptionPane.INFORMATION_MESSAGE);
-                    refreshData();
-                } else {
-                    JOptionPane.showMessageDialog(this, 
-                        "Không thể xóa bản ghi tiêm chủng.", 
-                        "Lỗi", 
-                        JOptionPane.ERROR_MESSAGE);
-                }
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, 
-                    "Lỗi khi xóa: " + ex.getMessage(), 
-                    "Lỗi", 
-                    JOptionPane.ERROR_MESSAGE);
-                ex.printStackTrace();
+                PetVaccinationService.getInstance().deleteVaccination(vaccinationId);
+                JOptionPane.showMessageDialog(this, "Xóa bản ghi tiêm chủng thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                refreshData();
+            } catch (PetcareException ex) {
+                JOptionPane.showMessageDialog(this, "Lỗi khi xóa: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         }
-    }
-    
-    private PetVaccination getVaccinationById(int vaccinationId) {
-        try {
-            String query = "SELECT * FROM pet_vaccinations WHERE pet_vaccination_id = ?";
-            ResultSet rs = Database.executeQuery(query, vaccinationId);
-            
-            if (rs != null && rs.next()) {
-                PetVaccination vaccination = new PetVaccination();
-                vaccination.setPetVaccinationId(rs.getInt("pet_vaccination_id"));
-                vaccination.setVaccineId(rs.getInt("vaccine_id"));
-                vaccination.setCustomerId(rs.getInt("customer_id"));
-                vaccination.setPetId(rs.getInt("pet_id"));
-                vaccination.setDoctorId(rs.getInt("doctor_id"));
-                
-                if (rs.getDate("vaccination_date") != null) {
-                    vaccination.setVaccinationDate(new java.util.Date(
-                        rs.getDate("vaccination_date").getTime()));
-                }
-                
-                if (rs.getDate("next_vaccination_date") != null) {
-                    vaccination.setNextVaccinationDate(new java.util.Date(
-                        rs.getDate("next_vaccination_date").getTime()));
-                }
-                
-                vaccination.setNotes(rs.getString("notes"));
-                
-                return vaccination;
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return null;
     }
 }

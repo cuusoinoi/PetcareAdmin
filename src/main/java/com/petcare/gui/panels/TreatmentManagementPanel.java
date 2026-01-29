@@ -2,15 +2,15 @@ package com.petcare.gui.panels;
 
 import com.petcare.gui.dialogs.AddEditTreatmentDialog;
 import com.petcare.gui.dialogs.TreatmentSessionsDialog;
-import com.petcare.model.Database;
-import com.petcare.model.TreatmentCourse;
+import com.petcare.model.entity.TreatmentCourseListDto;
+import com.petcare.model.exception.PetcareException;
+import com.petcare.service.TreatmentCourseService;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -119,47 +119,24 @@ public class TreatmentManagementPanel extends JPanel {
     
     private void loadTreatmentCourses() {
         tableModel.setRowCount(0);
-        
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         try {
-            String query = "SELECT tc.treatment_course_id, tc.start_date, tc.end_date, " +
-                          "c.customer_name, p.pet_name, tc.status " +
-                          "FROM treatment_courses tc " +
-                          "INNER JOIN customers c ON tc.customer_id = c.customer_id " +
-                          "INNER JOIN pets p ON tc.pet_id = p.pet_id " +
-                          "ORDER BY tc.treatment_course_id DESC";
-            
-            ResultSet rs = Database.executeQuery(query);
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-            
-            while (rs != null && rs.next()) {
-                String startDate = "";
-                if (rs.getDate("start_date") != null) {
-                    startDate = sdf.format(rs.getDate("start_date"));
-                }
-                
-                String endDate = "";
-                if (rs.getDate("end_date") != null) {
-                    endDate = sdf.format(rs.getDate("end_date"));
-                }
-                
-                String statusLabel = "1".equals(rs.getString("status")) ? "Đang điều trị" : "Kết thúc";
-                
-                Object[] row = {
-                    rs.getInt("treatment_course_id"),
-                    startDate,
-                    endDate,
-                    rs.getString("customer_name"),
-                    rs.getString("pet_name"),
+            List<TreatmentCourseListDto> list = TreatmentCourseService.getInstance().getCoursesForList();
+            for (TreatmentCourseListDto dto : list) {
+                String startDateStr = dto.getStartDate() != null ? sdf.format(dto.getStartDate()) : "";
+                String endDateStr = dto.getEndDate() != null ? sdf.format(dto.getEndDate()) : "";
+                String statusLabel = TreatmentCourseService.statusCodeToLabel(dto.getStatus());
+                tableModel.addRow(new Object[]{
+                    dto.getTreatmentCourseId(),
+                    startDateStr,
+                    endDateStr,
+                    dto.getCustomerName() != null ? dto.getCustomerName() : "",
+                    dto.getPetName() != null ? dto.getPetName() : "",
                     statusLabel
-                };
-                tableModel.addRow(row);
+                });
             }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, 
-                "Lỗi khi tải dữ liệu: " + ex.getMessage(), 
-                "Lỗi", 
-                JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
+        } catch (PetcareException ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi tải dữ liệu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -174,22 +151,21 @@ public class TreatmentManagementPanel extends JPanel {
     private void showEditTreatmentDialog() {
         int selectedRow = treatmentTable.getSelectedRow();
         if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, 
-                "Vui lòng chọn liệu trình cần sửa!", 
-                "Thông báo", 
-                JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn liệu trình cần sửa!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
         int courseId = (Integer) tableModel.getValueAt(selectedRow, 0);
-        TreatmentCourse course = getTreatmentCourseById(courseId);
-        
-        if (course != null) {
-            AddEditTreatmentDialog dialog = new AddEditTreatmentDialog(null, course);
-            dialog.setVisible(true);
-            if (dialog.isSaved()) {
-                refreshData();
+        try {
+            com.petcare.model.domain.TreatmentCourse course = TreatmentCourseService.getInstance().getCourseById(courseId);
+            if (course != null) {
+                AddEditTreatmentDialog dialog = new AddEditTreatmentDialog(null, course);
+                dialog.setVisible(true);
+                if (dialog.isSaved()) {
+                    refreshData();
+                }
             }
+        } catch (PetcareException ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -211,127 +187,43 @@ public class TreatmentManagementPanel extends JPanel {
     private void completeTreatment() {
         int selectedRow = treatmentTable.getSelectedRow();
         if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, 
-                "Vui lòng chọn liệu trình cần kết thúc!", 
-                "Thông báo", 
-                JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn liệu trình cần kết thúc!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
         int courseId = (Integer) tableModel.getValueAt(selectedRow, 0);
         String status = (String) tableModel.getValueAt(selectedRow, 5);
-        
         if ("Kết thúc".equals(status)) {
-            JOptionPane.showMessageDialog(this, 
-                "Liệu trình này đã kết thúc rồi!", 
-                "Thông báo", 
-                JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Liệu trình này đã kết thúc rồi!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
-        int confirm = JOptionPane.showConfirmDialog(this, 
-            "Bạn có chắc muốn kết thúc liệu trình này?", 
-            "Xác nhận", 
-            JOptionPane.YES_NO_OPTION);
-        
+        int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc muốn kết thúc liệu trình này?", "Xác nhận", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                String query = "UPDATE treatment_courses SET end_date = CURDATE(), status = '0' " +
-                              "WHERE treatment_course_id = ?";
-                int result = Database.executeUpdate(query, courseId);
-                
-                if (result > 0) {
-                    JOptionPane.showMessageDialog(this, 
-                        "Kết thúc liệu trình thành công!", 
-                        "Thành công", 
-                        JOptionPane.INFORMATION_MESSAGE);
-                    refreshData();
-                }
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, 
-                    "Lỗi: " + ex.getMessage(), 
-                    "Lỗi", 
-                    JOptionPane.ERROR_MESSAGE);
-                ex.printStackTrace();
+                TreatmentCourseService.getInstance().completeCourse(courseId);
+                JOptionPane.showMessageDialog(this, "Kết thúc liệu trình thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                refreshData();
+            } catch (PetcareException ex) {
+                JOptionPane.showMessageDialog(this, "Lỗi: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
-    
+
     private void deleteTreatment() {
         int selectedRow = treatmentTable.getSelectedRow();
         if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, 
-                "Vui lòng chọn liệu trình cần xóa!", 
-                "Thông báo", 
-                JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn liệu trình cần xóa!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
         int courseId = (Integer) tableModel.getValueAt(selectedRow, 0);
-        
-        int confirm = JOptionPane.showConfirmDialog(this, 
-            "Bạn có chắc muốn xóa liệu trình này?", 
-            "Xác nhận xóa", 
-            JOptionPane.YES_NO_OPTION);
-        
+        int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc muốn xóa liệu trình này?", "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                String query = "DELETE FROM treatment_courses WHERE treatment_course_id = ?";
-                int result = Database.executeUpdate(query, courseId);
-                
-                if (result > 0) {
-                    JOptionPane.showMessageDialog(this, 
-                        "Xóa liệu trình thành công!", 
-                        "Thành công", 
-                        JOptionPane.INFORMATION_MESSAGE);
-                    refreshData();
-                } else {
-                    JOptionPane.showMessageDialog(this, 
-                        "Không thể xóa liệu trình.", 
-                        "Lỗi", 
-                        JOptionPane.ERROR_MESSAGE);
-                }
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, 
-                    "Lỗi khi xóa: " + ex.getMessage(), 
-                    "Lỗi", 
-                    JOptionPane.ERROR_MESSAGE);
-                ex.printStackTrace();
+                TreatmentCourseService.getInstance().deleteCourse(courseId);
+                JOptionPane.showMessageDialog(this, "Xóa liệu trình thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                refreshData();
+            } catch (PetcareException ex) {
+                JOptionPane.showMessageDialog(this, "Lỗi khi xóa: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         }
-    }
-    
-    private TreatmentCourse getTreatmentCourseById(int courseId) {
-        try {
-            String query = "SELECT * FROM treatment_courses WHERE treatment_course_id = ?";
-            ResultSet rs = Database.executeQuery(query, courseId);
-            
-            if (rs != null && rs.next()) {
-                TreatmentCourse course = new TreatmentCourse();
-                course.setTreatmentCourseId(rs.getInt("treatment_course_id"));
-                course.setCustomerId(rs.getInt("customer_id"));
-                course.setPetId(rs.getInt("pet_id"));
-                
-                if (rs.getDate("start_date") != null) {
-                    course.setStartDate(new java.util.Date(
-                        rs.getDate("start_date").getTime()));
-                }
-                
-                if (rs.getDate("end_date") != null) {
-                    course.setEndDate(new java.util.Date(
-                        rs.getDate("end_date").getTime()));
-                }
-                
-                String statusStr = rs.getString("status");
-                if (statusStr != null) {
-                    course.setStatus(TreatmentCourse.Status.fromCode(statusStr));
-                }
-                
-                return course;
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return null;
     }
 }

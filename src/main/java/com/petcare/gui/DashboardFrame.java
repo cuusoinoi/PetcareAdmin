@@ -15,7 +15,7 @@ import com.petcare.gui.panels.TreatmentManagementPanel;
 import com.petcare.gui.panels.UserManagementPanel;
 import com.petcare.gui.panels.VaccinationManagementPanel;
 import com.petcare.gui.panels.VaccineTypeManagementPanel;
-import com.petcare.model.User;
+import com.petcare.model.domain.User;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import javax.swing.JFrame;

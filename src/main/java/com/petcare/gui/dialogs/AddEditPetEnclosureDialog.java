@@ -1,15 +1,15 @@
 package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import com.petcare.model.Database;
-import com.petcare.model.PetEnclosure;
+import com.petcare.model.domain.PetEnclosure;
+import com.petcare.service.CustomerService;
+import com.petcare.service.PetEnclosureService;
+import com.petcare.service.PetService;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -167,40 +167,26 @@ public class AddEditPetEnclosureDialog extends JDialog {
     private void loadCustomers() {
         customerCombo.removeAllItems();
         customerCombo.addItem("-- Chọn khách hàng --");
-        
         try {
-            String query = "SELECT customer_id, customer_name FROM customers ORDER BY customer_name";
-            ResultSet rs = Database.executeQuery(query);
-            
-            while (rs != null && rs.next()) {
-                String display = rs.getInt("customer_id") + " - " + rs.getString("customer_name");
-                customerCombo.addItem(display);
-            }
-        } catch (SQLException ex) {
+            CustomerService.getInstance().getAllCustomers().forEach(c -> {
+                customerCombo.addItem(c.getCustomerId() + " - " + c.getCustomerName());
+            });
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
-    
+
     private void loadPetsByCustomer() {
         petCombo.removeAllItems();
         petCombo.addItem("-- Chọn thú cưng --");
-        
-        if (customerCombo.getSelectedIndex() == 0) {
-            return;
-        }
-        
+        if (customerCombo.getSelectedIndex() == 0) return;
         try {
             String selected = (String) customerCombo.getSelectedItem();
             int customerId = Integer.parseInt(selected.split(" - ")[0]);
-            
-            String query = "SELECT pet_id, pet_name FROM pets WHERE customer_id = ? ORDER BY pet_name";
-            ResultSet rs = Database.executeQuery(query, customerId);
-            
-            while (rs != null && rs.next()) {
-                String display = rs.getInt("pet_id") + " - " + rs.getString("pet_name");
-                petCombo.addItem(display);
-            }
-        } catch (SQLException ex) {
+            PetService.getInstance().getPetsByCustomerId(customerId).forEach(p -> {
+                petCombo.addItem(p.getPetId() + " - " + p.getPetName());
+            });
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -299,58 +285,34 @@ public class AddEditPetEnclosureDialog extends JDialog {
                 return;
             }
             
+            PetEnclosureService service = PetEnclosureService.getInstance();
             if (enclosure == null) {
-                // Insert (Check-in)
-                String query = "INSERT INTO pet_enclosures (customer_id, pet_id, pet_enclosure_number, " +
-                              "check_in_date, daily_rate, deposit, emergency_limit, pet_enclosure_note, " +
-                              "pet_enclosure_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Check In')";
-                
-                java.sql.Timestamp sqlTimestamp = new java.sql.Timestamp(checkInDate.getTime());
-                
-                int result = Database.executeUpdate(query,
-                    customerId,
-                    petId,
-                    enclosureNumber,
-                    sqlTimestamp,
-                    dailyRate,
-                    deposit,
-                    emergencyLimit,
-                    noteArea.getText().trim().isEmpty() ? null : noteArea.getText().trim()
-                );
-                
-                if (result > 0) {
-                    JOptionPane.showMessageDialog(this, "Check-in thành công!", "Thành công", 
-                        JOptionPane.INFORMATION_MESSAGE);
-                    saved = true;
-                    dispose();
-                }
+                PetEnclosure newEnclosure = new PetEnclosure();
+                newEnclosure.setCustomerId(customerId);
+                newEnclosure.setPetId(petId);
+                newEnclosure.setPetEnclosureNumber(enclosureNumber);
+                newEnclosure.setCheckInDate(checkInDate);
+                newEnclosure.setDailyRate(dailyRate);
+                newEnclosure.setDeposit(deposit);
+                newEnclosure.setEmergencyLimit(emergencyLimit);
+                newEnclosure.setPetEnclosureNote(noteArea.getText().trim().isEmpty() ? null : noteArea.getText().trim());
+                service.createEnclosure(newEnclosure);
+                JOptionPane.showMessageDialog(this, "Check-in thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                saved = true;
+                dispose();
             } else {
-                // Update
-                String query = "UPDATE pet_enclosures SET customer_id = ?, pet_id = ?, " +
-                              "pet_enclosure_number = ?, check_in_date = ?, daily_rate = ?, " +
-                              "deposit = ?, emergency_limit = ?, pet_enclosure_note = ? " +
-                              "WHERE pet_enclosure_id = ?";
-                
-                java.sql.Timestamp sqlTimestamp = new java.sql.Timestamp(checkInDate.getTime());
-                
-                int result = Database.executeUpdate(query,
-                    customerId,
-                    petId,
-                    enclosureNumber,
-                    sqlTimestamp,
-                    dailyRate,
-                    deposit,
-                    emergencyLimit,
-                    noteArea.getText().trim().isEmpty() ? null : noteArea.getText().trim(),
-                    enclosure.getPetEnclosureId()
-                );
-                
-                if (result > 0) {
-                    JOptionPane.showMessageDialog(this, "Cập nhật lưu chuồng thành công!", "Thành công", 
-                        JOptionPane.INFORMATION_MESSAGE);
-                    saved = true;
-                    dispose();
-                }
+                enclosure.setCustomerId(customerId);
+                enclosure.setPetId(petId);
+                enclosure.setPetEnclosureNumber(enclosureNumber);
+                enclosure.setCheckInDate(checkInDate);
+                enclosure.setDailyRate(dailyRate);
+                enclosure.setDeposit(deposit);
+                enclosure.setEmergencyLimit(emergencyLimit);
+                enclosure.setPetEnclosureNote(noteArea.getText().trim().isEmpty() ? null : noteArea.getText().trim());
+                service.updateEnclosure(enclosure);
+                JOptionPane.showMessageDialog(this, "Cập nhật lưu chuồng thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                saved = true;
+                dispose();
             }
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập số hợp lệ cho phí/ngày, đặt cọc, hạn mức!", 

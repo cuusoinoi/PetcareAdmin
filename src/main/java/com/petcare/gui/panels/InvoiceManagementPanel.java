@@ -2,15 +2,15 @@ package com.petcare.gui.panels;
 
 import com.petcare.gui.dialogs.AddInvoiceDialog;
 import com.petcare.gui.dialogs.InvoiceDetailsDialog;
-import com.petcare.model.Database;
-import com.petcare.model.Invoice;
+import com.petcare.model.entity.InvoiceListDto;
+import com.petcare.model.exception.PetcareException;
+import com.petcare.service.InvoiceService;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -55,17 +55,17 @@ public class InvoiceManagementPanel extends JPanel {
         // Buttons panel
         JPanel buttonPanel = new JPanel(new GridLayout(1, 4, 10, 0));
         
-        addButton = new JButton("➕ Thêm");
+        addButton = new JButton("Thêm");
         addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         addButton.addActionListener(e -> showAddInvoiceDialog());
         buttonPanel.add(addButton);
         
-        viewButton = new JButton("👁️ Xem chi tiết");
+        viewButton = new JButton("Xem chi tiết");
         viewButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         viewButton.addActionListener(e -> showInvoiceDetails());
         buttonPanel.add(viewButton);
         
-        deleteButton = new JButton("🗑️ Xóa");
+        deleteButton = new JButton("Xóa");
         deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         deleteButton.addActionListener(e -> deleteInvoice());
         buttonPanel.add(deleteButton);
@@ -105,42 +105,24 @@ public class InvoiceManagementPanel extends JPanel {
     
     private void loadInvoices() {
         tableModel.setRowCount(0);
-        
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         try {
-            String query = "SELECT i.invoice_id, i.invoice_date, c.customer_name, p.pet_name, " +
-                          "i.subtotal, i.discount, i.deposit, i.total_amount " +
-                          "FROM invoices i " +
-                          "INNER JOIN customers c ON i.customer_id = c.customer_id " +
-                          "INNER JOIN pets p ON i.pet_id = p.pet_id " +
-                          "ORDER BY i.invoice_id DESC";
-            
-            ResultSet rs = Database.executeQuery(query);
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-            
-            while (rs != null && rs.next()) {
-                String invoiceDate = "";
-                if (rs.getTimestamp("invoice_date") != null) {
-                    invoiceDate = sdf.format(rs.getTimestamp("invoice_date"));
-                }
-                
-                Object[] row = {
-                    rs.getInt("invoice_id"),
-                    invoiceDate,
-                    rs.getString("customer_name"),
-                    rs.getString("pet_name"),
-                    formatCurrency(rs.getInt("subtotal")),
-                    formatCurrency(rs.getInt("discount")),
-                    formatCurrency(rs.getInt("deposit")),
-                    formatCurrency(rs.getInt("total_amount"))
-                };
-                tableModel.addRow(row);
+            List<InvoiceListDto> list = InvoiceService.getInstance().getInvoicesForList();
+            for (InvoiceListDto dto : list) {
+                String dateStr = dto.getInvoiceDate() != null ? sdf.format(dto.getInvoiceDate()) : "";
+                tableModel.addRow(new Object[]{
+                    dto.getInvoiceId(),
+                    dateStr,
+                    dto.getCustomerName() != null ? dto.getCustomerName() : "",
+                    dto.getPetName() != null ? dto.getPetName() : "",
+                    formatCurrency(dto.getSubtotal()),
+                    formatCurrency(dto.getDiscount()),
+                    formatCurrency(dto.getDeposit()),
+                    formatCurrency(dto.getTotalAmount())
+                });
             }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, 
-                "Lỗi khi tải dữ liệu: " + ex.getMessage(), 
-                "Lỗi", 
-                JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
+        } catch (PetcareException ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi tải dữ liệu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -186,32 +168,11 @@ public class InvoiceManagementPanel extends JPanel {
         
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                // Delete invoice details first
-                String deleteDetailsQuery = "DELETE FROM invoice_details WHERE invoice_id = ?";
-                Database.executeUpdate(deleteDetailsQuery, invoiceId);
-                
-                // Delete invoice
-                String deleteInvoiceQuery = "DELETE FROM invoices WHERE invoice_id = ?";
-                int result = Database.executeUpdate(deleteInvoiceQuery, invoiceId);
-                
-                if (result > 0) {
-                    JOptionPane.showMessageDialog(this, 
-                        "Xóa hóa đơn thành công!", 
-                        "Thành công", 
-                        JOptionPane.INFORMATION_MESSAGE);
-                    refreshData();
-                } else {
-                    JOptionPane.showMessageDialog(this, 
-                        "Không thể xóa hóa đơn.", 
-                        "Lỗi", 
-                        JOptionPane.ERROR_MESSAGE);
-                }
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, 
-                    "Lỗi khi xóa: " + ex.getMessage(), 
-                    "Lỗi", 
-                    JOptionPane.ERROR_MESSAGE);
-                ex.printStackTrace();
+                InvoiceService.getInstance().deleteInvoice(invoiceId);
+                JOptionPane.showMessageDialog(this, "Xóa hóa đơn thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                refreshData();
+            } catch (PetcareException ex) {
+                JOptionPane.showMessageDialog(this, "Lỗi khi xóa: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

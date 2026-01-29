@@ -34,6 +34,7 @@ public class Sidebar extends JPanel {
     public JToggleButton enclosureBtn;
     public JToggleButton appointmentBtn;
     public JToggleButton invoiceBtn;
+    public JToggleButton printingTemplateBtn;
     public JToggleButton serviceTypeBtn;
     public JToggleButton medicineBtn;
     public JToggleButton vaccineTypeBtn;
@@ -131,6 +132,11 @@ public class Sidebar extends JPanel {
         invoiceBtn = createMenuButton("🧾", "Hóa đơn", false);
         invoiceBtn.addActionListener(e -> dashboard.showInvoiceManagement());
         menuPanel.add(invoiceBtn);
+        
+        // Printing Template (Mẫu in lưu chuồng)
+        printingTemplateBtn = createMenuButton("📄", "Mẫu in lưu chuồng", false);
+        printingTemplateBtn.addActionListener(e -> dashboard.showPrintingTemplate());
+        menuPanel.add(printingTemplateBtn);
         
         // Separator
         menuPanel.add(createSeparator("DANH MỤC"));
@@ -301,6 +307,8 @@ public class Sidebar extends JPanel {
         appointmentBtn.setBackground(new Color(139, 69, 19));
         invoiceBtn.setSelected(false);
         invoiceBtn.setBackground(new Color(139, 69, 19));
+        printingTemplateBtn.setSelected(false);
+        printingTemplateBtn.setBackground(new Color(139, 69, 19));
         serviceTypeBtn.setSelected(false);
         serviceTypeBtn.setBackground(new Color(139, 69, 19));
         medicineBtn.setSelected(false);

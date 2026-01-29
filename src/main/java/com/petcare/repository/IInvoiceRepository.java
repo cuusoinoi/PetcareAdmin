@@ -16,6 +16,8 @@ public interface IInvoiceRepository {
 
     List<InvoiceListDto> findAllForList() throws PetcareException;
 
+    InvoiceEntity findEntityById(int invoiceId) throws PetcareException;
+
     InvoiceInfoDto findInfoById(int invoiceId) throws PetcareException;
 
     List<InvoiceDetailListDto> findDetailsByInvoiceId(int invoiceId) throws PetcareException;

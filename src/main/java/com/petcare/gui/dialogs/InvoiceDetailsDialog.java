@@ -4,6 +4,8 @@ import com.formdev.flatlaf.FlatClientProperties;
 import com.petcare.model.entity.InvoiceDetailListDto;
 import com.petcare.model.entity.InvoiceInfoDto;
 import com.petcare.service.InvoiceService;
+import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.PrintHelper;
 import com.petcare.util.ThemeManager;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -11,8 +13,10 @@ import java.awt.Font;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -22,12 +26,14 @@ import javax.swing.table.DefaultTableModel;
  * Dialog for viewing invoice details
  */
 public class InvoiceDetailsDialog extends JDialog {
-    
+    private final int invoiceId;
+
     public InvoiceDetailsDialog(JDialog parent, int invoiceId) {
         super(parent, true);
+        this.invoiceId = invoiceId;
         initComponents(invoiceId);
     }
-    
+
     private void initComponents(int invoiceId) {
         setSize(700, 500);
         setLocationRelativeTo(getParent());
@@ -111,17 +117,30 @@ public class InvoiceDetailsDialog extends JDialog {
         
         add(mainPanel, BorderLayout.CENTER);
         
-        // Close button
-        JPanel buttonPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        // Buttons
+        JPanel buttonPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 10, 0));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
         buttonPanel.setBackground(ThemeManager.getContentBackground());
-        
-        javax.swing.JButton closeButton = new javax.swing.JButton("Đóng");
+
+        JButton printButton = new JButton("In hóa đơn");
+        printButton.setIcon(EmojiFontHelper.createEmojiIcon("🖨️", ThemeManager.getIconColor()));
+        printButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        printButton.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
+        printButton.addActionListener(e -> {
+            try {
+                PrintHelper.printInvoice(this.invoiceId);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Lỗi khi mở in hóa đơn: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        buttonPanel.add(printButton);
+
+        JButton closeButton = new JButton("Đóng");
         closeButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         closeButton.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         closeButton.addActionListener(e -> dispose());
         buttonPanel.add(closeButton);
-        
+
         add(buttonPanel, BorderLayout.SOUTH);
     }
     

@@ -23,6 +23,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
+import com.petcare.util.PrintHelper;
 import com.petcare.util.ThemeManager;
 
 /**
@@ -40,6 +41,7 @@ public class MedicalRecordManagementPanel extends JPanel {
     private JTextField searchField;
     private JButton addButton;
     private JButton editButton;
+    private JButton printButton;
     private JButton deleteButton;
     private JButton refreshButton;
     
@@ -118,6 +120,12 @@ public class MedicalRecordManagementPanel extends JPanel {
         GUIUtil.setToolbarButtonSize(editButton);
         editButton.addActionListener(e -> showEditRecordDialog());
         sideButtonPanel.add(editButton);
+        printButton = new JButton("In phiếu khám");
+        printButton.setIcon(EmojiFontHelper.createEmojiIcon("🖨️", iconColor));
+        printButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(printButton);
+        printButton.addActionListener(e -> printMedicalRecord());
+        sideButtonPanel.add(printButton);
         deleteButton = new JButton("Xóa");
         deleteButton.setIcon(EmojiFontHelper.createEmojiIcon("🗑️", iconColor));
         deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -168,6 +176,7 @@ public class MedicalRecordManagementPanel extends JPanel {
             java.awt.Color iconColor = ThemeManager.getIconColor();
             addButton.setIcon(EmojiFontHelper.createEmojiIcon("➕", iconColor));
             editButton.setIcon(EmojiFontHelper.createEmojiIcon("✏️", iconColor));
+            if (printButton != null) printButton.setIcon(EmojiFontHelper.createEmojiIcon("🖨️", iconColor));
             deleteButton.setIcon(EmojiFontHelper.createEmojiIcon("🗑️", iconColor));
             refreshButton.setIcon(EmojiFontHelper.createEmojiIcon("🔄", iconColor));
         }
@@ -244,6 +253,24 @@ public class MedicalRecordManagementPanel extends JPanel {
             }
         } catch (PetcareException ex) {
             JOptionPane.showMessageDialog(this, "Lỗi: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void printMedicalRecord() {
+        int selectedRow = recordTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this,
+                "Vui lòng chọn hồ sơ cần in phiếu khám!",
+                "Thông báo",
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        int modelRow = recordTable.convertRowIndexToModel(selectedRow);
+        int recordId = (Integer) tableModel.getValueAt(modelRow, 0);
+        try {
+            PrintHelper.printMedicalRecord(recordId);
+        } catch (PetcareException | java.io.IOException ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi in: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
     

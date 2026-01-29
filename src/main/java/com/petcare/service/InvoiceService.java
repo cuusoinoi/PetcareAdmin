@@ -45,6 +45,10 @@ public class InvoiceService {
         return repository.findAllForList();
     }
 
+    public InvoiceEntity getInvoiceEntity(int invoiceId) throws PetcareException {
+        return repository.findEntityById(invoiceId);
+    }
+
     public InvoiceInfoDto getInvoiceInfo(int invoiceId) throws PetcareException {
         return repository.findInfoById(invoiceId);
     }

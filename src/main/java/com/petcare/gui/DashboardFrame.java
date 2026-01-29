@@ -6,6 +6,7 @@ import com.petcare.gui.panels.DashboardPanel;
 import com.petcare.gui.panels.DoctorManagementPanel;
 import com.petcare.gui.panels.InvoiceManagementPanel;
 import com.petcare.gui.panels.MedicalRecordManagementPanel;
+import com.petcare.gui.panels.PrintingTemplatePanel;
 import com.petcare.gui.panels.MedicineManagementPanel;
 import com.petcare.gui.panels.PetEnclosureManagementPanel;
 import com.petcare.gui.panels.PetManagementPanel;
@@ -44,6 +45,7 @@ public class DashboardFrame extends JFrame {
     private TreatmentManagementPanel treatmentPanel;
     private PetEnclosureManagementPanel enclosurePanel;
     private InvoiceManagementPanel invoicePanel;
+    private PrintingTemplatePanel printingTemplatePanel;
     private AppointmentManagementPanel appointmentPanel;
     private ServiceTypeManagementPanel serviceTypePanel;
     private MedicineManagementPanel medicinePanel;
@@ -80,6 +82,7 @@ public class DashboardFrame extends JFrame {
         treatmentPanel = new TreatmentManagementPanel();
         enclosurePanel = new PetEnclosureManagementPanel();
         invoicePanel = new InvoiceManagementPanel();
+        printingTemplatePanel = new PrintingTemplatePanel();
         appointmentPanel = new AppointmentManagementPanel();
         serviceTypePanel = new ServiceTypeManagementPanel();
         medicinePanel = new MedicineManagementPanel();
@@ -97,6 +100,7 @@ public class DashboardFrame extends JFrame {
         contentPanel.add(treatmentPanel, "TREATMENT");
         contentPanel.add(enclosurePanel, "ENCLOSURE");
         contentPanel.add(invoicePanel, "INVOICE");
+        contentPanel.add(printingTemplatePanel, "PRINTING_TEMPLATE");
         contentPanel.add(appointmentPanel, "APPOINTMENT");
         contentPanel.add(serviceTypePanel, "SERVICE_TYPE");
         contentPanel.add(medicinePanel, "MEDICINE");
@@ -176,6 +180,12 @@ public class DashboardFrame extends JFrame {
         sidebar.setSelectedButton(sidebar.invoiceBtn);
     }
     
+    public void showPrintingTemplate() {
+        cardLayout.show(contentPanel, "PRINTING_TEMPLATE");
+        printingTemplatePanel.refreshData();
+        sidebar.setSelectedButton(sidebar.printingTemplateBtn);
+    }
+    
     public void showServiceTypeManagement() {
         cardLayout.show(contentPanel, "SERVICE_TYPE");
         serviceTypePanel.refreshData();
@@ -219,6 +229,7 @@ public class DashboardFrame extends JFrame {
             treatmentPanel.updateTheme();
             enclosurePanel.updateTheme();
             invoicePanel.updateTheme();
+            printingTemplatePanel.updateTheme();
             appointmentPanel.updateTheme();
             serviceTypePanel.updateTheme();
             medicinePanel.updateTheme();

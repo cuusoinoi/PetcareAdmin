@@ -55,6 +55,37 @@ public class InvoiceRepository implements IInvoiceRepository {
     }
 
     @Override
+    public InvoiceEntity findEntityById(int invoiceId) throws PetcareException {
+        String query = "SELECT invoice_id, customer_id, pet_id, pet_enclosure_id, invoice_date, " +
+                "discount, subtotal, deposit, total_amount FROM invoices WHERE invoice_id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setInt(1, invoiceId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    InvoiceEntity e = new InvoiceEntity();
+                    e.setInvoiceId(rs.getInt("invoice_id"));
+                    e.setCustomerId(rs.getInt("customer_id"));
+                    e.setPetId(rs.getInt("pet_id"));
+                    int peId = rs.getInt("pet_enclosure_id");
+                    e.setPetEnclosureId(rs.wasNull() || peId <= 0 ? null : peId);
+                    if (rs.getTimestamp("invoice_date") != null) {
+                        e.setInvoiceDate(new java.util.Date(rs.getTimestamp("invoice_date").getTime()));
+                    }
+                    e.setDiscount(rs.getInt("discount"));
+                    e.setSubtotal(rs.getInt("subtotal"));
+                    e.setDeposit(rs.getInt("deposit"));
+                    e.setTotalAmount(rs.getInt("total_amount"));
+                    return e;
+                }
+            }
+        } catch (SQLException ex) {
+            throw new PetcareException("Lỗi khi tải hóa đơn theo ID: " + invoiceId, ex);
+        }
+        return null;
+    }
+
+    @Override
     public InvoiceInfoDto findInfoById(int invoiceId) throws PetcareException {
         String query = "SELECT i.invoice_id, i.invoice_date, i.subtotal, i.discount, i.deposit, i.total_amount, " +
                 "c.customer_name, c.customer_phone_number, p.pet_name, pe.pet_enclosure_number " +

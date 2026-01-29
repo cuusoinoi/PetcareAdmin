@@ -1,6 +1,7 @@
 package com.petcare.gui.panels;
 
 import com.petcare.util.DashboardService;
+import com.petcare.util.ThemeManager;
 import com.petcare.util.DashboardService.ServiceRevenue;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -45,22 +46,27 @@ public class DashboardPanel extends JPanel {
     public void refreshData() {
         loadData();
     }
-    
+
+    public void updateTheme() {
+        setBackground(ThemeManager.getContentBackground());
+        loadData();
+    }
+
     private void initComponents() {
         setLayout(new BorderLayout());
-        setBackground(new Color(245, 245, 245));
-        
+        setBackground(ThemeManager.getContentBackground());
+
         // Top panel with stat cards
         JPanel cardsPanel = createStatCardsPanel();
         add(cardsPanel, BorderLayout.NORTH);
-        
+
         // Charts panel (will be added in loadData)
     }
-    
+
     private JPanel createStatCardsPanel() {
         JPanel panel = new JPanel(new GridLayout(1, 5, 15, 0));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        panel.setBackground(new Color(245, 245, 245));
+        panel.setBackground(ThemeManager.getContentBackground());
         
         // Cards will be created in loadData()
         return panel;
@@ -101,7 +107,7 @@ public class DashboardPanel extends JPanel {
         // Create stat cards
         JPanel cardsPanel = new JPanel(new GridLayout(1, 5, 15, 0));
         cardsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        cardsPanel.setBackground(new Color(245, 245, 245));
+        cardsPanel.setBackground(ThemeManager.getContentBackground());
         
         cardsPanel.add(createStatCard("Tổng khách hàng", String.valueOf(customerCount), 
             new Color(52, 152, 219), null));
@@ -129,17 +135,17 @@ public class DashboardPanel extends JPanel {
     private JPanel createStatCard(String title, String value, Color color, Double percentChange) {
         JPanel card = new JPanel();
         card.setLayout(new BorderLayout());
-        card.setBackground(Color.WHITE);
+        card.setBackground(ThemeManager.getFormBackground());
         card.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
+            BorderFactory.createLineBorder(ThemeManager.getBorderColor(), 1),
             BorderFactory.createEmptyBorder(15, 15, 15, 15)
         ));
         card.setPreferredSize(new Dimension(200, 120));
-        
+
         // Title
         JLabel titleLabel = new JLabel(title);
         titleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        titleLabel.setForeground(new Color(100, 100, 100));
+        titleLabel.setForeground(ThemeManager.isDarkMode() ? new Color(0xb0b0b0) : new Color(100, 100, 100));
         card.add(titleLabel, BorderLayout.NORTH);
         
         // Value and percent change
@@ -172,7 +178,7 @@ public class DashboardPanel extends JPanel {
     private JPanel createChartsPanel() {
         JPanel panel = new JPanel(new GridLayout(2, 2, 15, 15));
         panel.setBorder(BorderFactory.createEmptyBorder(0, 20, 20, 20));
-        panel.setBackground(new Color(245, 245, 245));
+        panel.setBackground(ThemeManager.getContentBackground());
         
         // Chart 1: Medical Records (7 days)
         Map<String, Integer> medicalData = DashboardService.getMedicalRecordsByDay(7);
@@ -263,7 +269,7 @@ public class DashboardPanel extends JPanel {
         
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new Dimension(600, 300));
-        chartPanel.setBackground(Color.WHITE);
+        chartPanel.setBackground(ThemeManager.getFormBackground());
         
         return chartPanel;
     }
@@ -326,7 +332,7 @@ public class DashboardPanel extends JPanel {
         
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new Dimension(600, 300));
-        chartPanel.setBackground(Color.WHITE);
+        chartPanel.setBackground(ThemeManager.getFormBackground());
         
         return chartPanel;
     }
@@ -384,7 +390,7 @@ public class DashboardPanel extends JPanel {
         
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new Dimension(600, 300));
-        chartPanel.setBackground(Color.WHITE);
+        chartPanel.setBackground(ThemeManager.getFormBackground());
         
         return chartPanel;
     }
@@ -413,7 +419,7 @@ public class DashboardPanel extends JPanel {
         
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new Dimension(600, 300));
-        chartPanel.setBackground(Color.WHITE);
+        chartPanel.setBackground(ThemeManager.getFormBackground());
         
         return chartPanel;
     }

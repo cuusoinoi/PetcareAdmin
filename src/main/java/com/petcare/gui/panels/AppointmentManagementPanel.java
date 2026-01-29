@@ -22,6 +22,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
+import com.petcare.util.ThemeManager;
 
 /**
  * Appointment Management Panel - uses AppointmentService only
@@ -30,6 +31,11 @@ public class AppointmentManagementPanel extends JPanel {
     private JTable appointmentTable;
     private DefaultTableModel tableModel;
     private TablePaginationPanel paginationPanel;
+    private JPanel headerPanel;
+    private JPanel filterPanel;
+    private JPanel centerPanel;
+    private JPanel sideButtonPanel;
+    private JLabel titleLabel;
     private JButton addButton;
     private JButton editButton;
     private JButton updateStatusButton;
@@ -46,21 +52,22 @@ public class AppointmentManagementPanel extends JPanel {
 
     private void initComponents() {
         setLayout(new BorderLayout());
-        setBackground(new Color(245, 245, 245));
+        setBackground(ThemeManager.getContentBackground());
 
-        JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(Color.WHITE);
+        headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(ThemeManager.getHeaderBackground());
         headerPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(220, 220, 220)),
+            BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
             BorderFactory.createEmptyBorder(15, 20, 15, 20)
         ));
 
-        JLabel titleLabel = new JLabel("Quản lý Lịch hẹn");
+        titleLabel = new JLabel("Quản lý Lịch hẹn");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        titleLabel.setForeground(ThemeManager.getTitleForeground());
         headerPanel.add(titleLabel, BorderLayout.WEST);
 
-        JPanel filterPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-        filterPanel.setBackground(Color.WHITE);
+        filterPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        filterPanel.setBackground(ThemeManager.getHeaderBackground());
         filterPanel.add(new JLabel("Lọc theo trạng thái:"));
         statusFilterCombo = new JComboBox<>(new String[]{"Tất cả", "Chờ xác nhận", "Đã xác nhận", "Hoàn thành", "Đã hủy"});
         statusFilterCombo.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -85,12 +92,12 @@ public class AppointmentManagementPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(appointmentTable);
         scrollPane.setBorder(null);
 
-        JPanel sideButtonPanel = new JPanel(new GridLayout(0, 1, 0, 6));
-        sideButtonPanel.setBackground(new Color(245, 245, 245));
+        sideButtonPanel = new JPanel(new GridLayout(0, 1, 0, 6));
+        sideButtonPanel.setBackground(ThemeManager.getSideButtonPanelBackground());
         sideButtonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         sideButtonPanel.setMinimumSize(new java.awt.Dimension(175, 0));
         sideButtonPanel.setPreferredSize(new java.awt.Dimension(175, 0));
-        java.awt.Color iconColor = new Color(60, 60, 60);
+        java.awt.Color iconColor = ThemeManager.isDarkMode() ? new Color(0xc0c0c0) : new Color(60, 60, 60);
         addButton = new JButton("Thêm");
         addButton.setIcon(EmojiFontHelper.createEmojiIcon("➕", iconColor));
         addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -124,8 +131,8 @@ public class AppointmentManagementPanel extends JPanel {
         refreshButton.addActionListener(e -> refreshData());
         sideButtonPanel.add(refreshButton);
 
-        JPanel centerPanel = new JPanel(new BorderLayout());
-        centerPanel.setBackground(new Color(245, 245, 245));
+        centerPanel = new JPanel(new BorderLayout());
+        centerPanel.setBackground(ThemeManager.getContentBackground());
         centerPanel.add(scrollPane, BorderLayout.CENTER);
         paginationPanel = new TablePaginationPanel(appointmentTable);
         centerPanel.add(paginationPanel, BorderLayout.SOUTH);
@@ -135,6 +142,21 @@ public class AppointmentManagementPanel extends JPanel {
 
     public void refreshData() {
         loadAppointments();
+    }
+
+    public void updateTheme() {
+        setBackground(ThemeManager.getContentBackground());
+        if (headerPanel != null) {
+            headerPanel.setBackground(ThemeManager.getHeaderBackground());
+            headerPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(15, 20, 15, 20)
+            ));
+        }
+        if (titleLabel != null) titleLabel.setForeground(ThemeManager.getTitleForeground());
+        if (filterPanel != null) filterPanel.setBackground(ThemeManager.getHeaderBackground());
+        if (centerPanel != null) centerPanel.setBackground(ThemeManager.getContentBackground());
+        if (sideButtonPanel != null) sideButtonPanel.setBackground(ThemeManager.getSideButtonPanelBackground());
     }
 
     private void loadAppointments() {

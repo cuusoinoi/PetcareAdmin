@@ -18,6 +18,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
+import com.petcare.util.ThemeManager;
 
 /**
  * Vaccine Type Management Panel - uses VaccineTypeService only
@@ -26,6 +27,10 @@ public class VaccineTypeManagementPanel extends JPanel {
     private JTable vaccineTable;
     private DefaultTableModel tableModel;
     private TablePaginationPanel paginationPanel;
+    private JPanel headerPanel;
+    private JPanel centerPanel;
+    private JPanel sideButtonPanel;
+    private JLabel titleLabel;
     private JButton addButton;
     private JButton editButton;
     private JButton deleteButton;
@@ -39,17 +44,18 @@ public class VaccineTypeManagementPanel extends JPanel {
 
     private void initComponents() {
         setLayout(new BorderLayout());
-        setBackground(new Color(245, 245, 245));
+        setBackground(ThemeManager.getContentBackground());
 
-        JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(Color.WHITE);
+        headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(ThemeManager.getHeaderBackground());
         headerPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(220, 220, 220)),
+            BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
             BorderFactory.createEmptyBorder(15, 20, 15, 20)
         ));
 
-        JLabel titleLabel = new JLabel("Quản lý Vaccine");
+        titleLabel = new JLabel("Quản lý Vaccine");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        titleLabel.setForeground(ThemeManager.getTitleForeground());
         headerPanel.add(titleLabel, BorderLayout.WEST);
         add(headerPanel, BorderLayout.NORTH);
 
@@ -71,9 +77,9 @@ public class VaccineTypeManagementPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(vaccineTable);
         scrollPane.setBorder(null);
 
-        java.awt.Color iconColor = new Color(60, 60, 60);
-        JPanel sideButtonPanel = new JPanel(new GridLayout(0, 1, 0, 6));
-        sideButtonPanel.setBackground(new Color(245, 245, 245));
+        java.awt.Color iconColor = ThemeManager.isDarkMode() ? new Color(0xc0c0c0) : new Color(60, 60, 60);
+        sideButtonPanel = new JPanel(new GridLayout(0, 1, 0, 6));
+        sideButtonPanel.setBackground(ThemeManager.getSideButtonPanelBackground());
         sideButtonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         sideButtonPanel.setMinimumSize(new java.awt.Dimension(175, 0));
         sideButtonPanel.setPreferredSize(new java.awt.Dimension(175, 0));
@@ -102,8 +108,8 @@ public class VaccineTypeManagementPanel extends JPanel {
         refreshButton.addActionListener(e -> refreshData());
         sideButtonPanel.add(refreshButton);
 
-        JPanel centerPanel = new JPanel(new BorderLayout());
-        centerPanel.setBackground(new Color(245, 245, 245));
+        centerPanel = new JPanel(new BorderLayout());
+        centerPanel.setBackground(ThemeManager.getContentBackground());
         centerPanel.add(scrollPane, BorderLayout.CENTER);
         paginationPanel = new TablePaginationPanel(vaccineTable);
         centerPanel.add(paginationPanel, BorderLayout.SOUTH);
@@ -113,6 +119,20 @@ public class VaccineTypeManagementPanel extends JPanel {
 
     public void refreshData() {
         loadVaccines();
+    }
+
+    public void updateTheme() {
+        setBackground(ThemeManager.getContentBackground());
+        if (headerPanel != null) {
+            headerPanel.setBackground(ThemeManager.getHeaderBackground());
+            headerPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(15, 20, 15, 20)
+            ));
+        }
+        if (titleLabel != null) titleLabel.setForeground(ThemeManager.getTitleForeground());
+        if (centerPanel != null) centerPanel.setBackground(ThemeManager.getContentBackground());
+        if (sideButtonPanel != null) sideButtonPanel.setBackground(ThemeManager.getSideButtonPanelBackground());
     }
 
     private void loadVaccines() {

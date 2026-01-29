@@ -15,11 +15,17 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
+import com.petcare.util.ThemeManager;
 
 /**
  * Settings Management Panel - uses GeneralSettingService only
  */
 public class SettingsManagementPanel extends JPanel {
+    private JPanel headerPanel;
+    private JPanel formPanel;
+    private JPanel centerWrapper;
+    private JPanel sideButtonPanel;
+    private JLabel titleLabel;
     private JTextField clinicNameField;
     private JTextField clinicAddress1Field;
     private JTextField clinicAddress2Field;
@@ -41,23 +47,24 @@ public class SettingsManagementPanel extends JPanel {
 
     private void initComponents() {
         setLayout(new BorderLayout());
-        setBackground(new Color(245, 245, 245));
+        setBackground(ThemeManager.getContentBackground());
 
-        JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(Color.WHITE);
+        headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(ThemeManager.getHeaderBackground());
         headerPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(220, 220, 220)),
+            BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
             BorderFactory.createEmptyBorder(15, 20, 15, 20)
         ));
 
-        JLabel titleLabel = new JLabel("Cài đặt Hệ thống");
+        titleLabel = new JLabel("Cài đặt Hệ thống");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        titleLabel.setForeground(ThemeManager.getTitleForeground());
         headerPanel.add(titleLabel, BorderLayout.WEST);
         add(headerPanel, BorderLayout.NORTH);
 
-        JPanel formPanel = new JPanel(new GridLayout(0, 2, 15, 15));
+        formPanel = new JPanel(new GridLayout(0, 2, 15, 15));
         formPanel.setBorder(BorderFactory.createEmptyBorder(30, 50, 30, 50));
-        formPanel.setBackground(Color.WHITE);
+        formPanel.setBackground(ThemeManager.getFormBackground());
 
         formPanel.add(createLabel("Tên phòng khám *:"));
         clinicNameField = createTextField();
@@ -102,14 +109,14 @@ public class SettingsManagementPanel extends JPanel {
         signingPlaceField = createTextField();
         formPanel.add(signingPlaceField);
 
-        JPanel centerWrapper = new JPanel(new BorderLayout());
-        centerWrapper.setBackground(Color.WHITE);
+        centerWrapper = new JPanel(new BorderLayout());
+        centerWrapper.setBackground(ThemeManager.getFormBackground());
         centerWrapper.add(formPanel, BorderLayout.CENTER);
         add(centerWrapper, BorderLayout.CENTER);
 
-        java.awt.Color iconColor = new Color(60, 60, 60);
-        JPanel sideButtonPanel = new JPanel(new GridLayout(0, 1, 0, 6));
-        sideButtonPanel.setBackground(new Color(245, 245, 245));
+        java.awt.Color iconColor = ThemeManager.isDarkMode() ? new Color(0xc0c0c0) : new Color(60, 60, 60);
+        sideButtonPanel = new JPanel(new GridLayout(0, 1, 0, 6));
+        sideButtonPanel.setBackground(ThemeManager.getSideButtonPanelBackground());
         sideButtonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         sideButtonPanel.setMinimumSize(new java.awt.Dimension(175, 0));
         sideButtonPanel.setPreferredSize(new java.awt.Dimension(175, 0));
@@ -128,6 +135,21 @@ public class SettingsManagementPanel extends JPanel {
         refreshButton.addActionListener(e -> loadSettings());
         sideButtonPanel.add(refreshButton);
         add(sideButtonPanel, BorderLayout.EAST);
+    }
+
+    public void updateTheme() {
+        setBackground(ThemeManager.getContentBackground());
+        if (headerPanel != null) {
+            headerPanel.setBackground(ThemeManager.getHeaderBackground());
+            headerPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeManager.getBorderColor()),
+                BorderFactory.createEmptyBorder(15, 20, 15, 20)
+            ));
+        }
+        if (titleLabel != null) titleLabel.setForeground(ThemeManager.getTitleForeground());
+        if (formPanel != null) formPanel.setBackground(ThemeManager.getFormBackground());
+        if (centerWrapper != null) centerWrapper.setBackground(ThemeManager.getFormBackground());
+        if (sideButtonPanel != null) sideButtonPanel.setBackground(ThemeManager.getSideButtonPanelBackground());
     }
 
     private JLabel createLabel(String text) {

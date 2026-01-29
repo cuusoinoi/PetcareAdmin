@@ -68,6 +68,7 @@ public class DashboardFrame extends JFrame {
         // Create content panel with CardLayout
         cardLayout = new CardLayout();
         contentPanel = new JPanel(cardLayout);
+        contentPanel.setBackground(com.petcare.util.ThemeManager.getContentBackground());
         
         // Create panels
         dashboardPanel = new DashboardPanel();
@@ -206,10 +207,26 @@ public class DashboardFrame extends JFrame {
     }
     
     public void refreshTheme() {
-        // Update all UI components to reflect theme change
         SwingUtilities.invokeLater(() -> {
             SwingUtilities.updateComponentTreeUI(this);
-            pack();
+            contentPanel.setBackground(com.petcare.util.ThemeManager.getContentBackground());
+            dashboardPanel.updateTheme();
+            customerPanel.updateTheme();
+            petPanel.updateTheme();
+            doctorPanel.updateTheme();
+            medicalRecordPanel.updateTheme();
+            vaccinationPanel.updateTheme();
+            treatmentPanel.updateTheme();
+            enclosurePanel.updateTheme();
+            invoicePanel.updateTheme();
+            appointmentPanel.updateTheme();
+            serviceTypePanel.updateTheme();
+            medicinePanel.updateTheme();
+            vaccineTypePanel.updateTheme();
+            userPanel.updateTheme();
+            settingsPanel.updateTheme();
+            revalidate();
+            repaint();
         });
     }
     

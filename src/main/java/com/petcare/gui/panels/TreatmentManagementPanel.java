@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import com.petcare.util.EmojiFontHelper;
 
 /**
  * Treatment Course Management Panel with CRUD operations
@@ -57,34 +58,34 @@ public class TreatmentManagementPanel extends JPanel {
         // Buttons panel
         JPanel buttonPanel = new JPanel(new GridLayout(1, 6, 10, 0));
         
-        addButton = new JButton("➕ Thêm");
+        addButton = new JButton(EmojiFontHelper.withEmoji("➕", "Thêm"));
         addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         addButton.addActionListener(e -> showAddTreatmentDialog());
         buttonPanel.add(addButton);
         
-        editButton = new JButton("✏️ Sửa");
+        editButton = new JButton(EmojiFontHelper.withEmoji("✏️", "Sửa"));
         editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         editButton.addActionListener(e -> showEditTreatmentDialog());
         buttonPanel.add(editButton);
         
-        viewSessionsButton = new JButton("📋 Xem buổi điều trị");
+        viewSessionsButton = new JButton(EmojiFontHelper.withEmoji("📋", "Xem buổi điều trị"));
         viewSessionsButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         viewSessionsButton.addActionListener(e -> showTreatmentSessions());
         buttonPanel.add(viewSessionsButton);
         
-        completeButton = new JButton("✅ Kết thúc");
+        completeButton = new JButton(EmojiFontHelper.withEmoji("✅", "Kết thúc"));
         completeButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         completeButton.setBackground(new Color(40, 167, 69));
         completeButton.setForeground(Color.WHITE);
         completeButton.addActionListener(e -> completeTreatment());
         buttonPanel.add(completeButton);
         
-        deleteButton = new JButton("🗑️ Xóa");
+        deleteButton = new JButton(EmojiFontHelper.withEmoji("🗑️", "Xóa"));
         deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         deleteButton.addActionListener(e -> deleteTreatment());
         buttonPanel.add(deleteButton);
         
-        refreshButton = new JButton("🔄 Làm mới");
+        refreshButton = new JButton(EmojiFontHelper.withEmoji("🔄", "Làm mới"));
         refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         refreshButton.addActionListener(e -> refreshData());
         buttonPanel.add(refreshButton);

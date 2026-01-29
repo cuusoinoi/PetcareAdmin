@@ -1,6 +1,7 @@
 package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import com.petcare.util.EmojiFontHelper;
 import com.petcare.model.domain.PetVaccination;
 import com.petcare.service.CustomerService;
 import com.petcare.service.DoctorService;
@@ -126,7 +127,7 @@ public class AddEditVaccinationDialog extends JDialog {
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
         buttonPanel.setBackground(Color.WHITE);
         
-        saveButton = new JButton("💾 Lưu");
+        saveButton = new JButton(EmojiFontHelper.withEmoji("💾", "Lưu"));
         saveButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         saveButton.setBackground(new Color(139, 69, 19));
         saveButton.setForeground(Color.WHITE);
@@ -135,7 +136,7 @@ public class AddEditVaccinationDialog extends JDialog {
         saveButton.addActionListener(e -> saveVaccination());
         buttonPanel.add(saveButton);
         
-        cancelButton = new JButton("❌ Hủy");
+        cancelButton = new JButton(EmojiFontHelper.withEmoji("❌", "Hủy"));
         cancelButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         cancelButton.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         cancelButton.addActionListener(e -> dispose());

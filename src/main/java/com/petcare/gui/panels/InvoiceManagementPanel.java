@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import com.petcare.util.EmojiFontHelper;
 
 /**
  * Invoice Management Panel with CRUD operations
@@ -55,22 +56,22 @@ public class InvoiceManagementPanel extends JPanel {
         // Buttons panel
         JPanel buttonPanel = new JPanel(new GridLayout(1, 4, 10, 0));
         
-        addButton = new JButton("Thêm");
+        addButton = new JButton(EmojiFontHelper.withEmoji("➕", "Thêm"));
         addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         addButton.addActionListener(e -> showAddInvoiceDialog());
         buttonPanel.add(addButton);
         
-        viewButton = new JButton("Xem chi tiết");
+        viewButton = new JButton(EmojiFontHelper.withEmoji("👁️", "Xem chi tiết"));
         viewButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         viewButton.addActionListener(e -> showInvoiceDetails());
         buttonPanel.add(viewButton);
         
-        deleteButton = new JButton("Xóa");
+        deleteButton = new JButton(EmojiFontHelper.withEmoji("🗑️", "Xóa"));
         deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         deleteButton.addActionListener(e -> deleteInvoice());
         buttonPanel.add(deleteButton);
         
-        refreshButton = new JButton("🔄 Làm mới");
+        refreshButton = new JButton(EmojiFontHelper.withEmoji("🔄", "Làm mới"));
         refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         refreshButton.addActionListener(e -> refreshData());
         buttonPanel.add(refreshButton);

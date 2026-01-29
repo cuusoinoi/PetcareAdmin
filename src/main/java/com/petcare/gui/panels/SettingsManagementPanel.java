@@ -15,6 +15,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import com.formdev.flatlaf.FlatClientProperties;
+import com.petcare.util.EmojiFontHelper;
 
 /**
  * Settings Management Panel - uses GeneralSettingService only
@@ -55,7 +56,7 @@ public class SettingsManagementPanel extends JPanel {
         headerPanel.add(titleLabel, BorderLayout.WEST);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        refreshButton = new JButton("Làm mới");
+        refreshButton = new JButton(EmojiFontHelper.withEmoji("🔄", "Làm mới"));
         refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         refreshButton.addActionListener(e -> loadSettings());
         buttonPanel.add(refreshButton);
@@ -114,7 +115,7 @@ public class SettingsManagementPanel extends JPanel {
         JPanel savePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         savePanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 30, 20));
         savePanel.setBackground(Color.WHITE);
-        saveButton = new JButton("Lưu cài đặt");
+        saveButton = new JButton(EmojiFontHelper.withEmoji("💾", "Lưu cài đặt"));
         saveButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
         saveButton.setBackground(new Color(139, 69, 19));
         saveButton.setForeground(Color.WHITE);

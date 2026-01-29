@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import com.petcare.util.EmojiFontHelper;
 
 /**
  * Doctor Management Panel with CRUD operations
@@ -55,22 +56,22 @@ public class DoctorManagementPanel extends JPanel {
         // Buttons panel
         JPanel buttonPanel = new JPanel(new GridLayout(1, 4, 10, 0));
         
-        addButton = new JButton("➕ Thêm");
+        addButton = new JButton(EmojiFontHelper.withEmoji("➕", "Thêm"));
         addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         addButton.addActionListener(e -> showAddDoctorDialog());
         buttonPanel.add(addButton);
         
-        editButton = new JButton("✏️ Sửa");
+        editButton = new JButton(EmojiFontHelper.withEmoji("✏️", "Sửa"));
         editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         editButton.addActionListener(e -> showEditDoctorDialog());
         buttonPanel.add(editButton);
         
-        deleteButton = new JButton("🗑️ Xóa");
+        deleteButton = new JButton(EmojiFontHelper.withEmoji("🗑️", "Xóa"));
         deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         deleteButton.addActionListener(e -> deleteDoctor());
         buttonPanel.add(deleteButton);
         
-        refreshButton = new JButton("🔄 Làm mới");
+        refreshButton = new JButton(EmojiFontHelper.withEmoji("🔄", "Làm mới"));
         refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         refreshButton.addActionListener(e -> refreshData());
         buttonPanel.add(refreshButton);

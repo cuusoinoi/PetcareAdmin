@@ -1,6 +1,7 @@
 package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import com.petcare.util.EmojiFontHelper;
 import com.petcare.model.domain.Medicine;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.service.MedicineService;
@@ -71,7 +72,7 @@ public class AddEditMedicineDialog extends JDialog {
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
         buttonPanel.setBackground(Color.WHITE);
 
-        saveButton = new JButton("💾 Lưu");
+        saveButton = new JButton(EmojiFontHelper.withEmoji("💾", "Lưu"));
         saveButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         saveButton.setBackground(new Color(139, 69, 19));
         saveButton.setForeground(Color.WHITE);
@@ -80,7 +81,7 @@ public class AddEditMedicineDialog extends JDialog {
         saveButton.addActionListener(e -> saveMedicine());
         buttonPanel.add(saveButton);
 
-        cancelButton = new JButton("❌ Hủy");
+        cancelButton = new JButton(EmojiFontHelper.withEmoji("❌", "Hủy"));
         cancelButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         cancelButton.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         cancelButton.addActionListener(e -> dispose());

@@ -1,6 +1,7 @@
 package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import com.petcare.util.EmojiFontHelper;
 import com.petcare.model.domain.InvoiceDetailItem;
 import com.petcare.model.domain.PetEnclosure;
 import com.petcare.service.CustomerService;
@@ -139,7 +140,7 @@ public class CheckoutDialog extends JDialog {
         addServicePanel.add(new JLabel("Số lượng:"));
         addServicePanel.add(quantitySpinner);
         
-        addServiceButton = new JButton("➕ Thêm");
+        addServiceButton = new JButton(EmojiFontHelper.withEmoji("➕", "Thêm"));
         addServiceButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         addServiceButton.addActionListener(e -> addService());
         addServicePanel.add(addServiceButton);
@@ -161,7 +162,7 @@ public class CheckoutDialog extends JDialog {
         serviceTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
         
         // Remove service button
-        JButton removeServiceButton = new JButton("➖ Xóa dịch vụ đã chọn");
+        JButton removeServiceButton = new JButton(EmojiFontHelper.withEmoji("➖", "Xóa dịch vụ đã chọn"));
         removeServiceButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         removeServiceButton.addActionListener(e -> {
             int selectedRow = serviceTable.getSelectedRow();
@@ -222,7 +223,7 @@ public class CheckoutDialog extends JDialog {
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
         buttonPanel.setBackground(Color.WHITE);
         
-        checkoutButton = new JButton("✅ Check-out & Tạo hóa đơn");
+        checkoutButton = new JButton(EmojiFontHelper.withEmoji("✅", "Check-out & Tạo hóa đơn"));
         checkoutButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
         checkoutButton.setBackground(new Color(40, 167, 69));
         checkoutButton.setForeground(Color.WHITE);
@@ -231,7 +232,7 @@ public class CheckoutDialog extends JDialog {
         checkoutButton.addActionListener(e -> processCheckout());
         buttonPanel.add(checkoutButton);
         
-        cancelButton = new JButton("❌ Hủy");
+        cancelButton = new JButton(EmojiFontHelper.withEmoji("❌", "Hủy"));
         cancelButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         cancelButton.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         cancelButton.addActionListener(e -> dispose());

@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import com.petcare.util.EmojiFontHelper;
 
 /**
  * User Management Panel - uses UserService only (no direct Database)
@@ -54,27 +55,27 @@ public class UserManagementPanel extends JPanel {
 
         JPanel buttonPanel = new JPanel(new GridLayout(1, 5, 10, 0));
 
-        addButton = new JButton("➕ Thêm");
+        addButton = new JButton(EmojiFontHelper.withEmoji("➕", "Thêm"));
         addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         addButton.addActionListener(e -> showAddUserDialog());
         buttonPanel.add(addButton);
 
-        editButton = new JButton("✏️ Sửa");
+        editButton = new JButton(EmojiFontHelper.withEmoji("✏️", "Sửa"));
         editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         editButton.addActionListener(e -> showEditUserDialog());
         buttonPanel.add(editButton);
 
-        changePasswordButton = new JButton("🔑 Đổi mật khẩu");
+        changePasswordButton = new JButton(EmojiFontHelper.withEmoji("🔑", "Đổi mật khẩu"));
         changePasswordButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         changePasswordButton.addActionListener(e -> showChangePasswordDialog());
         buttonPanel.add(changePasswordButton);
 
-        deleteButton = new JButton("🗑️ Xóa");
+        deleteButton = new JButton(EmojiFontHelper.withEmoji("🗑️", "Xóa"));
         deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         deleteButton.addActionListener(e -> deleteUser());
         buttonPanel.add(deleteButton);
 
-        refreshButton = new JButton("🔄 Làm mới");
+        refreshButton = new JButton(EmojiFontHelper.withEmoji("🔄", "Làm mới"));
         refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         refreshButton.addActionListener(e -> refreshData());
         buttonPanel.add(refreshButton);

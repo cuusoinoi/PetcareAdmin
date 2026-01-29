@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import com.petcare.util.EmojiFontHelper;
 
 /**
  * Pet Enclosure Management Panel with Check-in/Check-out
@@ -56,29 +57,29 @@ public class PetEnclosureManagementPanel extends JPanel {
         // Buttons panel
         JPanel buttonPanel = new JPanel(new GridLayout(1, 5, 10, 0));
         
-        addButton = new JButton("➕ Check-in");
+        addButton = new JButton(EmojiFontHelper.withEmoji("➕", "Check-in"));
         addButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         addButton.addActionListener(e -> showCheckInDialog());
         buttonPanel.add(addButton);
         
-        editButton = new JButton("✏️ Sửa");
+        editButton = new JButton(EmojiFontHelper.withEmoji("✏️", "Sửa"));
         editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         editButton.addActionListener(e -> showEditEnclosureDialog());
         buttonPanel.add(editButton);
         
-        checkoutButton = new JButton("✅ Check-out");
+        checkoutButton = new JButton(EmojiFontHelper.withEmoji("✅", "Check-out"));
         checkoutButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         checkoutButton.setBackground(new Color(40, 167, 69));
         checkoutButton.setForeground(Color.WHITE);
         checkoutButton.addActionListener(e -> showCheckoutDialog());
         buttonPanel.add(checkoutButton);
         
-        deleteButton = new JButton("🗑️ Xóa");
+        deleteButton = new JButton(EmojiFontHelper.withEmoji("🗑️", "Xóa"));
         deleteButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         deleteButton.addActionListener(e -> deleteEnclosure());
         buttonPanel.add(deleteButton);
         
-        refreshButton = new JButton("🔄 Làm mới");
+        refreshButton = new JButton(EmojiFontHelper.withEmoji("🔄", "Làm mới"));
         refreshButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         refreshButton.addActionListener(e -> refreshData());
         buttonPanel.add(refreshButton);

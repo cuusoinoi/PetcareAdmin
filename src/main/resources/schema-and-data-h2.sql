@@ -1,5 +1,5 @@
 ﻿-- =====================================================
--- PETCARE - H2 Schema (tương thích với petcare_database.sql)
+-- PETCARE - H2 Schema (tương thích với petcare_mysql_database.sql)
 -- Chạy script này khi dùng H2 (file: ./data/petcare)
 -- ENUM MySQL -> VARCHAR trong H2
 -- =====================================================
@@ -278,7 +278,7 @@ CREATE TABLE otp_codes (
 );
 
 -- =====================================================
--- PETCARE - H2 Seed Data (tương đương petcare_database.sql)
+-- PETCARE - H2 Seed Data (tương đương petcare_mysql_database.sql)
 -- Chạy sau schema-h2.sql khi H2 khởi tạo lần đầu.
 -- NOW() đã đổi thành CURRENT_TIMESTAMP cho H2.
 -- =====================================================

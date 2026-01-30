@@ -16,7 +16,7 @@ Tất cả cấu hình kết nối DB nằm trong file này (không hard-code tr
 ### Đổi sang MySQL
 - Sửa database.properties: bật (bỏ #) các dòng db.driver, db.url, db.user, db.password của MySQL.
 - Comment (thêm #) các dòng H2.
-- Chạy script MySQL: petcare_database.sql (ở thư mục gốc project).
+- Chạy script MySQL: petcare_mysql_database.sql (ở thư mục gốc project).
 
 ## 2. Lần đầu dùng H2: tạo bảng và dữ liệu
 

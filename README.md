@@ -221,7 +221,7 @@ private static final String DB_PASSWORD = "your_password";
 Import file SQL vào MySQL:
 
 ```bash
-mysql -u root -p petcare < petcare_database.sql
+mysql -u root -p petcare < petcare_mysql_database.sql
 ```
 
 ### Bước 4: Build project

@@ -1,6 +1,7 @@
 package com.petcare.gui;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import com.petcare.model.domain.User;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.LogoHelper;
 import com.petcare.util.ThemeManager;
@@ -11,6 +12,8 @@ import java.awt.*;
 public class Sidebar extends JPanel {
     private DashboardFrame dashboard;
     private ButtonGroup buttonGroup;
+    private JLabel catalogSeparator;
+    private JLabel systemSeparator;
     public JToggleButton dashboardBtn;
     public JToggleButton customerBtn;
     public JToggleButton petBtn;
@@ -95,7 +98,8 @@ public class Sidebar extends JPanel {
         printingTemplateBtn = createMenuButton("📄", "Mẫu in lưu chuồng", false);
         printingTemplateBtn.addActionListener(e -> dashboard.showPrintingTemplate());
         menuPanel.add(printingTemplateBtn);
-        menuPanel.add(createSeparator("DANH MỤC"));
+        catalogSeparator = createSeparator("DANH MỤC");
+        menuPanel.add(catalogSeparator);
         serviceTypeBtn = createMenuButton("🛎️", "Dịch vụ", false);
         serviceTypeBtn.addActionListener(e -> dashboard.showServiceTypeManagement());
         menuPanel.add(serviceTypeBtn);
@@ -105,13 +109,16 @@ public class Sidebar extends JPanel {
         vaccineTypeBtn = createMenuButton("💉", "Vaccine", false);
         vaccineTypeBtn.addActionListener(e -> dashboard.showVaccineTypeManagement());
         menuPanel.add(vaccineTypeBtn);
-        menuPanel.add(createSeparator("HỆ THỐNG"));
+        systemSeparator = createSeparator("HỆ THỐNG");
+        menuPanel.add(systemSeparator);
         userBtn = createMenuButton("👤", "Người dùng", false);
         userBtn.addActionListener(e -> dashboard.showUserManagement());
         menuPanel.add(userBtn);
         settingsBtn = createMenuButton("⚙️", "Cài đặt", false);
         settingsBtn.addActionListener(e -> dashboard.showSettingsManagement());
         menuPanel.add(settingsBtn);
+
+        applyPermissions(dashboard.getCurrentUser());
 
         JScrollPane scrollPane = new JScrollPane(menuPanel);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -207,6 +214,19 @@ public class Sidebar extends JPanel {
         separator.setForeground(new Color(200, 200, 200));
         separator.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 5, 5, 5));
         return separator;
+    }
+
+    private void applyPermissions(User user) {
+        if (user == null) return;
+        boolean isAdmin = user.getRole() == User.Role.ADMIN;
+        dashboardBtn.setVisible(isAdmin);
+        catalogSeparator.setVisible(isAdmin);
+        serviceTypeBtn.setVisible(isAdmin);
+        medicineBtn.setVisible(isAdmin);
+        vaccineTypeBtn.setVisible(isAdmin);
+        userBtn.setVisible(isAdmin);
+        settingsBtn.setVisible(isAdmin);
+        systemSeparator.setVisible(isAdmin);
     }
 
     public void setSelectedButton(JToggleButton button) {

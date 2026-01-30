@@ -54,6 +54,10 @@ public class DashboardFrame extends JFrame {
         initComponents();
     }
 
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
     private void initComponents() {
         setTitle("UIT Petcare - " + currentUser.getFullname());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -104,19 +108,24 @@ public class DashboardFrame extends JFrame {
         contentPanel.add(userPanel, "USER");
         contentPanel.add(settingsPanel, "SETTINGS");
 
-        // Set default selection
-        sidebar.setSelectedButton(sidebar.dashboardBtn);
-
-        // Add components
+        // Set default selection và màn hình mặc định theo quyền
         add(sidebar, BorderLayout.WEST);
         add(contentPanel, BorderLayout.CENTER);
-
-        // Show dashboard by default
-        showDashboard();
+        if (currentUser.getRole() == User.Role.ADMIN) {
+            sidebar.setSelectedButton(sidebar.dashboardBtn);
+            showDashboard();
+        } else {
+            sidebar.setSelectedButton(sidebar.customerBtn);
+            showCustomerManagement();
+        }
     }
 
     // Navigation methods
     public void showDashboard() {
+        if (currentUser.getRole() != User.Role.ADMIN) {
+            JOptionPane.showMessageDialog(this, "Bạn không có quyền xem Dashboard.", "Phân quyền", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
         dashboardPanel.refreshData();
         cardLayout.show(contentPanel, "DASHBOARD");
         sidebar.setSelectedButton(sidebar.dashboardBtn);
@@ -201,12 +210,20 @@ public class DashboardFrame extends JFrame {
     }
 
     public void showUserManagement() {
+        if (currentUser.getRole() != User.Role.ADMIN) {
+            JOptionPane.showMessageDialog(this, "Bạn không có quyền truy cập mục Người dùng.", "Phân quyền", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
         cardLayout.show(contentPanel, "USER");
         userPanel.refreshData();
         sidebar.setSelectedButton(sidebar.userBtn);
     }
 
     public void showSettingsManagement() {
+        if (currentUser.getRole() != User.Role.ADMIN) {
+            JOptionPane.showMessageDialog(this, "Bạn không có quyền truy cập mục Cài đặt.", "Phân quyền", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
         cardLayout.show(contentPanel, "SETTINGS");
         settingsPanel.refreshData();
         sidebar.setSelectedButton(sidebar.settingsBtn);

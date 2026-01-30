@@ -42,6 +42,7 @@ Hệ thống quản lý phòng khám thú cưng - Phần Admin (Java Swing)
 - **JFreeChart 1.5.4** – Thư viện biểu đồ thống kê
 - **FlatLaf 3.1.1** – Look and Feel hiện đại cho Swing (Light/Dark theme)
 - **FlatLaf IntelliJ Themes 3.1.1** – Bộ theme bổ sung cho FlatLaf
+- **BCrypt (jbcrypt)** – Băm mật khẩu an toàn
 
 ---
 
@@ -55,7 +56,7 @@ Hệ thống quản lý phòng khám thú cưng - Phần Admin (Java Swing)
 | **ThemeManager** | Chuyển đổi Light/Dark, lưu preference (Preferences API); áp dụng màu nền, chữ, viền, font toàn cục (UIManager). |
 | **RoundedPanel** | Panel tùy chỉnh vẽ nền và viền bo góc (RoundRectangle2D, antialiasing) cho card thống kê và khung biểu đồ. |
 | **EmojiFontHelper** | Hiển thị emoji/icon trên nút (Sidebar, dialogs) tương thích font hệ thống. |
-| **GUIUtil** | Kích thước chuẩn nút toolbar và sidebar; đồng bộ giao diện giữa các màn hình. |
+| **GUIUtil** | Kích thước chuẩn nút toolbar và sidebar; độ rộng ô nhập trong dialog (TEXT_FIELD_COLUMNS). |
 | **PrintHelper** | Tạo HTML in hóa đơn, phiếu khám, giấy cam kết; mở trong trình duyệt (Ctrl+P in). |
 | **LogoHelper** | Tải và scale logo từ resources cho màn hình đăng nhập và sidebar. |
 
@@ -68,7 +69,7 @@ Các component Swing dùng trong dự án: `JFrame`, `JDialog`, `JPanel`, `JTabl
 - **Lập trình giao diện (Swing)**: Container và component (JFrame, JPanel, JTable, JTextField, …), Layout Manager (BorderLayout, GridLayout, FlowLayout, CardLayout), xử lý sự kiện (ActionListener, MouseListener, ItemListener).
 - **Truy cập dữ liệu (JDBC)**: Kết nối qua `DriverManager`, cấu hình ngoài file (`database.properties`), `PreparedStatement` tránh SQL Injection, xử lý `ResultSet` và map sang Entity/DTO, quản lý tài nguyên (try-with-resources).
 - **Kiến trúc phần mềm**: Kiến trúc đa tầng (Presentation – Service – Repository – Database), tách biệt trách nhiệm (Separation of Concerns).
-- **Design patterns**: Singleton (Service, kết nối DB), Repository (interface + implementation), Service Layer, DTO/Entity, Strategy (khởi tạo DB: H2 chạy schema/data, MySQL chỉ kết nối), MVC (Model–View–Controller), Factory (tạo connection, strategy).
+- **Design patterns**: Singleton (Service, kết nối DB), Repository (interface + implementation), Service Layer, DTO/Entity, Strategy (khởi tạo DB: H2 chạy schema/data, MySQL chỉ kết nối), MVC (Model–View–Controller), Proxy/AOP thủ công (annotation @RequireAdmin + PermissionHandler cho phân quyền theo vai trò ADMIN), Factory (tạo connection, strategy).
 - **Xử lý ngoại lệ**: Ngoại lệ tùy biến (`PetcareException`), truyền và bắt ở từng tầng, thông báo rõ ràng cho người dùng.
 - **Validation**: Kiểm tra dữ liệu ở Domain Model (setter), ở Service (quy tắc nghiệp vụ), và ở GUI (phản hồi ngay).
 - **Trực quan hóa dữ liệu**: JFreeChart (dataset, ChartFactory, CategoryPlot, PiePlot), tùy biến tiêu đề/trục/legend theo theme.
@@ -85,6 +86,7 @@ PetcareAdmin/
 │       └── java/
 │           └── com/
 │               └── petcare/
+│                   ├── aop/                   # Phân quyền AOP thủ công (RequireAdmin, PermissionHandler)
 │                   ├── config/                # Cấu hình (DatabaseConfig)
 │                   ├── gui/                   # Giao diện người dùng
 │                   │   ├── panels/            # Các panel quản lý
@@ -101,8 +103,7 @@ PetcareAdmin/
 │                   ├── service/               # Business logic layer
 │                   └── util/                  # ThemeManager, GUIUtil, PrintHelper, RoundedPanel, ...
 ├── pom.xml                                   # Maven configuration
-├── README.md                                 # File này
-└── GIOI_THIEU_DO_AN.md                      # Tài liệu giới thiệu chi tiết
+└── README.md                                 # File này
 ```
 
 ---
@@ -202,6 +203,12 @@ Dự án áp dụng các design patterns sau:
 - **View**: GUI components (Panels, Dialogs)
 - **Controller**: Service layer
 
+### 8. **Proxy (AOP thủ công)**
+- Annotation `@RequireAdmin` đánh dấu method chỉ dành cho ADMIN
+- `PermissionHandler` (InvocationHandler) tạo proxy cho IUserService, IServiceTypeService, IMedicineService, IVaccineTypeService, IGeneralSettingService
+- Trước khi gọi method thật, proxy kiểm tra tham số User trong args và role ADMIN, ném PetcareException nếu không đủ quyền
+- GUI: Sidebar ẩn menu (Dashboard, Dịch vụ, Thuốc, Vaccine, Người dùng, Cài đặt) với user STAFF; DashboardFrame chặn truy cập các màn tương ứng nếu không phải ADMIN
+
 ---
 
 ## 🚀 Cài đặt và chạy
@@ -252,7 +259,7 @@ java -jar target/PetcareAdmin-1.0-SNAPSHOT.jar
 ### ✅ Đã hoàn thành
 
 #### Quản lý cơ bản
-- [x] **Đăng nhập/Authentication** - Xác thực người dùng với MD5 hashing
+- [x] **Đăng nhập/Authentication** - Xác thực người dùng với BCrypt
 - [x] **Dashboard** - Bảng điều khiển với 4 biểu đồ và 5 stat cards
 - [x] **Sidebar Navigation** - Điều hướng giữa các module
 
@@ -362,9 +369,9 @@ java -jar target/PetcareAdmin-1.0-SNAPSHOT.jar
 - Quản lý loại vaccine
 
 #### 11. Quản lý Người dùng
-- Thêm/Sửa/Xóa người dùng
-- Đổi mật khẩu
-- Phân quyền (nếu có)
+- Thêm/Sửa/Xóa người dùng (chỉ ADMIN)
+- Đổi mật khẩu (bản thân hoặc ADMIN đổi cho người khác)
+- Phân quyền theo vai trò: ADMIN (toàn quyền), STAFF (ẩn menu Dashboard, Dịch vụ, Thuốc, Vaccine, Người dùng, Cài đặt); kiểm tra ở GUI và ở tầng Service (AOP @RequireAdmin)
 
 #### 12. Cài đặt
 - Cấu hình hệ thống
@@ -380,7 +387,8 @@ java -jar target/PetcareAdmin-1.0-SNAPSHOT.jar
 ## 🔒 Bảo mật
 
 - ✅ **PreparedStatement**: Tránh SQL Injection
-- ✅ **Password Hashing**: MD5 (có thể nâng cấp lên BCrypt)
+- ✅ **Password Hashing**: BCrypt (jbcrypt)
+- ✅ **Phân quyền**: Vai trò ADMIN/STAFF; AOP thủ công (@RequireAdmin) ở Service; ẩn menu và chặn truy cập màn chỉ ADMIN ở GUI
 - ✅ **Input Validation**: Ở nhiều tầng (GUI, Domain Model)
 - ✅ **Exception Handling**: Custom exception với message rõ ràng
 
@@ -420,7 +428,11 @@ mvn exec:java -Dexec.mainClass="com.petcare.App"
 
 ## 📚 Tài liệu tham khảo
 
-- [GIOI_THIEU_DO_AN.md](./GIOI_THIEU_DO_AN.md) - Tài liệu giới thiệu chi tiết về đồ án, thiết kế, design patterns
+- Tài liệu môn Công nghệ Java – Trường Đại học Công nghệ Thông tin
+- Oracle Java Documentation – Java Swing, JDBC
+- FlatLaf – https://www.formdev.com/flatlaf/
+- JFreeChart – https://www.jfree.org/jfreechart/
+- H2 Database – https://www.h2database.com/
 
 ---
 

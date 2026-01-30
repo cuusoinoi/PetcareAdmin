@@ -25,12 +25,14 @@ Hệ thống quản lý phòng khám thú cưng (Java Swing)
 
 ---
 
+<a id="tổng-quan"></a>
 ## 🎯 Tổng quan
 
 **PetcareAdmin** là ứng dụng quản lý phòng khám thú cưng được xây dựng bằng **Java Swing**, cung cấp giao diện quản lý toàn diện cho các chức năng của phòng khám. Ứng dụng được thiết kế theo **kiến trúc đa tầng (Multi-tier Architecture)** với separation of concerns rõ ràng, áp dụng các design patterns phù hợp và tuân thủ best practices trong Java development.
 
 ---
 
+<a id="công-nghệ-sử-dụng"></a>
 ## 🛠 Công nghệ sử dụng
 
 - **Java 17** – Ngôn ngữ lập trình chính
@@ -46,6 +48,7 @@ Hệ thống quản lý phòng khám thú cưng (Java Swing)
 
 ---
 
+<a id="công-cụ-và-thư-viện-giao-diện"></a>
 ## 🖥 Công cụ và thư viện giao diện
 
 | Thư viện | Mục đích |
@@ -58,6 +61,7 @@ Các component Swing dùng trong dự án: `JFrame`, `JDialog`, `JPanel`, `JTabl
 
 ---
 
+<a id="công-nghệ-và-kỹ-thuật"></a>
 ## 📚 Công nghệ và kỹ thuật
 
 - **Lập trình giao diện (Swing)**: Container và component (JFrame, JPanel, JTable, JTextField, …), Layout Manager (BorderLayout, GridLayout, FlowLayout, CardLayout), xử lý sự kiện (ActionListener, MouseListener, ItemListener).
@@ -71,6 +75,7 @@ Các component Swing dùng trong dự án: `JFrame`, `JDialog`, `JPanel`, `JTabl
 
 ---
 
+<a id="cấu-trúc-dự-án"></a>
 ## 📁 Cấu trúc dự án
 
 ```
@@ -95,13 +100,14 @@ PetcareAdmin/
 │                   │   └── Database.java
 │                   ├── repository/            # Data access (interface + impl)
 │                   ├── service/               # Business logic layer
-│                   └── util/                  # ThemeManager, GUIUtil, PrintHelper, LogoHelper, ...
+│                   └── util/                  # ThemeManager, RoundedPanel, GUIUtil, PrintHelper, LogoHelper, ...
 ├── pom.xml                                   # Maven configuration
 └── README.md                                 # File này
 ```
 
 ---
 
+<a id="kiến-trúc-hệ-thống"></a>
 ## 🏗 Kiến trúc hệ thống
 
 Dự án được thiết kế theo **kiến trúc đa tầng (Multi-tier Architecture)**:
@@ -163,6 +169,7 @@ Dự án được thiết kế theo **kiến trúc đa tầng (Multi-tier Archit
 
 ---
 
+<a id="design-patterns"></a>
 ## 🎨 Design Patterns
 
 Dự án áp dụng các design patterns sau:
@@ -205,6 +212,7 @@ Dự án áp dụng các design patterns sau:
 
 ---
 
+<a id="cài-đặt-và-chạy"></a>
 ## 🚀 Cài đặt và chạy
 
 ### Yêu cầu hệ thống
@@ -248,6 +256,7 @@ java -jar target/PetcareAdmin-1.0-SNAPSHOT.jar
 
 ---
 
+<a id="tính-năng"></a>
 ## ✨ Tính năng
 
 ### ✅ Đã hoàn thành
@@ -300,6 +309,7 @@ java -jar target/PetcareAdmin-1.0-SNAPSHOT.jar
 
 ---
 
+<a id="hướng-dẫn-sử-dụng"></a>
 ## 📖 Hướng dẫn sử dụng
 
 ### Đăng nhập

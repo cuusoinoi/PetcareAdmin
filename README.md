@@ -15,7 +15,7 @@ Hệ thống quản lý phòng khám thú cưng (Java Swing)
 - [Tổng quan](#tổng-quan)
 - [Công nghệ sử dụng](#công-nghệ-sử-dụng)
 - [Công cụ và thư viện giao diện](#công-cụ-và-thư-viện-giao-diện)
-- [Kỹ thuật áp dụng từ môn học](#kỹ-thuật-áp-dụng-từ-môn-học)
+- [Công nghệ và kỹ thuật](#công-nghệ-và-kỹ-thuật)
 - [Cấu trúc dự án](#cấu-trúc-dự-án)
 - [Kiến trúc hệ thống](#kiến-trúc-hệ-thống)
 - [Design Patterns](#design-patterns)
@@ -64,12 +64,12 @@ Các component Swing dùng trong dự án: `JFrame`, `JDialog`, `JPanel`, `JTabl
 
 ---
 
-## 📚 Kỹ thuật áp dụng từ môn học
+## 📚 Công nghệ và kỹ thuật
 
 - **Lập trình giao diện (Swing)**: Container và component (JFrame, JPanel, JTable, JTextField, …), Layout Manager (BorderLayout, GridLayout, FlowLayout, CardLayout), xử lý sự kiện (ActionListener, MouseListener, ItemListener).
 - **Truy cập dữ liệu (JDBC)**: Kết nối qua `DriverManager`, cấu hình ngoài file (`database.properties`), `PreparedStatement` tránh SQL Injection, xử lý `ResultSet` và map sang Entity/DTO, quản lý tài nguyên (try-with-resources).
 - **Kiến trúc phần mềm**: Kiến trúc đa tầng (Presentation – Service – Repository – Database), tách biệt trách nhiệm (Separation of Concerns).
-- **Design patterns**: Singleton (Service, kết nối DB), Repository (interface + implementation), Service Layer, DTO/Entity, Strategy (khởi tạo DB: H2 chạy schema/data, MySQL chỉ kết nối), MVC (Model–View–Controller), Proxy/AOP thủ công (annotation @RequireAdmin + PermissionHandler cho phân quyền theo vai trò ADMIN), Factory (tạo connection, strategy).
+- **Design patterns**: Singleton (Service, kết nối DB), Repository (interface + implementation), Service Layer, DTO/Entity, Strategy (khởi tạo DB: H2 chạy schema/data, MySQL chỉ kết nối), MVC (Model–View–Controller), Proxy/AOP (annotation @RequireAdmin + PermissionHandler cho phân quyền theo vai trò ADMIN), Factory (tạo connection, strategy).
 - **Xử lý ngoại lệ**: Ngoại lệ tùy biến (`PetcareException`), truyền và bắt ở từng tầng, thông báo rõ ràng cho người dùng.
 - **Validation**: Kiểm tra dữ liệu ở Domain Model (setter), ở Service (quy tắc nghiệp vụ), và ở GUI (phản hồi ngay).
 - **Trực quan hóa dữ liệu**: JFreeChart (dataset, ChartFactory, CategoryPlot, PiePlot), tùy biến tiêu đề/trục/legend theo theme.
@@ -86,7 +86,7 @@ PetcareAdmin/
 │       └── java/
 │           └── com/
 │               └── petcare/
-│                   ├── aop/                   # Phân quyền AOP thủ công (RequireAdmin, PermissionHandler)
+│                   ├── aop/                   # Phân quyền AOP (RequireAdmin, PermissionHandler)
 │                   ├── config/                # Cấu hình (DatabaseConfig)
 │                   ├── gui/                   # Giao diện người dùng
 │                   │   ├── panels/            # Các panel quản lý
@@ -388,7 +388,7 @@ java -jar target/PetcareAdmin-1.0-SNAPSHOT.jar
 
 - ✅ **PreparedStatement**: Tránh SQL Injection
 - ✅ **Password Hashing**: BCrypt (jbcrypt)
-- ✅ **Phân quyền**: Vai trò ADMIN/STAFF; AOP thủ công (@RequireAdmin) ở Service; ẩn menu và chặn truy cập màn chỉ ADMIN ở GUI
+- ✅ **Phân quyền**: Vai trò ADMIN/STAFF; AOP (@RequireAdmin) ở Service; ẩn menu và chặn truy cập màn chỉ ADMIN ở GUI
 - ✅ **Input Validation**: Ở nhiều tầng (GUI, Domain Model)
 - ✅ **Exception Handling**: Custom exception với message rõ ràng
 
@@ -438,7 +438,7 @@ mvn exec:java -Dexec.mainClass="com.petcare.App"
 
 ## 👥 Đóng góp
 
-Dự án này được phát triển như một đồ án môn học. Mọi đóng góp và góp ý đều được chào đón!
+Mọi đóng góp và góp ý đều được chào đón!
 
 ---
 
@@ -460,5 +460,4 @@ Cảm ơn các thầy cô đã hướng dẫn và cung cấp tài liệu học t
 
 **Phát triển bởi**: [Tên sinh viên]  
 **Lớp**: [Lớp]  
-**Môn học**: Công nghệ Java  
 **Năm học**: 2024-2025

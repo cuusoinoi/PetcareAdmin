@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 /**
  * Service Type Service - business logic; Entity ↔ Domain.
- * Phân quyền qua AOP thủ công: method có @RequireAdmin được kiểm tra bởi PermissionHandler.
  */
 public class ServiceTypeService implements IServiceTypeService {
     private static IServiceTypeService instance;
@@ -51,18 +50,12 @@ public class ServiceTypeService implements IServiceTypeService {
         return entity != null ? entityToDomain(entity) : null;
     }
 
-    /**
-     * Find by exact service name (for AddInvoiceDialog, CheckoutDialog).
-     */
     @Override
     public ServiceType getServiceTypeByName(String serviceName) throws PetcareException {
         ServiceTypeEntity entity = repository.findByName(serviceName);
         return entity != null ? entityToDomain(entity) : null;
     }
 
-    /**
-     * Find first service type whose name starts with prefix (e.g. "Lưu chuồng", "Phụ thu trễ giờ").
-     */
     @Override
     public ServiceType getServiceTypeByNamePrefix(String prefix) throws PetcareException {
         ServiceTypeEntity entity = repository.findByNameStartsWith(prefix);

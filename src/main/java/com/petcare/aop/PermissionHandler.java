@@ -7,11 +7,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-/**
- * InvocationHandler dùng cho AOP phân quyền (thủ công, không dùng thư viện).
- * Trước khi gọi method thật: nếu method có @RequireAdmin thì tìm tham số kiểu User trong args,
- * kiểm tra role ADMIN, ném PetcareException nếu không đủ quyền.
- */
+/** InvocationHandler cho AOP phân quyền: @RequireAdmin → kiểm tra User trong args, ném PetcareException nếu không ADMIN. */
 public class PermissionHandler implements InvocationHandler {
     private final Object target;
 

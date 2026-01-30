@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 /**
  * Vaccine Type Service - Entity ↔ Domain.
- * Phân quyền qua AOP thủ công: method có @RequireAdmin được kiểm tra bởi PermissionHandler.
  */
 public class VaccineTypeService implements IVaccineTypeService {
     private static IVaccineTypeService instance;

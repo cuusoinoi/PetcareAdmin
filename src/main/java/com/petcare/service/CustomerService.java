@@ -108,26 +108,17 @@ public class CustomerService {
      * @throws PetcareException if validation fails or database operation fails
      */
     public void createCustomer(Customer customer) throws PetcareException {
-        // Business rule: Check if phone already exists
         if (repository.existsByPhone(customer.getCustomerPhoneNumber())) {
             throw new PetcareException("Số điện thoại đã tồn tại trong hệ thống");
         }
-
-        // Business rule: Check if email already exists (if provided)
         if (customer.getCustomerEmail() != null && !customer.getCustomerEmail().isEmpty()) {
             if (repository.existsByEmail(customer.getCustomerEmail())) {
                 throw new PetcareException("Email đã tồn tại trong hệ thống");
             }
         }
-
-        // Convert domain model to entity
         CustomerEntity entity = domainToEntity(customer);
-
-        // Insert into database
         int result = repository.insert(entity);
-
         if (result > 0) {
-            // Set the generated ID back to domain model
             customer.setCustomerId(entity.getCustomerId());
         } else {
             throw new PetcareException("Không thể tạo khách hàng mới");
@@ -145,20 +136,15 @@ public class CustomerService {
      * @throws PetcareException if validation fails or database operation fails
      */
     public void updateCustomer(Customer customer) throws PetcareException {
-        // Business rule: Check if customer exists
         CustomerEntity existing = repository.findById(customer.getCustomerId());
         if (existing == null) {
             throw new PetcareException("Không tìm thấy khách hàng với ID: " + customer.getCustomerId());
         }
-
-        // Business rule: Check phone uniqueness (if changed)
         if (!existing.getCustomerPhoneNumber().equals(customer.getCustomerPhoneNumber())) {
             if (repository.existsByPhone(customer.getCustomerPhoneNumber())) {
                 throw new PetcareException("Số điện thoại đã được sử dụng bởi khách hàng khác");
             }
         }
-
-        // Business rule: Check email uniqueness (if changed and provided)
         if (customer.getCustomerEmail() != null && !customer.getCustomerEmail().isEmpty()) {
             if (!customer.getCustomerEmail().equals(existing.getCustomerEmail())) {
                 if (repository.existsByEmail(customer.getCustomerEmail())) {
@@ -166,11 +152,7 @@ public class CustomerService {
                 }
             }
         }
-
-        // Convert domain model to entity
         CustomerEntity entity = domainToEntity(customer);
-
-        // Update in database
         int result = repository.update(entity);
 
         if (result == 0) {
@@ -182,23 +164,16 @@ public class CustomerService {
      * Delete a customer
      * Business rules:
      * - Customer must exist
-     * - TODO: Check if customer has pets (would require PetRepository)
      *
      * @param id customer ID to delete
      * @throws PetcareException if validation fails or database operation fails
      */
     public void deleteCustomer(int id) throws PetcareException {
-        // Business rule: Check if customer exists
         CustomerEntity customer = repository.findById(id);
         if (customer == null) {
             throw new PetcareException("Không tìm thấy khách hàng với ID: " + id);
         }
 
-        // TODO: Business rule - Check if customer has pets
-        // This would require PetRepository to check for related records
-        // For now, we'll allow deletion (database foreign key constraints will handle it)
-
-        // Delete from database
         int result = repository.delete(id);
 
         if (result == 0) {
@@ -228,13 +203,6 @@ public class CustomerService {
         return repository.existsByEmail(email);
     }
 
-    /**
-     * Convert Entity to Domain Model
-     * Helper method to transform data from database layer to business layer
-     *
-     * @param entity CustomerEntity from database
-     * @return Customer domain model
-     */
     private Customer entityToDomain(CustomerEntity entity) {
         try {
             Customer customer = new Customer();
@@ -247,19 +215,10 @@ public class CustomerService {
             customer.setCustomerNote(entity.getCustomerNote());
             return customer;
         } catch (PetcareException ex) {
-            // Should not happen if entity data is valid
-            // But if it does, wrap it in RuntimeException
             throw new RuntimeException("Invalid entity data: " + ex.getMessage(), ex);
         }
     }
 
-    /**
-     * Convert Domain Model to Entity
-     * Helper method to transform data from business layer to database layer
-     *
-     * @param customer Customer domain model
-     * @return CustomerEntity for database
-     */
     private CustomerEntity domainToEntity(Customer customer) {
         CustomerEntity entity = new CustomerEntity();
         entity.setCustomerId(customer.getCustomerId());

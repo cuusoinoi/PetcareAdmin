@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 /**
  * Medicine Service - Entity ↔ Domain; Route enum mapping.
- * Phân quyền qua AOP thủ công: method có @RequireAdmin được kiểm tra bởi PermissionHandler.
  */
 public class MedicineService implements IMedicineService {
     private static IMedicineService instance;

@@ -57,9 +57,6 @@ public class InvoiceService {
         return repository.findDetailsByInvoiceId(invoiceId);
     }
 
-    /**
-     * Create invoice header and details. Returns generated invoice ID.
-     */
     public int createInvoice(int customerId, int petId, Integer petEnclosureId, Date invoiceDate,
                              int discount, int subtotal, int deposit, int totalAmount,
                              List<InvoiceDetailItem> details) throws PetcareException {

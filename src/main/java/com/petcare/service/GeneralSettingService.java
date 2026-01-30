@@ -11,7 +11,6 @@ import com.petcare.repository.IGeneralSettingRepository;
 
 /**
  * General Setting Service - single row config; Entity ↔ Domain.
- * Phân quyền qua AOP thủ công: saveSettings có @RequireAdmin được kiểm tra bởi PermissionHandler.
  */
 public class GeneralSettingService implements IGeneralSettingService {
     private static IGeneralSettingService instance;
@@ -62,9 +61,6 @@ public class GeneralSettingService implements IGeneralSettingService {
         }
     }
 
-    /**
-     * For CheckoutDialog: get checkout hour (e.g. 18) and overtime fee per hour.
-     */
     @Override
     public int getCheckoutHour() throws PetcareException {
         GeneralSetting s = getSettings();

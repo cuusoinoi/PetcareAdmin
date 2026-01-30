@@ -14,9 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * User Service - Business logic for User.
- * Singleton; Entity ↔ Domain; BCrypt for password hashing.
- * Phân quyền qua AOP thủ công (proxy): method có @RequireAdmin được kiểm tra bởi PermissionHandler.
+ * User Service - Business logic for User. Singleton; Entity ↔ Domain; BCrypt.
  */
 public class UserService implements IUserService {
     private static IUserService instance;
@@ -40,11 +38,7 @@ public class UserService implements IUserService {
         }
     }
 
-    /**
-     * Authenticate user by username and plain password.
-     * Supports BCrypt (current) and legacy MD5; on successful MD5 login, password is re-hashed to BCrypt.
-     * Returns domain User if valid, null otherwise.
-     */
+    /** Authenticate by username and password (BCrypt; legacy MD5 re-hashed to BCrypt). */
     @Override
     public User authenticate(String username, String plainPassword) throws PetcareException {
         UserEntity entity = repository.findByUsername(username);

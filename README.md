@@ -121,9 +121,9 @@ Dự án được thiết kế theo **kiến trúc đa tầng (Multi-tier Archit
                │
 ┌──────────────▼──────────────────────┐
 │      SERVICE LAYER                  │
-│  - Business Logic                    │
-│  - Business Rules                    │
-│  - Entity ↔ Domain Conversion        │
+│  - Business Logic                   │
+│  - Business Rules                   │
+│  - Entity ↔ Domain Conversion       │
 └──────────────┬──────────────────────┘
                │
 ┌──────────────▼──────────────────────┐

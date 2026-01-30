@@ -422,13 +422,13 @@ mvn exec:java -Dexec.mainClass="com.petcare.App"
 
 ## 📚 Tài liệu tham khảo
 
-[1] Oracle, "Java Platform, Standard Edition 17 API Specification," 2021. [Online]. Available: https://docs.oracle.com/en/java/javase/17/docs/api/. [Accessed: Jan. 29, 2025].
+[1] Oracle, "Java Platform, Standard Edition 17 API Specification," 2021. [Online]. Available: https://docs.oracle.com/en/java/javase/17/docs/api/.
 
-[2] FormDev, "FlatLaf - Flat Look and Feel," 2024. [Online]. Available: https://www.formdev.com/flatlaf/. [Accessed: Jan. 29, 2025].
+[2] FormDev, "FlatLaf - Flat Look and Feel," 2024. [Online]. Available: https://www.formdev.com/flatlaf/.
 
-[3] JFree.org, "JFreeChart - A free Java chart library," 2024. [Online]. Available: https://www.jfree.org/jfreechart/. [Accessed: Jan. 29, 2025].
+[3] JFree.org, "JFreeChart - A free Java chart library," 2024. [Online]. Available: https://www.jfree.org/jfreechart/.
 
-[4] H2 Database Engine, "Introduction to H2 Database," 2024. [Online]. Available: https://www.h2database.com/. [Accessed: Jan. 29, 2025].
+[4] H2 Database Engine, "Introduction to H2 Database," 2024. [Online]. Available: https://www.h2database.com/.
 
 ---
 
@@ -453,7 +453,3 @@ Cảm ơn các thầy cô đã hướng dẫn và cung cấp tài liệu học t
 - Software Architecture
 
 ---
-
-**Phát triển bởi**: [Tên sinh viên]  
-**Lớp**: [Lớp]  
-**Năm học**: 2024-2025

@@ -3,6 +3,7 @@ package com.petcare.gui;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.LogoHelper;
+import com.petcare.util.ThemeManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -51,7 +52,7 @@ public class Sidebar extends JPanel {
         logoLabel.setIcon(LogoHelper.createLogoIcon(36));
         logoLabel.setHorizontalTextPosition(SwingConstants.TRAILING);
         logoLabel.setIconTextGap(10);
-        logoLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        logoLabel.setFont(ThemeManager.getSemiboldFont(20));
         logoLabel.setForeground(Color.WHITE);
         headerPanel.add(logoLabel, BorderLayout.CENTER);
 
@@ -186,7 +187,7 @@ public class Sidebar extends JPanel {
         themeToggleBtn.setIcon(EmojiFontHelper.createEmojiIcon("🌙"));
         themeToggleBtn.setHorizontalTextPosition(SwingConstants.RIGHT);
         themeToggleBtn.setIconTextGap(8);
-        themeToggleBtn.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        themeToggleBtn.setFont(ThemeManager.getSemiboldFont(13));
         themeToggleBtn.setBackground(new Color(108, 117, 125));
         themeToggleBtn.setForeground(Color.WHITE);
         themeToggleBtn.setBorderPainted(false);
@@ -206,7 +207,7 @@ public class Sidebar extends JPanel {
         logoutBtn.setIcon(EmojiFontHelper.createEmojiIcon("🚪"));
         logoutBtn.setHorizontalTextPosition(SwingConstants.RIGHT);
         logoutBtn.setIconTextGap(8);
-        logoutBtn.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        logoutBtn.setFont(ThemeManager.getSemiboldFont(14));
         logoutBtn.setBackground(new Color(220, 53, 69));
         logoutBtn.setForeground(Color.WHITE);
         logoutBtn.setBorderPainted(false);
@@ -223,7 +224,7 @@ public class Sidebar extends JPanel {
         btn.setIcon(EmojiFontHelper.createEmojiIcon(emoji));
         btn.setHorizontalTextPosition(SwingConstants.RIGHT);
         btn.setIconTextGap(8);
-        btn.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        btn.setFont(ThemeManager.getSemiboldFont(14));
         btn.setBackground(selected ? new Color(160, 90, 30) : new Color(139, 69, 19));
         btn.setForeground(Color.WHITE);
         btn.setBorderPainted(false);
@@ -258,7 +259,7 @@ public class Sidebar extends JPanel {
 
     private JLabel createSeparator(String text) {
         JLabel separator = new JLabel(text);
-        separator.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        separator.setFont(ThemeManager.getSemiboldFont(11));
         separator.setForeground(new Color(200, 200, 200));
         separator.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 5, 5, 5));
         return separator;

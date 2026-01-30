@@ -62,11 +62,9 @@ public class DashboardPanel extends JPanel {
     }
 
     private JPanel createStatCardsPanel() {
-        JPanel panel = new JPanel(new GridLayout(1, 5, 15, 0));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        JPanel panel = new JPanel(new GridLayout(1, 5, 20, 0));
+        panel.setBorder(BorderFactory.createEmptyBorder(24, 24, 24, 24));
         panel.setBackground(ThemeManager.getContentBackground());
-
-        // Cards will be created in loadData()
         return panel;
     }
 
@@ -114,9 +112,9 @@ public class DashboardPanel extends JPanel {
                 cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1);
         double revenuePercentChange = DashboardService.calculatePercentChange(lastMonthRevenue, thisMonthRevenue);
 
-        // Create stat cards
-        JPanel cardsPanel = new JPanel(new GridLayout(1, 5, 15, 0));
-        cardsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        // Create stat cards (khoảng cách rộng hơn, mềm mại)
+        JPanel cardsPanel = new JPanel(new GridLayout(1, 5, 20, 0));
+        cardsPanel.setBorder(BorderFactory.createEmptyBorder(24, 24, 24, 24));
         cardsPanel.setBackground(ThemeManager.getContentBackground());
 
         cardsPanel.add(createStatCard("Tổng khách hàng", String.valueOf(customerCount),
@@ -143,33 +141,31 @@ public class DashboardPanel extends JPanel {
     }
 
     private JPanel createStatCard(String title, String value, Color color, Double percentChange) {
-        JPanel card = new JPanel();
+        Color borderColor = ThemeManager.isDarkMode()
+                ? new Color(0x404040)
+                : new Color(0xe0e0e0);
+        JPanel card = new com.petcare.util.RoundedPanel(16, borderColor, 1f);
         card.setLayout(new BorderLayout());
         card.setBackground(ThemeManager.getFormBackground());
-        card.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(ThemeManager.getBorderColor(), 1),
-                BorderFactory.createEmptyBorder(15, 15, 15, 15)
-        ));
-        card.setPreferredSize(new Dimension(200, 120));
+        card.setBorder(BorderFactory.createEmptyBorder(18, 18, 18, 18));
+        card.setPreferredSize(new Dimension(220, 128));
 
-        // Title
         JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        titleLabel.setFont(ThemeManager.getModernFont(13));
         titleLabel.setForeground(ThemeManager.isDarkMode() ? new Color(0xb0b0b0) : new Color(100, 100, 100));
         card.add(titleLabel, BorderLayout.NORTH);
 
-        // Value and percent change
         JPanel valuePanel = new JPanel(new BorderLayout());
         valuePanel.setOpaque(false);
 
         JLabel valueLabel = new JLabel(value);
-        valueLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        valueLabel.setFont(ThemeManager.getSemiboldFont(24));
         valueLabel.setForeground(color);
         valuePanel.add(valueLabel, BorderLayout.CENTER);
 
         if (percentChange != null) {
             JLabel percentLabel = new JLabel();
-            percentLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+            percentLabel.setFont(ThemeManager.getModernFont(11));
             if (percentChange >= 0) {
                 percentLabel.setText(String.format("↑ %.1f%%", percentChange));
                 percentLabel.setForeground(new Color(46, 204, 113));
@@ -181,53 +177,73 @@ public class DashboardPanel extends JPanel {
         }
 
         card.add(valuePanel, BorderLayout.CENTER);
-
         return card;
     }
 
     private JPanel createChartsPanel() {
-        JPanel panel = new JPanel(new GridLayout(2, 2, 15, 15));
-        panel.setBorder(BorderFactory.createEmptyBorder(0, 20, 20, 20));
+        JPanel panel = new JPanel(new GridLayout(2, 2, 20, 20));
+        panel.setBorder(BorderFactory.createEmptyBorder(0, 24, 24, 24));
         panel.setBackground(ThemeManager.getContentBackground());
 
+        Color chartBorderColor = ThemeManager.isDarkMode() ? new Color(0x404040) : new Color(0xe0e0e0);
         try {
             Map<String, Integer> medicalData = DashboardService.getMedicalRecordsByDay(7);
-            panel.add(createLineChart("Lượt khám (7 ngày gần nhất)", medicalData));
+            panel.add(wrapChartInRounded(createLineChart("Lượt khám (7 ngày gần nhất)", medicalData), chartBorderColor));
         } catch (Exception e) {
             e.printStackTrace();
-            panel.add(createPlaceholderPanel("Lượt khám"));
+            panel.add(wrapChartInRounded(createPlaceholderPanel("Lượt khám"), chartBorderColor));
         }
         try {
             Map<String, Map<String, Integer>> checkinCheckoutData = DashboardService.getCheckinCheckoutStats(7);
-            panel.add(createBarChart("Check-in / Check-out (7 ngày gần nhất)", checkinCheckoutData));
+            panel.add(wrapChartInRounded(createBarChart("Check-in / Check-out (7 ngày gần nhất)", checkinCheckoutData), chartBorderColor));
         } catch (Exception e) {
             e.printStackTrace();
-            panel.add(createPlaceholderPanel("Check-in / Check-out"));
+            panel.add(wrapChartInRounded(createPlaceholderPanel("Check-in / Check-out"), chartBorderColor));
         }
         try {
             Map<String, Long> monthlyRevenue = DashboardService.getMonthlyRevenueStats();
-            panel.add(createRevenueLineChart("Doanh thu theo tháng (12 tháng)", monthlyRevenue));
+            panel.add(wrapChartInRounded(createRevenueLineChart("Doanh thu theo tháng (12 tháng)", monthlyRevenue), chartBorderColor));
         } catch (Exception e) {
             e.printStackTrace();
-            panel.add(createPlaceholderPanel("Doanh thu theo tháng"));
+            panel.add(wrapChartInRounded(createPlaceholderPanel("Doanh thu theo tháng"), chartBorderColor));
         }
         try {
             List<ServiceRevenue> serviceRevenue = DashboardService.getRevenueByServiceType();
-            panel.add(createDoughnutChart("Tỷ trọng doanh thu theo loại dịch vụ", serviceRevenue));
+            panel.add(wrapChartInRounded(createDoughnutChart("Tỷ trọng doanh thu theo loại dịch vụ", serviceRevenue), chartBorderColor));
         } catch (Exception e) {
             e.printStackTrace();
-            panel.add(createPlaceholderPanel("Tỷ trọng doanh thu"));
+            panel.add(wrapChartInRounded(createPlaceholderPanel("Tỷ trọng doanh thu"), chartBorderColor));
         }
 
         return panel;
     }
 
+    private JPanel wrapChartInRounded(JComponent chart, Color borderColor) {
+        com.petcare.util.RoundedPanel wrapper = new com.petcare.util.RoundedPanel(16, borderColor, 1f);
+        wrapper.setLayout(new BorderLayout());
+        wrapper.setBackground(ThemeManager.getFormBackground());
+        wrapper.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
+        wrapper.add(chart, BorderLayout.CENTER);
+        wrapper.setPreferredSize(new Dimension(600, 320));
+        return wrapper;
+    }
+
     private JPanel createPlaceholderPanel(String title) {
         JPanel p = new JPanel(new BorderLayout());
-        p.setBackground(ThemeManager.getFormBackground());
-        p.add(new JLabel(title + " – Không thể tải", JLabel.CENTER), BorderLayout.CENTER);
+        p.setOpaque(false);
+        JLabel lbl = new JLabel(title + " – Không thể tải", JLabel.CENTER);
+        lbl.setFont(ThemeManager.getModernFont(14));
+        p.add(lbl, BorderLayout.CENTER);
         p.setPreferredSize(new Dimension(600, 300));
         return p;
+    }
+
+    /** Áp dụng màu chữ legend theo theme (dark = sáng, light = tối). */
+    private void applyChartLegendTheme(JFreeChart chart, Color textColor) {
+        if (chart.getLegend() != null) {
+            chart.getLegend().setBackgroundPaint(ThemeManager.getFormBackground());
+            chart.getLegend().setItemPaint(textColor);
+        }
     }
 
     private ChartPanel createLineChart(String title, Map<String, Integer> data) {
@@ -263,14 +279,20 @@ public class DashboardPanel extends JPanel {
                 false
         );
 
-        chart.getTitle().setFont(new Font("Segoe UI", Font.BOLD, 16));
-        chart.setBackgroundPaint(Color.WHITE);
+        Color textColor = ThemeManager.getTitleForeground();
+        chart.getTitle().setFont(ThemeManager.getSemiboldFont(16));
+        chart.getTitle().setPaint(textColor);
+        chart.setBackgroundPaint(ThemeManager.getFormBackground());
 
         CategoryPlot plot = chart.getCategoryPlot();
-        plot.setBackgroundPaint(Color.WHITE);
-        plot.setRangeGridlinePaint(new Color(220, 220, 220));
+        plot.setBackgroundPaint(ThemeManager.getFormBackground());
+        plot.setRangeGridlinePaint(ThemeManager.isDarkMode() ? new Color(0x404040) : new Color(220, 220, 220));
         plot.getRenderer().setSeriesPaint(0, new Color(220, 53, 69));
+        plot.getDomainAxis().setTickLabelPaint(textColor);
+        plot.getDomainAxis().setLabelPaint(textColor);
         NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+        rangeAxis.setTickLabelPaint(textColor);
+        rangeAxis.setLabelPaint(textColor);
         rangeAxis.setAutoRangeIncludesZero(true);
         rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
         rangeAxis.setNumberFormatOverride(NumberFormat.getIntegerInstance());
@@ -281,11 +303,12 @@ public class DashboardPanel extends JPanel {
                     maxVal = Math.max(maxVal, dataset.getValue(r, c).doubleValue());
             if (maxVal <= 0) rangeAxis.setUpperBound(5);
         }
+        applyChartLegendTheme(chart, textColor);
 
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new Dimension(600, 300));
+        chartPanel.setOpaque(false);
         chartPanel.setBackground(ThemeManager.getFormBackground());
-
         return chartPanel;
     }
 
@@ -325,15 +348,21 @@ public class DashboardPanel extends JPanel {
                 false
         );
 
-        chart.getTitle().setFont(new Font("Segoe UI", Font.BOLD, 16));
-        chart.setBackgroundPaint(Color.WHITE);
+        Color textColor = ThemeManager.getTitleForeground();
+        chart.getTitle().setFont(ThemeManager.getSemiboldFont(16));
+        chart.getTitle().setPaint(textColor);
+        chart.setBackgroundPaint(ThemeManager.getFormBackground());
 
         CategoryPlot plot = chart.getCategoryPlot();
-        plot.setBackgroundPaint(Color.WHITE);
-        plot.setRangeGridlinePaint(new Color(220, 220, 220));
+        plot.setBackgroundPaint(ThemeManager.getFormBackground());
+        plot.setRangeGridlinePaint(ThemeManager.isDarkMode() ? new Color(0x404040) : new Color(220, 220, 220));
         plot.getRenderer().setSeriesPaint(0, new Color(255, 193, 7));
         plot.getRenderer().setSeriesPaint(1, new Color(40, 167, 69));
+        plot.getDomainAxis().setTickLabelPaint(textColor);
+        plot.getDomainAxis().setLabelPaint(textColor);
         NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+        rangeAxis.setTickLabelPaint(textColor);
+        rangeAxis.setLabelPaint(textColor);
         rangeAxis.setAutoRangeIncludesZero(true);
         rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
         rangeAxis.setNumberFormatOverride(NumberFormat.getIntegerInstance());
@@ -344,11 +373,12 @@ public class DashboardPanel extends JPanel {
                     maxVal = Math.max(maxVal, dataset.getValue(r, c).doubleValue());
             if (maxVal <= 0) rangeAxis.setUpperBound(5);
         }
+        applyChartLegendTheme(chart, textColor);
 
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new Dimension(600, 300));
+        chartPanel.setOpaque(false);
         chartPanel.setBackground(ThemeManager.getFormBackground());
-
         return chartPanel;
     }
 
@@ -386,27 +416,32 @@ public class DashboardPanel extends JPanel {
                 false
         );
 
-        chart.getTitle().setFont(new Font("Segoe UI", Font.BOLD, 16));
-        chart.setBackgroundPaint(Color.WHITE);
+        Color textColor = ThemeManager.getTitleForeground();
+        chart.getTitle().setFont(ThemeManager.getSemiboldFont(16));
+        chart.getTitle().setPaint(textColor);
+        chart.setBackgroundPaint(ThemeManager.getFormBackground());
 
         CategoryPlot plot = chart.getCategoryPlot();
-        plot.setBackgroundPaint(Color.WHITE);
-        plot.setRangeGridlinePaint(new Color(220, 220, 220));
+        plot.setBackgroundPaint(ThemeManager.getFormBackground());
+        plot.setRangeGridlinePaint(ThemeManager.isDarkMode() ? new Color(0x404040) : new Color(220, 220, 220));
         plot.getRenderer().setSeriesPaint(0, new Color(23, 162, 184));
-        // Trục tháng (domain): hiển thị đúng nhãn MM/yyyy (01/2025, 02/2025...)
         CategoryAxis domainAxis = (CategoryAxis) plot.getDomainAxis();
-        domainAxis.setTickLabelFont(new Font("Segoe UI", Font.PLAIN, 11));
+        domainAxis.setTickLabelFont(ThemeManager.getModernFont(11));
+        domainAxis.setTickLabelPaint(textColor);
+        domainAxis.setLabelPaint(textColor);
         domainAxis.setMaximumCategoryLabelLines(2);
         domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_45);
-        // Trục doanh thu (range): hiển thị số thập phân (triệu VNĐ) đúng
         NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+        rangeAxis.setTickLabelPaint(textColor);
+        rangeAxis.setLabelPaint(textColor);
         rangeAxis.setAutoRangeIncludesZero(true);
         rangeAxis.setNumberFormatOverride(new DecimalFormat("#,##0.0"));
+        applyChartLegendTheme(chart, textColor);
 
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new Dimension(600, 300));
+        chartPanel.setOpaque(false);
         chartPanel.setBackground(ThemeManager.getFormBackground());
-
         return chartPanel;
     }
 
@@ -425,22 +460,26 @@ public class DashboardPanel extends JPanel {
                 false
         );
 
-        chart.getTitle().setFont(new Font("Segoe UI", Font.BOLD, 16));
-        chart.setBackgroundPaint(Color.WHITE);
+        Color textColor = ThemeManager.getTitleForeground();
+        chart.getTitle().setFont(ThemeManager.getSemiboldFont(16));
+        chart.getTitle().setPaint(textColor);
+        chart.setBackgroundPaint(ThemeManager.getFormBackground());
 
         PiePlot plot = (PiePlot) chart.getPlot();
-        plot.setBackgroundPaint(Color.WHITE);
-        plot.setLabelFont(new Font("Segoe UI", Font.PLAIN, 11));
+        plot.setBackgroundPaint(ThemeManager.getFormBackground());
+        plot.setLabelFont(ThemeManager.getModernFont(11));
+        plot.setLabelPaint(textColor);
         try {
             plot.setLabelGenerator(new StandardPieSectionLabelGenerator("{0}: {1} ({2})"));
         } catch (Exception ignored) {
             // Giữ mặc định nếu format lỗi
         }
+        applyChartLegendTheme(chart, textColor);
 
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new Dimension(600, 300));
+        chartPanel.setOpaque(false);
         chartPanel.setBackground(ThemeManager.getFormBackground());
-
         return chartPanel;
     }
 

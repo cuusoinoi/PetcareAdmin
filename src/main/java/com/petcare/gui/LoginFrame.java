@@ -5,6 +5,7 @@ import com.petcare.model.domain.User;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.service.UserService;
 import com.petcare.util.LogoHelper;
+import com.petcare.util.ThemeManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -42,7 +43,7 @@ public class LoginFrame extends JFrame {
         titleLabel.setIcon(LogoHelper.createLogoIcon(48));
         titleLabel.setHorizontalTextPosition(SwingConstants.TRAILING);
         titleLabel.setIconTextGap(12);
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 32));
+        titleLabel.setFont(ThemeManager.getSemiboldFont(32));
         titleLabel.setForeground(Color.WHITE);
         headerPanel.add(titleLabel);
 
@@ -55,7 +56,7 @@ public class LoginFrame extends JFrame {
         // Username label
         JLabel usernameLabel = new JLabel("Tên đăng nhập:");
         usernameLabel.setBounds(50, 50, 300, 25);
-        usernameLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        usernameLabel.setFont(ThemeManager.getModernFont(14));
         formPanel.add(usernameLabel);
 
         // Username field
@@ -63,13 +64,13 @@ public class LoginFrame extends JFrame {
         usernameField.setBounds(50, 80, 350, 40);
         usernameField.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
         usernameField.putClientProperty("JTextField.placeholderText", "Nhập tên đăng nhập");
-        usernameField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        usernameField.setFont(ThemeManager.getModernFont(14));
         formPanel.add(usernameField);
 
         // Password label
         JLabel passwordLabel = new JLabel("Mật khẩu:");
         passwordLabel.setBounds(50, 140, 300, 25);
-        passwordLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        passwordLabel.setFont(ThemeManager.getModernFont(14));
         formPanel.add(passwordLabel);
 
         // Password field
@@ -77,7 +78,7 @@ public class LoginFrame extends JFrame {
         passwordField.setBounds(50, 170, 350, 40);
         passwordField.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
         passwordField.putClientProperty("JTextField.placeholderText", "Nhập mật khẩu");
-        passwordField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        passwordField.setFont(ThemeManager.getModernFont(14));
         formPanel.add(passwordField);
 
         // Login button
@@ -85,7 +86,7 @@ public class LoginFrame extends JFrame {
         loginButton.setBounds(50, 250, 350, 45);
         loginButton.setBackground(new Color(139, 69, 19));
         loginButton.setForeground(Color.WHITE);
-        loginButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        loginButton.setFont(ThemeManager.getSemiboldFont(16));
         loginButton.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
         loginButton.addActionListener(e -> performLogin());
         formPanel.add(loginButton);
@@ -94,7 +95,7 @@ public class LoginFrame extends JFrame {
         JLabel infoLabel = new JLabel("<html><center>Mặc định: admin / 123456</center></html>",
                 SwingConstants.CENTER);
         infoLabel.setBounds(50, 310, 350, 40);
-        infoLabel.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        infoLabel.setFont(ThemeManager.getModernFont(12).deriveFont(Font.ITALIC));
         infoLabel.setForeground(Color.GRAY);
         formPanel.add(infoLabel);
 

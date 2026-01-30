@@ -44,12 +44,72 @@ public class ThemeManager {
                 UIManager.setLookAndFeel(new FlatLightLaf());
                 applyLightUiDefaults();
             }
+            applyModernStyle();
             prefs.put(THEME_PREF_KEY, theme);
             prefs.flush();
         } catch (Exception ex) {
             System.err.println("Failed to set theme: " + ex.getMessage());
             ex.printStackTrace();
         }
+    }
+
+    /**
+     * Bo góc, font hiện đại, scrollbar bo góc – áp dụng cho toàn bộ UI
+     */
+    private static void applyModernStyle() {
+        // Bo góc (arc): nút, ô nhập, combo, checkbox, progress bar
+        UIManager.put("Button.arc", 12);
+        UIManager.put("Component.arc", 10);
+        UIManager.put("TextComponent.arc", 10);
+        UIManager.put("CheckBox.arc", 6);
+        UIManager.put("ProgressBar.arc", 8);
+        // Scrollbar bo góc
+        UIManager.put("ScrollBar.thumbArc", 8);
+        UIManager.put("ScrollBar.trackArc", 8);
+        UIManager.put("ScrollBar.width", 12);
+        // Font giống Restaurant: size 14, Segoe UI Semibold cho header/nút
+        Font baseFont = createModernFont(14);
+        Font semiboldFont = createSemiboldFont(14);
+        Font headerFont = createSemiboldFont(16);
+        UIManager.put("Label.font", baseFont);
+        UIManager.put("Button.font", semiboldFont);
+        UIManager.put("ToggleButton.font", semiboldFont);
+        UIManager.put("TextField.font", baseFont);
+        UIManager.put("ComboBox.font", baseFont);
+        UIManager.put("Table.font", baseFont);
+        UIManager.put("TableHeader.font", headerFont);
+        UIManager.put("Table.rowHeight", 34);
+        UIManager.put("TableHeader.height", 34);
+    }
+
+    private static Font createModernFont(int size) {
+        String[] families = { "Segoe UI", "SF Pro Display", "Inter", "Roboto", "Helvetica Neue", Font.SANS_SERIF };
+        for (String name : families) {
+            Font f = new Font(name, Font.PLAIN, size);
+            if (name.equals(f.getFamily())) {
+                return f;
+            }
+        }
+        return new Font(Font.SANS_SERIF, Font.PLAIN, size);
+    }
+
+    /** Segoe UI Semibold (đẹp như Restaurant), fallback BOLD nếu không có. */
+    private static Font createSemiboldFont(int size) {
+        Font f = new Font("Segoe UI Semibold", Font.PLAIN, size);
+        if ("Segoe UI Semibold".equals(f.getFamily()) || "Segoe UI".equals(f.getFamily())) {
+            return f;
+        }
+        return createModernFont(size).deriveFont(Font.BOLD);
+    }
+
+    /** Font hiện đại dùng chung (Label, Button, TextField, ...). */
+    public static Font getModernFont(int size) {
+        return createModernFont(size);
+    }
+
+    /** Font Semibold cho tiêu đề, nút (giống Restaurant). */
+    public static Font getSemiboldFont(int size) {
+        return createSemiboldFont(size);
     }
 
     /**

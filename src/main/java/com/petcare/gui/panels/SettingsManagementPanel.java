@@ -140,8 +140,14 @@ public class SettingsManagementPanel extends JPanel {
             ));
         }
         if (titleLabel != null) titleLabel.setForeground(ThemeManager.getTitleForeground());
-        if (formPanel != null) formPanel.setBackground(ThemeManager.getFormBackground());
+        if (formPanel != null) {
+            formPanel.setBackground(ThemeManager.getFormBackground());
+            for (Component c : formPanel.getComponents()) {
+                if (c instanceof JLabel) ((JLabel) c).setForeground(ThemeManager.getTitleForeground());
+            }
+        }
         if (centerWrapper != null) centerWrapper.setBackground(ThemeManager.getFormBackground());
+        applyThemeToTextFields();
         if (sideButtonPanel != null) {
             sideButtonPanel.setBackground(ThemeManager.getSideButtonPanelBackground());
             if (saveButton != null) {
@@ -159,18 +165,38 @@ public class SettingsManagementPanel extends JPanel {
 
     private JLabel createLabel(String text) {
         JLabel label = new JLabel(text);
-        label.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        label.setFont(ThemeManager.getModernFont(14));
+        label.setForeground(ThemeManager.getTitleForeground());
         return label;
     }
 
     private JTextField createTextField() {
         JTextField field = new JTextField();
-        field.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        field.setFont(ThemeManager.getModernFont(14));
+        field.setBackground(ThemeManager.getTextFieldBackground());
+        field.setForeground(ThemeManager.getTextFieldForeground());
         field.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(220, 220, 220)),
+                BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
                 BorderFactory.createEmptyBorder(8, 12, 8, 12)
         ));
         return field;
+    }
+
+    private void applyThemeToTextFields() {
+        for (JTextField f : new JTextField[]{
+                clinicNameField, clinicAddress1Field, clinicAddress2Field,
+                phoneNumber1Field, phoneNumber2Field, representativeNameField,
+                checkoutHourField, overtimeFeePerHourField, defaultDailyRateField, signingPlaceField
+        }) {
+            if (f != null) {
+                f.setBackground(ThemeManager.getTextFieldBackground());
+                f.setForeground(ThemeManager.getTextFieldForeground());
+                f.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
+                        BorderFactory.createEmptyBorder(8, 12, 8, 12)
+                ));
+            }
+        }
     }
 
     private void loadSettings() {

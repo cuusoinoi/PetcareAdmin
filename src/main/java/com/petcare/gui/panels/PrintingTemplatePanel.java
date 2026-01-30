@@ -301,11 +301,11 @@ public class PrintingTemplatePanel extends JPanel {
             scrollPane.getHorizontalScrollBar().setBackground(ThemeManager.getContentBackground());
             scrollPane.getHorizontalScrollBar().setOpaque(true);
         }
-        // Áp lại nội dung xem trước theo theme mới; ép JEditorPane refresh để đổi sáng/tối chắc chắn
-        if (lastPreviewFragment != null) {
+        // Áp lại nội dung xem trước theo theme mới (cả placeholder "Chọn hóa đơn và bấm..." và nội dung đã xem)
+        if (previewPane != null) {
             previewPane.setText("");
             previewPane.setContentType("text/html");
-            previewPane.setText(wrapHtml(lastPreviewFragment));
+            previewPane.setText(wrapHtml(lastPreviewFragment != null ? lastPreviewFragment : ""));
             previewPane.setCaretPosition(0);
             previewPane.revalidate();
             previewPane.repaint();

@@ -204,7 +204,7 @@ Dự án áp dụng các design patterns sau:
 - **View**: GUI components (Panels, Dialogs)
 - **Controller**: Service layer
 
-### 8. **Proxy (AOP thủ công)**
+### 8. **Proxy (AOP)**
 - Annotation `@RequireAdmin` đánh dấu method chỉ dành cho ADMIN
 - `PermissionHandler` (InvocationHandler) tạo proxy cho IUserService, IServiceTypeService, IMedicineService, IVaccineTypeService, IGeneralSettingService
 - Trước khi gọi method thật, proxy kiểm tra tham số User trong args và role ADMIN, ném PetcareException nếu không đủ quyền

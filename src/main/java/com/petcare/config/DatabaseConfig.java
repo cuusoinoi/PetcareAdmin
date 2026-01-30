@@ -5,10 +5,6 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Load database configuration from src/main/resources/database.properties.
- * Không hard-code trong code, dễ đổi MySQL/H2 hoặc môi trường.
- */
 public final class DatabaseConfig {
     private static final Logger logger = Logger.getLogger(DatabaseConfig.class.getName());
     private static final String RESOURCE = "database.properties";

@@ -10,9 +10,6 @@ import com.petcare.util.ThemeManager;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * Settings Management Panel - uses GeneralSettingService only
- */
 public class SettingsManagementPanel extends JPanel {
     private JPanel headerPanel;
     private JPanel formPanel;

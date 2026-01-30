@@ -28,9 +28,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Dashboard Panel with stat cards and charts
- */
 public class DashboardPanel extends JPanel {
 
     public DashboardPanel() {
@@ -38,9 +35,6 @@ public class DashboardPanel extends JPanel {
         loadData();
     }
 
-    /**
-     * Gọi khi bấm menu Dashboard để cập nhật lại thẻ thống kê và biểu đồ.
-     */
     public void refreshData() {
         loadData();
     }
@@ -54,11 +48,8 @@ public class DashboardPanel extends JPanel {
         setLayout(new BorderLayout());
         setBackground(ThemeManager.getContentBackground());
 
-        // Top panel with stat cards
         JPanel cardsPanel = createStatCardsPanel();
         add(cardsPanel, BorderLayout.NORTH);
-
-        // Charts panel (will be added in loadData)
     }
 
     private JPanel createStatCardsPanel() {
@@ -81,14 +72,12 @@ public class DashboardPanel extends JPanel {
     }
 
     private void loadDataInternal() {
-        // Get data
         int customerCount = DashboardService.getCustomerCount();
         int petCount = DashboardService.getPetCount();
         int medicalCount = DashboardService.getMedicalRecordCountThisMonth();
         int enclosureCount = DashboardService.getPetEnclosureCountThisMonth();
         long revenue = DashboardService.getInvoiceRevenueThisYear();
 
-        // Calculate percentage changes
         Calendar cal = Calendar.getInstance();
         Date today = cal.getTime();
         cal.add(Calendar.DAY_OF_MONTH, -1);
@@ -112,7 +101,6 @@ public class DashboardPanel extends JPanel {
                 cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1);
         double revenuePercentChange = DashboardService.calculatePercentChange(lastMonthRevenue, thisMonthRevenue);
 
-        // Create stat cards (khoảng cách rộng hơn, mềm mại)
         JPanel cardsPanel = new JPanel(new GridLayout(1, 5, 20, 0));
         cardsPanel.setBorder(BorderFactory.createEmptyBorder(24, 24, 24, 24));
         cardsPanel.setBackground(ThemeManager.getContentBackground());
@@ -128,11 +116,8 @@ public class DashboardPanel extends JPanel {
         cardsPanel.add(createStatCard("Doanh thu", formatCurrency(revenue),
                 new Color(46, 204, 113), revenuePercentChange));
 
-        // Remove old cards panel and add new one
         removeAll();
         add(cardsPanel, BorderLayout.NORTH);
-
-        // Create charts panel (bắt lỗi từng chart để không vỡ cả màn hình)
         JPanel chartsPanel = createChartsPanel();
         add(chartsPanel, BorderLayout.CENTER);
 
@@ -238,7 +223,6 @@ public class DashboardPanel extends JPanel {
         return p;
     }
 
-    /** Áp dụng màu chữ legend theo theme (dark = sáng, light = tối). */
     private void applyChartLegendTheme(JFreeChart chart, Color textColor) {
         if (chart.getLegend() != null) {
             chart.getLegend().setBackgroundPaint(ThemeManager.getFormBackground());
@@ -252,10 +236,8 @@ public class DashboardPanel extends JPanel {
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM");
 
-        // Sort by date so chart shows chronological order
         List<String> sortedKeys = new ArrayList<>(data.keySet());
         Collections.sort(sortedKeys);
-
         for (String dateKey : sortedKeys) {
             Integer value = data.get(dateKey);
             if (value == null) value = 0;
@@ -318,10 +300,8 @@ public class DashboardPanel extends JPanel {
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM");
 
-        // Sort by date so chart shows chronological order
         List<String> sortedKeys = new ArrayList<>(data.keySet());
         Collections.sort(sortedKeys);
-
         for (String dateKey : sortedKeys) {
             Map<String, Integer> dayData = data.get(dateKey);
             int checkin = dayData != null ? dayData.getOrDefault("checkin", 0) : 0;
@@ -388,7 +368,6 @@ public class DashboardPanel extends JPanel {
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM");
         SimpleDateFormat outputFormat = new SimpleDateFormat("MM/yyyy");
 
-        // Sort by month so chart shows chronological order
         List<String> sortedKeys = new ArrayList<>(data.keySet());
         Collections.sort(sortedKeys);
 
@@ -472,7 +451,6 @@ public class DashboardPanel extends JPanel {
         try {
             plot.setLabelGenerator(new StandardPieSectionLabelGenerator("{0}: {1} ({2})"));
         } catch (Exception ignored) {
-            // Giữ mặc định nếu format lỗi
         }
         applyChartLegendTheme(chart, textColor);
 

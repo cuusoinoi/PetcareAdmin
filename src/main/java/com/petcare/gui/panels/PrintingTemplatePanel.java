@@ -13,9 +13,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-/**
- * Panel Mẫu in lưu chuồng: chọn hóa đơn, xem Giấy cam kết / Hóa đơn lưu chuồng, in trang hiện tại.
- */
 public class PrintingTemplatePanel extends JPanel {
     private JPanel headerPanel;
     private JLabel titleLabel;
@@ -28,9 +25,6 @@ public class PrintingTemplatePanel extends JPanel {
     private JEditorPane previewPane;
     private final InvoiceService invoiceService = InvoiceService.getInstance();
     private static final SimpleDateFormat SDF_DATE_TIME = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-    /**
-     * Fragment HTML đang xem (để áp dụng lại theme khi đổi sáng/tối).
-     */
     private String lastPreviewFragment;
 
     public PrintingTemplatePanel() {
@@ -181,11 +175,6 @@ public class PrintingTemplatePanel extends JPanel {
         }
     }
 
-    /**
-     * Bọc nội dung HTML và áp dụng theme (sáng/tối) cho vùng xem trước.
-     * Luôn dùng bản gốc bodyContent: khi tối chỉ thay màu bản sao để hiển thị, không lưu bản đã thay.
-     * bodyContent null hoặc rỗng = hiển thị hướng dẫn.
-     */
     private String wrapHtml(String bodyContent) {
         boolean dark = ThemeManager.isDarkMode();
         String bgHex = dark ? "#2d2d2d" : "#ffffff";
@@ -194,7 +183,6 @@ public class PrintingTemplatePanel extends JPanel {
         String thBgHex = dark ? "#3d3d3d" : "#f5f5f5";
         String trAltHex = dark ? "#383838" : "#f9f9f9";
         String totalColorHex = dark ? "#ff8a80" : "#dc3545";
-        // Cả sáng và tối đều có style block để JEditorPane luôn áp theme mới, tránh cache cũ
         String styleBlock = "<style type=\"text/css\">"
                 + "body { background: " + bgHex + " !important; color: " + fgHex + " !important; }"
                 + "div.invoice-sheet, div.commitment-sheet { background: " + bgHex + " !important; color: " + fgHex + " !important; }"
@@ -206,8 +194,6 @@ public class PrintingTemplatePanel extends JPanel {
                 + "</style>";
         String inner;
         if (bodyContent != null && !bodyContent.isEmpty()) {
-            // Chế độ tối: thay màu inline trên bản sao để hiển thị (JEditorPane có thể bỏ qua CSS)
-            // Chế độ sáng: dùng nguyên bản (màu trắng/xám sáng). Không lưu bản đã thay vào lastPreviewFragment.
             if (dark) {
                 inner = bodyContent
                         .replace("background: #f5f5f5", "background: #3d3d3d")
@@ -219,7 +205,6 @@ public class PrintingTemplatePanel extends JPanel {
                         .replace("color: #dc3545", "color: #ff8a80")
                         .replace("color:#dc3545", "color:#ff8a80");
             } else {
-                // Đảm bảo chế độ sáng: đưa lại màu gốc nếu fragment đã từng bị thay (ví dụ do lỗi)
                 inner = bodyContent
                         .replace("background: #3d3d3d", "background: #f5f5f5")
                         .replace("background:#3d3d3d", "background:#f5f5f5")
@@ -301,7 +286,6 @@ public class PrintingTemplatePanel extends JPanel {
             scrollPane.getHorizontalScrollBar().setBackground(ThemeManager.getContentBackground());
             scrollPane.getHorizontalScrollBar().setOpaque(true);
         }
-        // Áp lại nội dung xem trước theo theme mới (cả placeholder "Chọn hóa đơn và bấm..." và nội dung đã xem)
         if (previewPane != null) {
             previewPane.setText("");
             previewPane.setContentType("text/html");

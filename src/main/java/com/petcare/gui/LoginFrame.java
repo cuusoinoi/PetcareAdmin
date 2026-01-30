@@ -10,9 +10,6 @@ import com.petcare.util.ThemeManager;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * Login Frame for Petcare Admin
- */
 public class LoginFrame extends JFrame {
     private JTextField usernameField;
     private JPasswordField passwordField;
@@ -30,13 +27,10 @@ public class LoginFrame extends JFrame {
         setLocationRelativeTo(null);
         setResizable(false);
 
-        // Main panel
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(Color.WHITE);
-
-        // Header
         JPanel headerPanel = new JPanel();
-        headerPanel.setBackground(new Color(139, 69, 19)); // Brown color
+        headerPanel.setBackground(new Color(139, 69, 19));
         headerPanel.setPreferredSize(new Dimension(0, 120));
 
         JLabel titleLabel = new JLabel("UIT PETCARE", SwingConstants.CENTER);
@@ -46,42 +40,30 @@ public class LoginFrame extends JFrame {
         titleLabel.setFont(ThemeManager.getSemiboldFont(32));
         titleLabel.setForeground(Color.WHITE);
         headerPanel.add(titleLabel);
-
-        // Login form panel
         JPanel formPanel = new JPanel();
         formPanel.setLayout(null);
         formPanel.setBackground(Color.WHITE);
         formPanel.setPreferredSize(new Dimension(0, 400));
-
-        // Username label
         JLabel usernameLabel = new JLabel("Tên đăng nhập:");
         usernameLabel.setBounds(50, 50, 300, 25);
         usernameLabel.setFont(ThemeManager.getModernFont(14));
         formPanel.add(usernameLabel);
-
-        // Username field
         usernameField = new JTextField();
         usernameField.setBounds(50, 80, 350, 40);
         usernameField.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
         usernameField.putClientProperty("JTextField.placeholderText", "Nhập tên đăng nhập");
         usernameField.setFont(ThemeManager.getModernFont(14));
         formPanel.add(usernameField);
-
-        // Password label
         JLabel passwordLabel = new JLabel("Mật khẩu:");
         passwordLabel.setBounds(50, 140, 300, 25);
         passwordLabel.setFont(ThemeManager.getModernFont(14));
         formPanel.add(passwordLabel);
-
-        // Password field
         passwordField = new JPasswordField();
         passwordField.setBounds(50, 170, 350, 40);
         passwordField.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
         passwordField.putClientProperty("JTextField.placeholderText", "Nhập mật khẩu");
         passwordField.setFont(ThemeManager.getModernFont(14));
         formPanel.add(passwordField);
-
-        // Login button
         loginButton = new JButton("Đăng nhập");
         loginButton.setBounds(50, 250, 350, 45);
         loginButton.setBackground(new Color(139, 69, 19));
@@ -90,8 +72,6 @@ public class LoginFrame extends JFrame {
         loginButton.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
         loginButton.addActionListener(e -> performLogin());
         formPanel.add(loginButton);
-
-        // Info label
         JLabel infoLabel = new JLabel("<html><center>Mặc định: admin / 123456</center></html>",
                 SwingConstants.CENTER);
         infoLabel.setBounds(50, 310, 350, 40);
@@ -103,14 +83,11 @@ public class LoginFrame extends JFrame {
         mainPanel.add(formPanel, BorderLayout.CENTER);
 
         add(mainPanel);
-
-        // Set default values for testing
         usernameField.setText("admin");
         passwordField.setText("123456");
     }
 
     private void setupUI() {
-        // Allow Enter key to trigger login
         passwordField.addActionListener(e -> performLogin());
     }
 

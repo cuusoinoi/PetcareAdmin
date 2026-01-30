@@ -8,9 +8,6 @@ import com.petcare.util.ThemeManager;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * Sidebar navigation for Petcare Admin
- */
 public class Sidebar extends JPanel {
     private DashboardFrame dashboard;
     private ButtonGroup buttonGroup;
@@ -39,10 +36,9 @@ public class Sidebar extends JPanel {
 
     private void initComponents() {
         setLayout(new BorderLayout());
-        setBackground(new Color(139, 69, 19)); // Brown color
+        setBackground(new Color(139, 69, 19));
         setPreferredSize(new Dimension(300, 0));
 
-        // Header
         JPanel headerPanel = new JPanel();
         headerPanel.setBackground(new Color(139, 69, 19));
         headerPanel.setPreferredSize(new Dimension(0, 80));
@@ -58,114 +54,70 @@ public class Sidebar extends JPanel {
 
         add(headerPanel, BorderLayout.NORTH);
 
-        // Menu items panel - BoxLayout so buttons keep preferred width, icon+text stay on one line
         JPanel menuPanel = new JPanel();
         menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
         menuPanel.setBackground(new Color(139, 69, 19));
         menuPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Dashboard
         dashboardBtn = createMenuButton("📊", "Dashboard", true);
         dashboardBtn.addActionListener(e -> dashboard.showDashboard());
         menuPanel.add(dashboardBtn);
-
-        // Separator
         menuPanel.add(createSeparator("QUẢN LÝ CHÍNH"));
-
-        // Customer
         customerBtn = createMenuButton("👥", "Khách hàng", false);
         customerBtn.addActionListener(e -> dashboard.showCustomerManagement());
         menuPanel.add(customerBtn);
-
-        // Pet
         petBtn = createMenuButton("🐾", "Thú cưng", false);
         petBtn.addActionListener(e -> dashboard.showPetManagement());
         menuPanel.add(petBtn);
-
-        // Doctor
         doctorBtn = createMenuButton("👨‍⚕️", "Bác sĩ", false);
         doctorBtn.addActionListener(e -> dashboard.showDoctorManagement());
         menuPanel.add(doctorBtn);
-
-        // Separator
         menuPanel.add(createSeparator("KHÁM & ĐIỀU TRỊ"));
-
-        // Medical Record
         medicalRecordBtn = createMenuButton("📋", "Hồ sơ khám bệnh", false);
         medicalRecordBtn.addActionListener(e -> dashboard.showMedicalRecordManagement());
         menuPanel.add(medicalRecordBtn);
-
-        // Vaccination
         vaccinationBtn = createMenuButton("💉", "Tiêm chủng", false);
         vaccinationBtn.addActionListener(e -> dashboard.showVaccinationManagement());
         menuPanel.add(vaccinationBtn);
-
-        // Treatment
         treatmentBtn = createMenuButton("🏥", "Liệu trình điều trị", false);
         treatmentBtn.addActionListener(e -> dashboard.showTreatmentManagement());
         menuPanel.add(treatmentBtn);
-
-        // Separator
         menuPanel.add(createSeparator("DỊCH VỤ"));
-
-        // Pet Enclosure
         enclosureBtn = createMenuButton("🏠", "Lưu chuồng", false);
         enclosureBtn.addActionListener(e -> dashboard.showEnclosureManagement());
         menuPanel.add(enclosureBtn);
-
-        // Appointment
         appointmentBtn = createMenuButton("📅", "Lịch hẹn", false);
         appointmentBtn.addActionListener(e -> dashboard.showAppointmentManagement());
         menuPanel.add(appointmentBtn);
-
-        // Invoice
         invoiceBtn = createMenuButton("🧾", "Hóa đơn", false);
         invoiceBtn.addActionListener(e -> dashboard.showInvoiceManagement());
         menuPanel.add(invoiceBtn);
-
-        // Printing Template (Mẫu in lưu chuồng)
         printingTemplateBtn = createMenuButton("📄", "Mẫu in lưu chuồng", false);
         printingTemplateBtn.addActionListener(e -> dashboard.showPrintingTemplate());
         menuPanel.add(printingTemplateBtn);
-
-        // Separator
         menuPanel.add(createSeparator("DANH MỤC"));
-
-        // Service Types
         serviceTypeBtn = createMenuButton("🛎️", "Dịch vụ", false);
         serviceTypeBtn.addActionListener(e -> dashboard.showServiceTypeManagement());
         menuPanel.add(serviceTypeBtn);
-
-        // Medicines
         medicineBtn = createMenuButton("💊", "Thuốc", false);
         medicineBtn.addActionListener(e -> dashboard.showMedicineManagement());
         menuPanel.add(medicineBtn);
-
-        // Vaccine Types
         vaccineTypeBtn = createMenuButton("💉", "Vaccine", false);
         vaccineTypeBtn.addActionListener(e -> dashboard.showVaccineTypeManagement());
         menuPanel.add(vaccineTypeBtn);
-
-        // Separator
         menuPanel.add(createSeparator("HỆ THỐNG"));
-
-        // Users
         userBtn = createMenuButton("👤", "Người dùng", false);
         userBtn.addActionListener(e -> dashboard.showUserManagement());
         menuPanel.add(userBtn);
-
-        // Settings
         settingsBtn = createMenuButton("⚙️", "Cài đặt", false);
         settingsBtn.addActionListener(e -> dashboard.showSettingsManagement());
         menuPanel.add(settingsBtn);
 
-        // Scroll pane for menu (chỉ cuộn dọc, không cuộn ngang)
         JScrollPane scrollPane = new JScrollPane(menuPanel);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setBorder(null);
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
-        // Thanh cuộn dễ nhìn, dễ bấm: rộng hơn, màu tương phản với nền nâu
         javax.swing.JScrollBar verticalBar = scrollPane.getVerticalScrollBar();
         verticalBar.setUnitIncrement(16);
         verticalBar.setPreferredSize(new Dimension(12, 0));
@@ -177,12 +129,9 @@ public class Sidebar extends JPanel {
                 + "width:12");
         add(scrollPane, BorderLayout.CENTER);
 
-        // Footer with theme toggle and logout
         JPanel footerPanel = new JPanel(new GridLayout(2, 1, 5, 5));
         footerPanel.setBackground(new Color(139, 69, 19));
         footerPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        // Theme toggle button
         JButton themeToggleBtn = new JButton("Giao diện tối");
         themeToggleBtn.setIcon(EmojiFontHelper.createEmojiIcon("🌙"));
         themeToggleBtn.setHorizontalTextPosition(SwingConstants.RIGHT);
@@ -196,13 +145,10 @@ public class Sidebar extends JPanel {
         themeToggleBtn.addActionListener(e -> {
             com.petcare.util.ThemeManager.toggleTheme();
             updateThemeButton(themeToggleBtn);
-            // Refresh UI
             dashboard.refreshTheme();
         });
         updateThemeButton(themeToggleBtn);
         footerPanel.add(themeToggleBtn);
-
-        // Logout button
         JButton logoutBtn = new JButton("Đăng xuất");
         logoutBtn.setIcon(EmojiFontHelper.createEmojiIcon("🚪"));
         logoutBtn.setHorizontalTextPosition(SwingConstants.RIGHT);
@@ -235,8 +181,6 @@ public class Sidebar extends JPanel {
         btn.setMinimumSize(new Dimension(270, 40));
         btn.setPreferredSize(new Dimension(270, 40));
         btn.setMaximumSize(new Dimension(270, 40));
-
-        // Hover effect
         btn.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -266,10 +210,7 @@ public class Sidebar extends JPanel {
     }
 
     public void setSelectedButton(JToggleButton button) {
-        // Reset all buttons
         resetAllButtons();
-
-        // Set selected button
         if (button != null) {
             button.setSelected(true);
             button.setBackground(new Color(160, 90, 30));

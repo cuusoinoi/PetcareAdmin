@@ -12,9 +12,6 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * H2: sau khi kết nối, chạy schema-and-data-h2.sql (DROP bảng cũ, tạo mới, INSERT toàn bộ).
- */
 public class H2DatabaseInitStrategy implements DatabaseInitStrategy {
     private static final Logger logger = Logger.getLogger(H2DatabaseInitStrategy.class.getName());
     private static final String SCRIPT = "schema-and-data-h2.sql";

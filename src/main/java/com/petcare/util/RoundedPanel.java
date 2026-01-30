@@ -4,10 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 
-/**
- * Panel có nền và viền bo góc (mềm mại, hiện đại).
- * Dùng cho card thống kê, khung biểu đồ, v.v.
- */
 public class RoundedPanel extends JPanel {
     private final int radius;
     private final Color borderColor;
@@ -32,10 +28,8 @@ public class RoundedPanel extends JPanel {
         int w = getWidth();
         int h = getHeight();
         int r = Math.min(radius, Math.min(w, h) / 2);
-        // Nền bo góc
         g2.setColor(getBackground());
         g2.fill(new RoundRectangle2D.Float(0, 0, w, h, r * 2f, r * 2f));
-        // Viền bo góc (mảnh, mềm)
         g2.setColor(borderColor);
         g2.setStroke(new BasicStroke(borderThickness));
         g2.draw(new RoundRectangle2D.Float(borderThickness / 2, borderThickness / 2,

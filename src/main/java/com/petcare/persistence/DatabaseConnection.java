@@ -14,10 +14,6 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Quản lý kết nối DB. Cấu hình từ src/main/resources/database.properties.
- * Strategy: H2 → chạy schema-and-data-h2.sql; MySQL → chỉ kết nối, không tạo dữ liệu.
- */
 public class DatabaseConnection {
     private static final Logger logger = Logger.getLogger(DatabaseConnection.class.getName());
     private static Connection connection;
@@ -46,7 +42,6 @@ public class DatabaseConnection {
                     } catch (Exception e) {
                         logger.log(Level.WARNING, "Database init strategy failed", e);
                     }
-                    // H2 RunScript có thể đóng connection; lấy connection mới cho các thao tác sau
                     if (connection == null || connection.isClosed()) {
                         connection = DriverManager.getConnection(
                                 DatabaseConfig.getUrl(),
@@ -66,10 +61,6 @@ public class DatabaseConnection {
         }
     }
 
-    /**
-     * Trả về connection wrapper: gọi close() trên connection này sẽ KHÔNG đóng connection thật,
-     * để tránh repository/service dùng try-with-resources đóng nhầm connection dùng chung.
-     */
     public static Connection getConnection() throws PetcareException {
         try {
             if (connection == null || connection.isClosed()) {

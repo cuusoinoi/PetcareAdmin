@@ -26,9 +26,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-/**
- * In hóa đơn, phiếu khám: tạo HTML và mở trong trình duyệt mặc định (Ctrl+P để in).
- */
 public class PrintHelper {
 
     private static String escapeHtml(String s) {
@@ -48,9 +45,6 @@ public class PrintHelper {
         return String.format("%,d", n);
     }
 
-    /**
-     * Mở HTML trong trình duyệt mặc định (người dùng bấm Ctrl+P để in).
-     */
     public static void openInBrowser(String html, String filename) throws IOException {
         File tmp = File.createTempFile(filename, ".html");
         tmp.deleteOnExit();
@@ -62,9 +56,6 @@ public class PrintHelper {
         }
     }
 
-    /**
-     * Tạo HTML in hóa đơn và mở trong trình duyệt.
-     */
     public static void printInvoice(int invoiceId) throws PetcareException, IOException {
         InvoiceInfoDto info = InvoiceService.getInstance().getInvoiceInfo(invoiceId);
         if (info == null) throw new PetcareException("Không tìm thấy hóa đơn #" + invoiceId);
@@ -120,9 +111,6 @@ public class PrintHelper {
         openInBrowser(html, "invoice-" + invoiceId);
     }
 
-    /**
-     * Tạo HTML in phiếu khám và mở trong trình duyệt.
-     */
     public static void printMedicalRecord(int recordId) throws PetcareException, IOException {
         MedicalRecord record = MedicalRecordService.getInstance().getRecordById(recordId);
         if (record == null) throw new PetcareException("Không tìm thấy phiếu khám #" + recordId);
@@ -162,10 +150,6 @@ public class PrintHelper {
         openInBrowser(html, "medical-record-" + recordId);
     }
 
-    /**
-     * Tạo HTML Giấy cam kết lưu chuồng (chỉ nội dung, không wrapper) để hiển thị trong panel hoặc in.
-     * Trả về null nếu hóa đơn không gắn lưu chuồng.
-     */
     public static String buildCommitmentHtml(int invoiceId) throws PetcareException {
         InvoiceEntity invoice = InvoiceService.getInstance().getInvoiceEntity(invoiceId);
         if (invoice == null) return "<p>Không tìm thấy hóa đơn.</p>";
@@ -254,9 +238,6 @@ public class PrintHelper {
         return sb.toString();
     }
 
-    /**
-     * Tạo HTML mẫu Hóa đơn lưu chuồng (chỉ nội dung) theo load_invoice.php.
-     */
     public static String buildInvoiceTemplateHtml(int invoiceId) throws PetcareException {
         InvoiceInfoDto info = InvoiceService.getInstance().getInvoiceInfo(invoiceId);
         if (info == null) return "<p>Không tìm thấy hóa đơn.</p>";

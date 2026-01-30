@@ -290,14 +290,14 @@ CREATE TABLE otp_codes (
 -- PHẦN 2: DỮ LIỆU MẪU
 -- =====================================================
 
--- === USERS (Password: 123456 - MD5 hash) ===
+-- === USERS (admin/123456, staff/654321, 0901234567/123456). Mật khẩu BCrypt. ===
 INSERT INTO users (username, password, fullname, avatar, role, created_at) VALUES
-('admin', 'e10adc3949ba59abbe56e057f20f883e', 'Quản trị viên', NULL, 'admin', NOW()),
-('lethimai', 'e3afed0047b08059d0fada10f400c1e5', 'Lê Thị Mai', NULL, 'staff', NOW()),
-('tranhung', 'e3afed0047b08059d0fada10f400c1e5', 'Trần Văn Hùng', NULL, 'staff', NOW()),
-('nguyenlan', 'e3afed0047b08059d0fada10f400c1e5', 'Nguyễn Thị Lan', NULL, 'staff', NOW()),
-('phamquang', 'e3afed0047b08059d0fada10f400c1e5', 'Phạm Quang Minh', NULL, 'staff', NOW()),
-('0901234567', 'e10adc3949ba59abbe56e057f20f883e', 'Khách hàng', NULL, 'customer', NOW());
+('admin', '$2a$10$N9qo8uLOickgx2ZMRZoMyeapvT9gqHHhU1pKuMj2cpskE48fM3Kwy', 'Quản trị viên', NULL, 'admin', NOW()),
+('lethimai', '$2a$10$EixZaYVK1fsbw1ZfbX3OXeabk2r5C7ovVRf5NIaezHaxeq67HvBQS', 'Lê Thị Mai', NULL, 'staff', NOW()),
+('tranhung', '$2a$10$EixZaYVK1fsbw1ZfbX3OXeabk2r5C7ovVRf5NIaezHaxeq67HvBQS', 'Trần Văn Hùng', NULL, 'staff', NOW()),
+('nguyenlan', '$2a$10$EixZaYVK1fsbw1ZfbX3OXeabk2r5C7ovVRf5NIaezHaxeq67HvBQS', 'Nguyễn Thị Lan', NULL, 'staff', NOW()),
+('phamquang', '$2a$10$EixZaYVK1fsbw1ZfbX3OXeabk2r5C7ovVRf5NIaezHaxeq67HvBQS', 'Phạm Quang Minh', NULL, 'staff', NOW()),
+('0901234567', '$2a$10$N9qo8uLOickgx2ZMRZoMyeapvT9gqHHhU1pKuMj2cpskE48fM3Kwy', 'Khách hàng', NULL, 'customer', NOW());
 
 -- === SERVICE TYPES ===
 INSERT INTO service_types (service_name, description, price) VALUES

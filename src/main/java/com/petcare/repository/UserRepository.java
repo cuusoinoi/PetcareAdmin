@@ -53,6 +53,24 @@ public class UserRepository implements IUserRepository {
     }
 
     @Override
+    public UserEntity findByUsername(String username) throws PetcareException {
+        String query = "SELECT id, username, password, fullname, avatar, role FROM users " +
+                "WHERE username = ? AND role IN ('admin', 'staff')";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToEntity(rs);
+                }
+            }
+        } catch (SQLException ex) {
+            throw new PetcareException("Lỗi xác thực đăng nhập", ex);
+        }
+        return null;
+    }
+
+    @Override
     public UserEntity findByUsernameAndPassword(String username, String hashedPassword) throws PetcareException {
         String query = "SELECT id, username, password, fullname, avatar, role FROM users " +
                 "WHERE username = ? AND password = ? AND role IN ('admin', 'staff')";

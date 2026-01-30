@@ -15,6 +15,8 @@ public interface IUserRepository {
 
     UserEntity findById(int id) throws PetcareException;
 
+    UserEntity findByUsername(String username) throws PetcareException;
+
     UserEntity findByUsernameAndPassword(String username, String hashedPassword) throws PetcareException;
 
     int insert(UserEntity entity) throws PetcareException;

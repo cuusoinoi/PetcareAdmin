@@ -5,14 +5,15 @@ import com.petcare.model.entity.UserEntity;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.repository.IUserRepository;
 import com.petcare.repository.UserRepository;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.security.MessageDigest;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * User Service - Business logic for User
- * Singleton; Entity ↔ Domain; MD5 hashing for password
+ * User Service - Business logic for User.
+ * Singleton; Entity ↔ Domain; BCrypt for password hashing (legacy MD5 supported on login, then upgraded).
  */
 public class UserService {
     private static UserService instance;
@@ -37,12 +38,26 @@ public class UserService {
 
     /**
      * Authenticate user by username and plain password.
+     * Supports BCrypt (current) and legacy MD5; on successful MD5 login, password is re-hashed to BCrypt.
      * Returns domain User if valid, null otherwise.
      */
     public User authenticate(String username, String plainPassword) throws PetcareException {
-        String hashed = md5(plainPassword);
-        UserEntity entity = repository.findByUsernameAndPassword(username, hashed);
-        return entity != null ? entityToDomain(entity) : null;
+        UserEntity entity = repository.findByUsername(username);
+        if (entity == null) {
+            return null;
+        }
+        String storedHash = entity.getPassword();
+        boolean match = false;
+        if (isBcryptHash(storedHash)) {
+            match = BCrypt.checkpw(plainPassword, storedHash);
+        } else {
+            match = md5(plainPassword).equals(storedHash);
+            if (match) {
+                String newHash = BCrypt.hashpw(plainPassword, BCrypt.gensalt());
+                repository.updatePassword(entity.getId(), newHash);
+            }
+        }
+        return match ? entityToDomain(entity) : null;
     }
 
     public List<User> getAllUsers() throws PetcareException {
@@ -64,7 +79,7 @@ public class UserService {
             throw new PetcareException("Username đã tồn tại!");
         }
         UserEntity entity = domainToEntity(user);
-        entity.setPassword(md5(plainPassword));
+        entity.setPassword(BCrypt.hashpw(plainPassword, BCrypt.gensalt())); // salt ngẫu nhiên mỗi lần
         entity.setRole(roleToDb(user.getRole()));
         int result = repository.insert(entity);
         if (result > 0) {
@@ -109,7 +124,7 @@ public class UserService {
         if (existing == null) {
             throw new PetcareException("Không tìm thấy người dùng với ID: " + userId);
         }
-        String hashed = md5(newPlainPassword);
+        String hashed = BCrypt.hashpw(newPlainPassword, BCrypt.gensalt()); // salt ngẫu nhiên
         int result = repository.updatePassword(userId, hashed);
         if (result == 0) {
             throw new PetcareException("Không thể đổi mật khẩu");
@@ -120,10 +135,14 @@ public class UserService {
         return repository.existsByUsername(username);
     }
 
+    private static boolean isBcryptHash(String s) {
+        return s != null && (s.startsWith("$2a$") || s.startsWith("$2b$") || s.startsWith("$2y$"));
+    }
+
     private static String md5(String input) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] digest = md.digest(input.getBytes());
+            byte[] digest = md.digest(input.getBytes(java.nio.charset.StandardCharsets.UTF_8));
             StringBuilder sb = new StringBuilder();
             for (byte b : digest) {
                 sb.append(String.format("%02x", b & 0xff));

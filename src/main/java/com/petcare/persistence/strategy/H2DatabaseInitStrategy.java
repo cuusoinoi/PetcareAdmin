@@ -28,7 +28,7 @@ public class H2DatabaseInitStrategy implements DatabaseInitStrategy {
             try (var reader = new InputStreamReader(withoutBom, StandardCharsets.UTF_8)) {
                 RunScript.execute(conn, reader);
             }
-            logger.info("H2: " + SCRIPT + " OK. Login: admin / 123456");
+            logger.info("H2: " + SCRIPT + " OK. Login: admin / 123456 (mật khẩu BCrypt)");
         } catch (IOException | SQLException ex) {
             logger.log(Level.WARNING, "H2: lỗi khi chạy " + SCRIPT, ex);
         }

@@ -1,4 +1,4 @@
-﻿-- =====================================================
+-- =====================================================
 -- PETCARE - H2 Schema (tương thích với petcare_mysql_database.sql)
 -- Chạy script này khi dùng H2 (file: ./data/petcare)
 -- ENUM MySQL -> VARCHAR trong H2
@@ -283,14 +283,14 @@ CREATE TABLE otp_codes (
 -- NOW() đã đổi thành CURRENT_TIMESTAMP cho H2.
 -- =====================================================
 
--- === USERS (Password: 123456 = e10adc..., 654321 = e3afed...) ===
+-- === USERS (admin/123456, staff/654321, 0901234567/123456). Mật khẩu BCrypt. ===
 INSERT INTO users (username, password, fullname, avatar, role, created_at) VALUES
-('admin', 'e10adc3949ba59abbe56e057f20f883e', 'Quản trị viên', NULL, 'admin', CURRENT_TIMESTAMP),
-('lethimai', 'e3afed0047b08059d0fada10f400c1e5', 'Lê Thị Mai', NULL, 'staff', CURRENT_TIMESTAMP),
-('tranhung', 'e3afed0047b08059d0fada10f400c1e5', 'Trần Văn Hùng', NULL, 'staff', CURRENT_TIMESTAMP),
-('nguyenlan', 'e3afed0047b08059d0fada10f400c1e5', 'Nguyễn Thị Lan', NULL, 'staff', CURRENT_TIMESTAMP),
-('phamquang', 'e3afed0047b08059d0fada10f400c1e5', 'Phạm Quang Minh', NULL, 'staff', CURRENT_TIMESTAMP),
-('0901234567', 'e10adc3949ba59abbe56e057f20f883e', 'Khách hàng', NULL, 'customer', CURRENT_TIMESTAMP);
+('admin', '$2a$10$N9qo8uLOickgx2ZMRZoMyeapvT9gqHHhU1pKuMj2cpskE48fM3Kwy', 'Quản trị viên', NULL, 'admin', CURRENT_TIMESTAMP),
+('lethimai', '$2a$10$EixZaYVK1fsbw1ZfbX3OXeabk2r5C7ovVRf5NIaezHaxeq67HvBQS', 'Lê Thị Mai', NULL, 'staff', CURRENT_TIMESTAMP),
+('tranhung', '$2a$10$EixZaYVK1fsbw1ZfbX3OXeabk2r5C7ovVRf5NIaezHaxeq67HvBQS', 'Trần Văn Hùng', NULL, 'staff', CURRENT_TIMESTAMP),
+('nguyenlan', '$2a$10$EixZaYVK1fsbw1ZfbX3OXeabk2r5C7ovVRf5NIaezHaxeq67HvBQS', 'Nguyễn Thị Lan', NULL, 'staff', CURRENT_TIMESTAMP),
+('phamquang', '$2a$10$EixZaYVK1fsbw1ZfbX3OXeabk2r5C7ovVRf5NIaezHaxeq67HvBQS', 'Phạm Quang Minh', NULL, 'staff', CURRENT_TIMESTAMP),
+('0901234567', '$2a$10$N9qo8uLOickgx2ZMRZoMyeapvT9gqHHhU1pKuMj2cpskE48fM3Kwy', 'Khách hàng', NULL, 'customer', CURRENT_TIMESTAMP);
 
 -- === SERVICE TYPES ===
 INSERT INTO service_types (service_name, description, price) VALUES

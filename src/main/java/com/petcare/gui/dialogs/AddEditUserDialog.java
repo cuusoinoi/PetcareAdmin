@@ -6,6 +6,7 @@ import com.petcare.model.exception.PetcareException;
 import com.petcare.service.IUserService;
 import com.petcare.service.UserService;
 import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.GUIUtil;
 import com.petcare.util.ThemeManager;
 
 import javax.swing.*;
@@ -41,7 +42,7 @@ public class AddEditUserDialog extends JDialog {
     }
 
     private void initComponents() {
-        setSize(450, 300);
+        setSize(520, 320);
         setLocationRelativeTo(getParent());
         setLayout(new BorderLayout());
         getContentPane().setBackground(ThemeManager.getContentBackground());
@@ -55,7 +56,7 @@ public class AddEditUserDialog extends JDialog {
         formPanel.add(usernameField);
 
         formPanel.add(createLabel("Mật khẩu" + (user == null ? " *:" : ":")));
-        passwordField = new JPasswordField();
+        passwordField = new JPasswordField(GUIUtil.TEXT_FIELD_COLUMNS);
         passwordField.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         passwordField.setBackground(ThemeManager.getTextFieldBackground());
         passwordField.setForeground(ThemeManager.getTextFieldForeground());
@@ -114,7 +115,7 @@ public class AddEditUserDialog extends JDialog {
     }
 
     private JTextField createTextField() {
-        JTextField field = new JTextField();
+        JTextField field = new JTextField(GUIUtil.TEXT_FIELD_COLUMNS);
         field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         field.setBackground(ThemeManager.getTextFieldBackground());
         field.setForeground(ThemeManager.getTextFieldForeground());

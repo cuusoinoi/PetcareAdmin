@@ -8,6 +8,7 @@ import com.petcare.service.PetService;
 import com.petcare.service.PetVaccinationService;
 import com.petcare.service.VaccineTypeService;
 import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.GUIUtil;
 import com.petcare.util.ThemeManager;
 
 import javax.swing.*;
@@ -156,7 +157,7 @@ public class AddEditVaccinationDialog extends JDialog {
     }
 
     private JTextField createTextField() {
-        JTextField field = new JTextField();
+        JTextField field = new JTextField(GUIUtil.TEXT_FIELD_COLUMNS);
         field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         field.setBackground(ThemeManager.getTextFieldBackground());
         field.setForeground(ThemeManager.getTextFieldForeground());

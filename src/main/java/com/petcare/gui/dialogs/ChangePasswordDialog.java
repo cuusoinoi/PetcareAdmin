@@ -6,6 +6,7 @@ import com.petcare.model.exception.PetcareException;
 import com.petcare.service.IUserService;
 import com.petcare.service.UserService;
 import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.GUIUtil;
 import com.petcare.util.ThemeManager;
 
 import javax.swing.*;
@@ -32,7 +33,7 @@ public class ChangePasswordDialog extends JDialog {
     }
 
     private void initComponents() {
-        setSize(400, 200);
+        setSize(480, 220);
         setLocationRelativeTo(getParent());
         setLayout(new BorderLayout());
         getContentPane().setBackground(ThemeManager.getContentBackground());
@@ -42,7 +43,7 @@ public class ChangePasswordDialog extends JDialog {
         formPanel.setBackground(ThemeManager.getContentBackground());
 
         formPanel.add(createLabel("Mật khẩu mới *:"));
-        newPasswordField = new JPasswordField();
+        newPasswordField = new JPasswordField(GUIUtil.TEXT_FIELD_COLUMNS);
         newPasswordField.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         newPasswordField.setBackground(ThemeManager.getTextFieldBackground());
         newPasswordField.setForeground(ThemeManager.getTextFieldForeground());
@@ -54,7 +55,7 @@ public class ChangePasswordDialog extends JDialog {
         formPanel.add(newPasswordField);
 
         formPanel.add(createLabel("Xác nhận mật khẩu *:"));
-        confirmPasswordField = new JPasswordField();
+        confirmPasswordField = new JPasswordField(GUIUtil.TEXT_FIELD_COLUMNS);
         confirmPasswordField.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         confirmPasswordField.setBackground(ThemeManager.getTextFieldBackground());
         confirmPasswordField.setForeground(ThemeManager.getTextFieldForeground());

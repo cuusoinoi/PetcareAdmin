@@ -7,6 +7,7 @@ import com.petcare.model.exception.PetcareException;
 import com.petcare.service.IVaccineTypeService;
 import com.petcare.service.VaccineTypeService;
 import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.GUIUtil;
 import com.petcare.util.ThemeManager;
 
 import javax.swing.*;
@@ -39,7 +40,7 @@ public class AddEditVaccineTypeDialog extends JDialog {
     }
 
     private void initComponents() {
-        setSize(500, 300);
+        setSize(560, 320);
         setLocationRelativeTo(getParent());
         setLayout(new BorderLayout());
         getContentPane().setBackground(ThemeManager.getContentBackground());
@@ -53,7 +54,7 @@ public class AddEditVaccineTypeDialog extends JDialog {
         formPanel.add(vaccineNameField);
 
         formPanel.add(createLabel("Mô tả:"));
-        descriptionArea = new JTextArea(3, 20);
+        descriptionArea = new JTextArea(3, GUIUtil.TEXT_FIELD_COLUMNS);
         descriptionArea.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         descriptionArea.setBackground(ThemeManager.getTextFieldBackground());
         descriptionArea.setForeground(ThemeManager.getTextFieldForeground());
@@ -98,7 +99,7 @@ public class AddEditVaccineTypeDialog extends JDialog {
     }
 
     private JTextField createTextField() {
-        JTextField field = new JTextField();
+        JTextField field = new JTextField(GUIUtil.TEXT_FIELD_COLUMNS);
         field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         field.setBackground(ThemeManager.getTextFieldBackground());
         field.setForeground(ThemeManager.getTextFieldForeground());

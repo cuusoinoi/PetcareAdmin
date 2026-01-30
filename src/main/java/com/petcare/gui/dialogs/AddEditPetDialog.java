@@ -7,6 +7,7 @@ import com.petcare.model.exception.PetcareException;
 import com.petcare.service.CustomerService;
 import com.petcare.service.PetService;
 import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.GUIUtil;
 import com.petcare.util.ThemeManager;
 
 import javax.swing.*;
@@ -127,7 +128,7 @@ public class AddEditPetDialog extends JDialog {
 
         // Characteristic
         formPanel.add(createLabel("Đặc điểm:"));
-        characteristicArea = new JTextArea(2, 20);
+        characteristicArea = new JTextArea(2, GUIUtil.TEXT_FIELD_COLUMNS);
         characteristicArea.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         characteristicArea.setBackground(ThemeManager.getTextFieldBackground());
         characteristicArea.setForeground(ThemeManager.getTextFieldForeground());
@@ -140,7 +141,7 @@ public class AddEditPetDialog extends JDialog {
 
         // Allergy
         formPanel.add(createLabel("Dị ứng thuốc:"));
-        allergyArea = new JTextArea(2, 20);
+        allergyArea = new JTextArea(2, GUIUtil.TEXT_FIELD_COLUMNS);
         allergyArea.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         allergyArea.setBackground(ThemeManager.getTextFieldBackground());
         allergyArea.setForeground(ThemeManager.getTextFieldForeground());
@@ -186,7 +187,7 @@ public class AddEditPetDialog extends JDialog {
     }
 
     private JTextField createTextField() {
-        JTextField field = new JTextField();
+        JTextField field = new JTextField(GUIUtil.TEXT_FIELD_COLUMNS);
         field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         field.setBackground(ThemeManager.getTextFieldBackground());
         field.setForeground(ThemeManager.getTextFieldForeground());

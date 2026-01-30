@@ -7,6 +7,7 @@ import com.petcare.model.exception.PetcareException;
 import com.petcare.service.IServiceTypeService;
 import com.petcare.service.ServiceTypeService;
 import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.GUIUtil;
 import com.petcare.util.ThemeManager;
 
 import javax.swing.*;
@@ -40,7 +41,7 @@ public class AddEditServiceTypeDialog extends JDialog {
     }
 
     private void initComponents() {
-        setSize(500, 350);
+        setSize(560, 360);
         setLocationRelativeTo(getParent());
         setLayout(new BorderLayout());
         getContentPane().setBackground(ThemeManager.getContentBackground());
@@ -54,7 +55,7 @@ public class AddEditServiceTypeDialog extends JDialog {
         formPanel.add(serviceNameField);
 
         formPanel.add(createLabel("Mô tả:"));
-        descriptionArea = new JTextArea(3, 20);
+        descriptionArea = new JTextArea(3, GUIUtil.TEXT_FIELD_COLUMNS);
         descriptionArea.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         descriptionArea.setBackground(ThemeManager.getTextFieldBackground());
         descriptionArea.setForeground(ThemeManager.getTextFieldForeground());
@@ -104,7 +105,7 @@ public class AddEditServiceTypeDialog extends JDialog {
     }
 
     private JTextField createTextField() {
-        JTextField field = new JTextField();
+        JTextField field = new JTextField(GUIUtil.TEXT_FIELD_COLUMNS);
         field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         field.setBackground(ThemeManager.getTextFieldBackground());
         field.setForeground(ThemeManager.getTextFieldForeground());

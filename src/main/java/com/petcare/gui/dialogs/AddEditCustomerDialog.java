@@ -5,6 +5,7 @@ import com.petcare.model.domain.Customer;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.service.CustomerService;
 import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.GUIUtil;
 import com.petcare.util.ThemeManager;
 
 import javax.swing.*;
@@ -41,7 +42,7 @@ public class AddEditCustomerDialog extends JDialog {
     }
 
     private void initComponents() {
-        setSize(500, 450);
+        setSize(560, 460);
         setLocationRelativeTo(getParent());
         setLayout(new BorderLayout());
         getContentPane().setBackground(ThemeManager.getContentBackground());
@@ -78,7 +79,7 @@ public class AddEditCustomerDialog extends JDialog {
 
         // Note
         formPanel.add(createLabel("Ghi chú:"));
-        noteArea = new JTextArea(3, 20);
+        noteArea = new JTextArea(3, GUIUtil.TEXT_FIELD_COLUMNS);
         noteArea.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         noteArea.setBackground(ThemeManager.getTextFieldBackground());
         noteArea.setForeground(ThemeManager.getTextFieldForeground());
@@ -124,7 +125,7 @@ public class AddEditCustomerDialog extends JDialog {
     }
 
     private JTextField createTextField() {
-        JTextField field = new JTextField();
+        JTextField field = new JTextField(GUIUtil.TEXT_FIELD_COLUMNS);
         field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         field.setBackground(ThemeManager.getTextFieldBackground());
         field.setForeground(ThemeManager.getTextFieldForeground());

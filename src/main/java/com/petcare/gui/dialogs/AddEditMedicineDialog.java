@@ -7,6 +7,7 @@ import com.petcare.model.exception.PetcareException;
 import com.petcare.service.IMedicineService;
 import com.petcare.service.MedicineService;
 import com.petcare.util.EmojiFontHelper;
+import com.petcare.util.GUIUtil;
 import com.petcare.util.ThemeManager;
 
 import javax.swing.*;
@@ -39,7 +40,7 @@ public class AddEditMedicineDialog extends JDialog {
     }
 
     private void initComponents() {
-        setSize(450, 200);
+        setSize(520, 220);
         setLocationRelativeTo(getParent());
         setLayout(new BorderLayout());
         getContentPane().setBackground(ThemeManager.getContentBackground());
@@ -98,7 +99,7 @@ public class AddEditMedicineDialog extends JDialog {
     }
 
     private JTextField createTextField() {
-        JTextField field = new JTextField();
+        JTextField field = new JTextField(GUIUtil.TEXT_FIELD_COLUMNS);
         field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         field.setBackground(ThemeManager.getTextFieldBackground());
         field.setForeground(ThemeManager.getTextFieldForeground());

@@ -6,6 +6,8 @@ import java.awt.*;
 public final class GUIUtil {
     public static final Dimension TOOLBAR_BUTTON_SIZE = new Dimension(155, 36);
     public static final Dimension SIDEBAR_BUTTON_SIZE = new Dimension(145, 36);
+    /** Số cột hiển thị cho JTextField/JPasswordField trong dialog (ô nhập rộng hơn). */
+    public static final int TEXT_FIELD_COLUMNS = 32;
 
     public static void setToolbarButtonSize(JButton button) {
         if (button != null) {

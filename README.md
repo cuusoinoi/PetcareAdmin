@@ -48,17 +48,11 @@ Hệ thống quản lý phòng khám thú cưng (Java Swing)
 
 ## 🖥 Công cụ và thư viện giao diện
 
-| Công cụ / Thư viện | Mục đích |
-|--------------------|----------|
-| **FlatLaf** | Look and Feel phẳng, hiện đại; bo góc (arc), font Segoe UI; hỗ trợ Light/Dark. |
+| Thư viện | Mục đích |
+|----------|----------|
+| **FlatLaf** | Look and Feel phẳng, hiện đại; font Segoe UI; hỗ trợ Light/Dark. |
 | **FlatLaf IntelliJ Themes** | Theme bổ sung tương thích FlatLaf. |
 | **JFreeChart** | Biểu đồ: Line, Bar, Ring (doughnut); tiêu đề và trục theo theme. |
-| **ThemeManager** | Chuyển đổi Light/Dark, lưu preference (Preferences API); áp dụng màu nền, chữ, viền, font toàn cục (UIManager). |
-| **RoundedPanel** | Panel tùy chỉnh vẽ nền và viền bo góc (RoundRectangle2D, antialiasing) cho card thống kê và khung biểu đồ. |
-| **EmojiFontHelper** | Hiển thị emoji/icon trên nút (Sidebar, dialogs) tương thích font hệ thống. |
-| **GUIUtil** | Kích thước chuẩn nút toolbar và sidebar; độ rộng ô nhập trong dialog (TEXT_FIELD_COLUMNS). |
-| **PrintHelper** | Tạo HTML in hóa đơn, phiếu khám, giấy cam kết; mở trong trình duyệt (Ctrl+P in). |
-| **LogoHelper** | Tải và scale logo từ resources cho màn hình đăng nhập và sidebar. |
 
 Các component Swing dùng trong dự án: `JFrame`, `JDialog`, `JPanel`, `JTable`, `JTextField`, `JComboBox`, `JButton`, `JToggleButton`, `JScrollPane`, `JEditorPane` (xem trước HTML); layout: `BorderLayout`, `GridLayout`, `FlowLayout`, `CardLayout`; event: `ActionListener`, `MouseListener`, `ItemListener`.
 
@@ -101,7 +95,7 @@ PetcareAdmin/
 │                   │   └── Database.java
 │                   ├── repository/            # Data access (interface + impl)
 │                   ├── service/               # Business logic layer
-│                   └── util/                  # ThemeManager, GUIUtil, PrintHelper, RoundedPanel, ...
+│                   └── util/                  # ThemeManager, GUIUtil, PrintHelper, LogoHelper, ...
 ├── pom.xml                                   # Maven configuration
 └── README.md                                 # File này
 ```
@@ -428,11 +422,13 @@ mvn exec:java -Dexec.mainClass="com.petcare.App"
 
 ## 📚 Tài liệu tham khảo
 
-- Tài liệu môn Công nghệ Java – Trường Đại học Công nghệ Thông tin
-- Oracle Java Documentation – Java Swing, JDBC
-- FlatLaf – https://www.formdev.com/flatlaf/
-- JFreeChart – https://www.jfree.org/jfreechart/
-- H2 Database – https://www.h2database.com/
+[1] Oracle, "Java Platform, Standard Edition 17 API Specification," 2021. [Online]. Available: https://docs.oracle.com/en/java/javase/17/docs/api/. [Accessed: Jan. 29, 2025].
+
+[2] FormDev, "FlatLaf - Flat Look and Feel," 2024. [Online]. Available: https://www.formdev.com/flatlaf/. [Accessed: Jan. 29, 2025].
+
+[3] JFree.org, "JFreeChart - A free Java chart library," 2024. [Online]. Available: https://www.jfree.org/jfreechart/. [Accessed: Jan. 29, 2025].
+
+[4] H2 Database Engine, "Introduction to H2 Database," 2024. [Online]. Available: https://www.h2database.com/. [Accessed: Jan. 29, 2025].
 
 ---
 

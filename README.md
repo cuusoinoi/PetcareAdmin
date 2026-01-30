@@ -238,7 +238,7 @@ mvn clean package
 
 **Cách 1: Chạy trực tiếp với Maven**
 ```bash
-mvn exec:java -Dexec.mainClass="com.petcare.gui.Main"
+mvn exec:java -Dexec.mainClass="com.petcare.App"
 ```
 
 **Cách 2: Chạy từ JAR**
@@ -248,7 +248,7 @@ java -jar target/PetcareAdmin-1.0-SNAPSHOT.jar
 
 **Cách 3: Chạy từ IDE**
 - Mở project trong IntelliJ IDEA hoặc Eclipse
-- Run class `com.petcare.gui.Main`
+- Run class `com.petcare.App`
 
 ---
 
@@ -417,7 +417,7 @@ mvn clean package
 ### Run Application
 
 ```bash
-mvn exec:java -Dexec.mainClass="com.petcare.gui.Main"
+mvn exec:java -Dexec.mainClass="com.petcare.App"
 ```
 
 ---

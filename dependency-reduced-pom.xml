@@ -33,7 +33,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>com.petcare.gui.Main</mainClass>
+                  <mainClass>com.petcare.App</mainClass>
                 </transformer>
               </transformers>
             </configuration>

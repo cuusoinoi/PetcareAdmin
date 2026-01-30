@@ -5,6 +5,7 @@ Hệ thống quản lý phòng khám thú cưng - Phần Admin (Java Swing)
 [![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://www.oracle.com/java/)
 [![Swing](https://img.shields.io/badge/Swing-GUI-blue.svg)](https://docs.oracle.com/javase/tutorial/uiswing/)
 [![Maven](https://img.shields.io/badge/Maven-3.8+-red.svg)](https://maven.apache.org/)
+[![H2](https://img.shields.io/badge/H2-2.2-green.svg)](https://www.h2database.com/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-blue.svg)](https://www.mysql.com/)
 
 ---
@@ -13,6 +14,8 @@ Hệ thống quản lý phòng khám thú cưng - Phần Admin (Java Swing)
 
 - [Tổng quan](#tổng-quan)
 - [Công nghệ sử dụng](#công-nghệ-sử-dụng)
+- [Công cụ và thư viện giao diện](#công-cụ-và-thư-viện-giao-diện)
+- [Kỹ thuật áp dụng từ môn học](#kỹ-thuật-áp-dụng-từ-môn-học)
 - [Cấu trúc dự án](#cấu-trúc-dự-án)
 - [Kiến trúc hệ thống](#kiến-trúc-hệ-thống)
 - [Design Patterns](#design-patterns)
@@ -30,13 +33,46 @@ Hệ thống quản lý phòng khám thú cưng - Phần Admin (Java Swing)
 
 ## 🛠 Công nghệ sử dụng
 
-- **Java 17** - Ngôn ngữ lập trình chính
-- **Java Swing** - Framework xây dựng giao diện người dùng (GUI)
-- **Maven 3.8+** - Quản lý dự án và dependencies
-- **MySQL 8.0+** - Hệ quản trị cơ sở dữ liệu quan hệ
-- **JDBC** - API kết nối và tương tác với cơ sở dữ liệu
-- **JFreeChart 1.5.4** - Thư viện tạo biểu đồ thống kê
-- **FlatLaf 3.1.1** - Look and Feel hiện đại cho Swing (hỗ trợ Light/Dark theme)
+- **Java 17** – Ngôn ngữ lập trình chính
+- **Java Swing** – Framework xây dựng giao diện người dùng (GUI)
+- **Maven 3.8+** – Quản lý dự án và dependencies
+- **H2 2.2** – Cơ sở dữ liệu nhúng (mặc định, cấu hình trong `database.properties`)
+- **MySQL 8.0+** – Hệ quản trị CSDL quan hệ (tùy chọn, cấu hình trong `database.properties`)
+- **JDBC** – API kết nối và tương tác với cơ sở dữ liệu
+- **JFreeChart 1.5.4** – Thư viện biểu đồ thống kê
+- **FlatLaf 3.1.1** – Look and Feel hiện đại cho Swing (Light/Dark theme)
+- **FlatLaf IntelliJ Themes 3.1.1** – Bộ theme bổ sung cho FlatLaf
+
+---
+
+## 🖥 Công cụ và thư viện giao diện
+
+| Công cụ / Thư viện | Mục đích |
+|--------------------|----------|
+| **FlatLaf** | Look and Feel phẳng, hiện đại; bo góc (arc), font Segoe UI; hỗ trợ Light/Dark. |
+| **FlatLaf IntelliJ Themes** | Theme bổ sung tương thích FlatLaf. |
+| **JFreeChart** | Biểu đồ: Line, Bar, Ring (doughnut); tiêu đề và trục theo theme. |
+| **ThemeManager** | Chuyển đổi Light/Dark, lưu preference (Preferences API); áp dụng màu nền, chữ, viền, font toàn cục (UIManager). |
+| **RoundedPanel** | Panel tùy chỉnh vẽ nền và viền bo góc (RoundRectangle2D, antialiasing) cho card thống kê và khung biểu đồ. |
+| **EmojiFontHelper** | Hiển thị emoji/icon trên nút (Sidebar, dialogs) tương thích font hệ thống. |
+| **GUIUtil** | Kích thước chuẩn nút toolbar và sidebar; đồng bộ giao diện giữa các màn hình. |
+| **PrintHelper** | Tạo HTML in hóa đơn, phiếu khám, giấy cam kết; mở trong trình duyệt (Ctrl+P in). |
+| **LogoHelper** | Tải và scale logo từ resources cho màn hình đăng nhập và sidebar. |
+
+Các component Swing dùng trong dự án: `JFrame`, `JDialog`, `JPanel`, `JTable`, `JTextField`, `JComboBox`, `JButton`, `JToggleButton`, `JScrollPane`, `JEditorPane` (xem trước HTML); layout: `BorderLayout`, `GridLayout`, `FlowLayout`, `CardLayout`; event: `ActionListener`, `MouseListener`, `ItemListener`.
+
+---
+
+## 📚 Kỹ thuật áp dụng từ môn học
+
+- **Lập trình giao diện (Swing)**: Container và component (JFrame, JPanel, JTable, JTextField, …), Layout Manager (BorderLayout, GridLayout, FlowLayout, CardLayout), xử lý sự kiện (ActionListener, MouseListener, ItemListener).
+- **Truy cập dữ liệu (JDBC)**: Kết nối qua `DriverManager`, cấu hình ngoài file (`database.properties`), `PreparedStatement` tránh SQL Injection, xử lý `ResultSet` và map sang Entity/DTO, quản lý tài nguyên (try-with-resources).
+- **Kiến trúc phần mềm**: Kiến trúc đa tầng (Presentation – Service – Repository – Database), tách biệt trách nhiệm (Separation of Concerns).
+- **Design patterns**: Singleton (Service, kết nối DB), Repository (interface + implementation), Service Layer, DTO/Entity, Strategy (khởi tạo DB: H2 chạy schema/data, MySQL chỉ kết nối), MVC (Model–View–Controller), Factory (tạo connection, strategy).
+- **Xử lý ngoại lệ**: Ngoại lệ tùy biến (`PetcareException`), truyền và bắt ở từng tầng, thông báo rõ ràng cho người dùng.
+- **Validation**: Kiểm tra dữ liệu ở Domain Model (setter), ở Service (quy tắc nghiệp vụ), và ở GUI (phản hồi ngay).
+- **Trực quan hóa dữ liệu**: JFreeChart (dataset, ChartFactory, CategoryPlot, PiePlot), tùy biến tiêu đề/trục/legend theo theme.
+- **Look and Feel và theme**: FlatLaf, UIManager để đặt font/arc/màu toàn cục, ThemeManager để chuyển và lưu theme Light/Dark.
 
 ---
 
@@ -49,48 +85,21 @@ PetcareAdmin/
 │       └── java/
 │           └── com/
 │               └── petcare/
-│                   ├── gui/                    # Giao diện người dùng
-│                   │   ├── panels/            # 15 Panel quản lý
-│                   │   │   ├── CustomerManagementPanel.java
-│                   │   │   ├── PetManagementPanel.java
-│                   │   │   ├── DoctorManagementPanel.java
-│                   │   │   ├── DashboardPanel.java
-│                   │   │   └── ...
-│                   │   ├── dialogs/           # 17 Dialog
-│                   │   │   ├── AddEditCustomerDialog.java
-│                   │   │   ├── AddEditPetDialog.java
-│                   │   │   └── ...
+│                   ├── config/                # Cấu hình (DatabaseConfig)
+│                   ├── gui/                   # Giao diện người dùng
+│                   │   ├── panels/            # Các panel quản lý
+│                   │   ├── dialogs/           # Các dialog thêm/sửa/chi tiết
 │                   │   ├── DashboardFrame.java
 │                   │   ├── LoginFrame.java
-│                   │   ├── Main.java
 │                   │   └── Sidebar.java
-│                   ├── model/                 # Models
-│                   │   ├── domain/           # Domain models với validation
-│                   │   │   ├── Customer.java
-│                   │   │   ├── Doctor.java
-│                   │   │   └── Pet.java
-│                   │   ├── entity/           # Entity DTOs
-│                   │   │   ├── CustomerEntity.java
-│                   │   │   ├── DoctorEntity.java
-│                   │   │   └── PetEntity.java
-│                   │   ├── exception/        # Custom exceptions
-│                   │   │   └── PetcareException.java
-│                   │   └── [legacy models]   # Các model cũ
-│                   ├── repository/           # Data access layer
+│                   ├── model/                 # Domain, entity, exception
+│                   ├── persistence/           # Kết nối DB, strategy khởi tạo
+│                   │   ├── strategy/          # H2 (schema+data), MySQL (chỉ kết nối)
 │                   │   ├── DatabaseConnection.java
-│                   │   ├── ICustomerRepository.java
-│                   │   ├── CustomerRepository.java
-│                   │   ├── IPetRepository.java
-│                   │   ├── PetRepository.java
-│                   │   ├── IDoctorRepository.java
-│                   │   └── DoctorRepository.java
-│                   ├── service/              # Business logic layer
-│                   │   ├── CustomerService.java
-│                   │   ├── PetService.java
-│                   │   └── DoctorService.java
-│                   └── util/                 # Utilities
-│                       ├── DashboardService.java
-│                       └── ThemeManager.java
+│                   │   └── Database.java
+│                   ├── repository/            # Data access (interface + impl)
+│                   ├── service/               # Business logic layer
+│                   └── util/                  # ThemeManager, GUIUtil, PrintHelper, RoundedPanel, ...
 ├── pom.xml                                   # Maven configuration
 ├── README.md                                 # File này
 └── GIOI_THIEU_DO_AN.md                      # Tài liệu giới thiệu chi tiết
@@ -172,19 +181,23 @@ Dự án áp dụng các design patterns sau:
 - Tách biệt data access logic khỏi business logic
 - Dễ dàng thay đổi data source
 
-### 3. **Service Layer Pattern**
+### 3. **Strategy Pattern**
+- `DatabaseInitStrategy`: H2 chạy schema+data, MySQL chỉ kết nối
+- `DatabaseInitStrategyFactory` chọn strategy theo driver trong `database.properties`
+
+### 4. **Service Layer Pattern**
 - Tách biệt business logic khỏi presentation và data access
 - Chứa business rules và validation phức tạp
 
-### 4. **DTO Pattern (Data Transfer Object)**
+### 5. **DTO Pattern (Data Transfer Object)**
 - Entity classes: Mapping với database
 - Domain classes: Chứa business logic
 
-### 5. **Dependency Injection**
+### 6. **Dependency Injection**
 - Service classes có thể inject Repository thông qua setter
 - Dễ dàng test với mock objects
 
-### 6. **MVC Pattern**
+### 7. **MVC Pattern**
 - **Model**: Domain models và Entity classes
 - **View**: GUI components (Panels, Dialogs)
 - **Controller**: Service layer
@@ -197,34 +210,16 @@ Dự án áp dụng các design patterns sau:
 
 - **Java 17+**
 - **Maven 3.8+**
-- **MySQL 8.0+**
-- **Database `petcare`** đã được tạo và import dữ liệu
+- **H2** (mặc định, dùng file nhúng) hoặc **MySQL 8.0+** (tùy chọn)
 
-### Bước 1: Clone hoặc tải dự án
+### Bước 1: Cấu hình Database
 
-```bash
-cd PetcareAdmin
-```
+Chỉnh file `src/main/resources/database.properties`:
 
-### Bước 2: Cấu hình Database
+- **H2 (mặc định)**: dùng `db.driver=org.h2.Driver`, `db.url`, `db.user`, `db.password` tương ứng. Ứng dụng tự chạy script `schema-and-data-h2.sql` lần đầu.
+- **MySQL**: đổi driver sang `com.mysql.cj.jdbc.Driver`, cấu hình url/user/password cho MySQL; tự tạo database và import dữ liệu.
 
-Sửa file `src/main/java/com/petcare/repository/DatabaseConnection.java`:
-
-```java
-private static final String DB_URL = "jdbc:mysql://localhost:3306/petcare";
-private static final String DB_USER = "root";
-private static final String DB_PASSWORD = "your_password";
-```
-
-### Bước 3: Import Database
-
-Import file SQL vào MySQL:
-
-```bash
-mysql -u root -p petcare < petcare_mysql_database.sql
-```
-
-### Bước 4: Build project
+### Bước 2: Build project
 
 ```bash
 # Clean và compile
@@ -234,7 +229,7 @@ mvn clean compile
 mvn clean package
 ```
 
-### Bước 5: Chạy ứng dụng
+### Bước 3: Chạy ứng dụng
 
 **Cách 1: Chạy trực tiếp với Maven**
 ```bash
@@ -285,6 +280,7 @@ java -jar target/PetcareAdmin-1.0-SNAPSHOT.jar
 - [x] **User Management** - Quản lý người dùng
 - [x] **Settings Management** - Cài đặt hệ thống
 - [x] **Theme Toggle** - Chuyển đổi Light/Dark theme
+- [x] **Mẫu in lưu chuồng** - Xem giấy cam kết, mẫu hóa đơn, in trang
 
 ### 📊 Dashboard Features
 
@@ -396,7 +392,7 @@ java -jar target/PetcareAdmin-1.0-SNAPSHOT.jar
 - ✅ **Single Responsibility**: Mỗi class có trách nhiệm rõ ràng
 - ✅ **DRY Principle**: Không lặp lại code
 - ✅ **Clean Code**: Code dễ đọc, dễ maintain
-- ✅ **Comments**: Javadoc cho các methods quan trọng
+- ✅ **Clean structure**: Code rõ ràng, dễ bảo trì
 
 ---
 

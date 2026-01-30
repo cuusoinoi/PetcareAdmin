@@ -23,10 +23,28 @@
 - **Java 17**: Ngôn ngữ lập trình chính
 - **Java Swing**: Framework xây dựng giao diện người dùng (GUI)
 - **Maven 3.8+**: Công cụ quản lý dự án và dependencies
-- **MySQL 8.0+**: Hệ quản trị cơ sở dữ liệu quan hệ
+- **H2 2.2**: Cơ sở dữ liệu nhúng (mặc định, cấu hình trong `database.properties`)
+- **MySQL 8.0+**: Hệ quản trị CSDL quan hệ (tùy chọn)
 - **JDBC**: API kết nối và tương tác với cơ sở dữ liệu
-- **JFreeChart 1.5.4**: Thư viện tạo biểu đồ thống kê
-- **FlatLaf 3.1.1**: Thư viện Look and Feel hiện đại cho Swing
+- **JFreeChart 1.5.4**: Thư viện biểu đồ thống kê
+- **FlatLaf 3.1.1**: Look and Feel hiện đại cho Swing (Light/Dark theme)
+- **FlatLaf IntelliJ Themes 3.1.1**: Bộ theme bổ sung cho FlatLaf
+
+### 1.3. Công cụ và thư viện giao diện
+
+| Công cụ / Thư viện | Mục đích |
+|--------------------|----------|
+| **FlatLaf** | Look and Feel phẳng, hiện đại; bo góc (arc), font Segoe UI; hỗ trợ Light/Dark. |
+| **FlatLaf IntelliJ Themes** | Theme bổ sung tương thích FlatLaf. |
+| **JFreeChart** | Biểu đồ Line, Bar, Ring (doughnut); tiêu đề và trục theo theme. |
+| **ThemeManager** | Chuyển đổi Light/Dark, lưu preference (Preferences API); áp dụng màu nền, chữ, viền, font toàn cục (UIManager). |
+| **RoundedPanel** | Panel tùy chỉnh vẽ nền và viền bo góc (RoundRectangle2D, antialiasing) cho card thống kê và khung biểu đồ. |
+| **EmojiFontHelper** | Hiển thị emoji/icon trên nút (Sidebar, dialogs) tương thích font hệ thống. |
+| **GUIUtil** | Kích thước chuẩn nút toolbar và sidebar; đồng bộ giao diện giữa các màn hình. |
+| **PrintHelper** | Tạo HTML in hóa đơn, phiếu khám, giấy cam kết; mở trong trình duyệt (Ctrl+P in). |
+| **LogoHelper** | Tải và scale logo từ resources cho màn hình đăng nhập và sidebar. |
+
+Các component Swing sử dụng: JFrame, JDialog, JPanel, JTable, JTextField, JComboBox, JButton, JToggleButton, JScrollPane, JEditorPane; Layout: BorderLayout, GridLayout, FlowLayout, CardLayout; Event: ActionListener, MouseListener, ItemListener.
 
 ---
 
@@ -109,7 +127,7 @@ if (repository.existsByPhone(customer.getCustomerPhoneNumber())) {
 **Các thành phần chính**:
 - **Interfaces**: `ICustomerRepository`, `IPetRepository`, `IDoctorRepository`
 - **Implementations**: `CustomerRepository`, `PetRepository`, `DoctorRepository`
-- **Connection Manager**: `DatabaseConnection` - Quản lý kết nối database
+- **Connection Manager**: `DatabaseConnection` (package `persistence`) – Cấu hình từ `database.properties`; Strategy pattern cho khởi tạo DB (H2 / MySQL)
 
 **Đặc điểm**:
 - Sử dụng **PreparedStatement** để tránh SQL Injection
@@ -195,40 +213,16 @@ PetcareAdmin/
 │       └── java/
 │           └── com/
 │               └── petcare/
-│                   ├── gui/                    # Giao diện người dùng
-│                   │   ├── panels/            # Các panel quản lý (15 files)
-│                   │   ├── dialogs/           # Các dialog (17 files)
-│                   │   ├── DashboardFrame.java
-│                   │   ├── LoginFrame.java
-│                   │   ├── Main.java
-│                   │   └── Sidebar.java
-│                   ├── model/                  # Models
-│                   │   ├── domain/            # Domain models với validation
-│                   │   │   ├── Customer.java
-│                   │   │   ├── Doctor.java
-│                   │   │   └── Pet.java
-│                   │   ├── entity/            # Entity DTOs
-│                   │   │   ├── CustomerEntity.java
-│                   │   │   ├── DoctorEntity.java
-│                   │   │   └── PetEntity.java
-│                   │   ├── exception/         # Custom exceptions
-│                   │   │   └── PetcareException.java
-│                   │   └── [legacy models]   # Các model cũ (compatibility)
-│                   ├── repository/            # Data access layer
+│                   ├── config/                # Cấu hình (DatabaseConfig, database.properties)
+│                   ├── gui/                    # Giao diện (panels, dialogs, DashboardFrame, LoginFrame, Sidebar)
+│                   ├── model/                  # domain, entity, exception
+│                   ├── persistence/            # Kết nối DB, strategy khởi tạo
+│                   │   ├── strategy/           # DatabaseInitStrategy (H2, NoOp)
 │                   │   ├── DatabaseConnection.java
-│                   │   ├── ICustomerRepository.java
-│                   │   ├── CustomerRepository.java
-│                   │   ├── IPetRepository.java
-│                   │   ├── PetRepository.java
-│                   │   ├── IDoctorRepository.java
-│                   │   └── DoctorRepository.java
+│                   │   └── Database.java
+│                   ├── repository/            # Data access (interface + implementation)
 │                   ├── service/               # Business logic layer
-│                   │   ├── CustomerService.java
-│                   │   ├── PetService.java
-│                   │   └── DoctorService.java
-│                   └── util/                  # Utilities
-│                       ├── DashboardService.java
-│                       └── ThemeManager.java
+│                   └── util/                  # ThemeManager, GUIUtil, PrintHelper, RoundedPanel, EmojiFontHelper, LogoHelper, DashboardService
 ├── pom.xml                                  # Maven configuration
 └── README.md
 ```
@@ -279,7 +273,7 @@ PetcareAdmin/
 
 - **Interfaces**: Định nghĩa contract cho data access (`I*Repository.java`)
 - **Implementations**: Triển khai các interface (`*Repository.java`)
-- **Connection Manager**: `DatabaseConnection.java` - Quản lý kết nối
+- **Connection Manager**: `DatabaseConnection` (package `persistence`) – Cấu hình từ `database.properties`; Strategy pattern cho khởi tạo DB (H2 / MySQL)
 
 #### 3.2.5. Service Package Organization
 
@@ -436,15 +430,23 @@ User Action (View)
     → View displays Domain Model
 ```
 
-### 4.7. Factory Pattern (Implicit)
+### 4.7. Strategy Pattern
 
-**Mục đích**: Tạo objects mà không cần chỉ định class cụ thể.
+**Mục đích**: Định nghĩa họ thuật toán (khởi tạo DB), đóng gói từng thuật toán và cho phép thay thế lẫn nhau.
 
 **Áp dụng**:
-- `DatabaseConnection.getConnection()`: Factory method tạo Connection
-- Service `getInstance()`: Factory method tạo Service instance
+- **DatabaseInitStrategy**: Interface với method `afterConnect(Connection conn)`
+- **H2DatabaseInitStrategy**: Chạy script `schema-and-data-h2.sql` sau khi kết nối H2
+- **NoOpDatabaseInitStrategy**: Không thực hiện gì (dùng cho MySQL)
+- **DatabaseInitStrategyFactory**: Chọn strategy theo driver trong `database.properties`
 
-### 4.8. Template Method Pattern (Implicit)
+**Lợi ích**: Dễ mở rộng thêm driver/CSDL khác mà không sửa `DatabaseConnection`.
+
+### 4.8. Factory Pattern (Implicit)
+
+**Áp dụng**: `DatabaseConnection.getConnection()`, Service `getInstance()`, `DatabaseInitStrategyFactory`.
+
+### 4.9. Template Method Pattern (Implicit)
 
 **Mục đích**: Định nghĩa skeleton của algorithm trong base class.
 
@@ -458,9 +460,11 @@ User Action (View)
 
 ---
 
-## 5. CÁC KỸ THUẬT VÀ CÔNG NGHỆ ÁP DỤNG
+## 5. CÁC KỸ THUẬT ĐÃ ÁP DỤNG TỪ MÔN HỌC
 
-### 5.1. Java Swing (Chương 2)
+Các kỹ thuật dưới đây được áp dụng trong đồ án mà không viện dẫn đến chương cụ thể trong giáo trình.
+
+### 5.1. Lập trình giao diện (Swing)
 
 #### 5.1.1. Swing Components sử dụng
 
@@ -505,18 +509,12 @@ customerCombo.addItemListener(e -> {
 
 #### 5.1.3. Look and Feel
 
-**FlatLaf Integration**:
-- Sử dụng **FlatLaf** để có giao diện hiện đại, phẳng
-- Hỗ trợ Light/Dark theme switching
-- Custom styling với `FlatClientProperties`
+**FlatLaf và Theme**:
+- **FlatLaf**: Look and Feel phẳng, hiện đại; bo góc (UIManager: Button.arc, Component.arc, TextComponent.arc); font Segoe UI / Segoe UI Semibold qua UIManager.
+- **ThemeManager**: Chuyển Light/Dark (FlatLightLaf / FlatDarkLaf), lưu preference (Preferences API), áp dụng màu nền/chữ/viền toàn cục; hỗ trợ RoundedPanel, JFreeChart (tiêu đề/trục/legend theo theme).
+- **FlatClientProperties**: Styling từng component (arc, placeholderText, …).
 
-**Ví dụ**:
-```java
-button.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
-textField.putClientProperty("JTextField.placeholderText", "Nhập tên...");
-```
-
-### 5.2. JDBC (Chương 3)
+### 5.2. Truy cập dữ liệu (JDBC)
 
 #### 5.2.1. Database Connection
 
@@ -615,19 +613,16 @@ try {
 }
 ```
 
-### 5.4. Data Visualization
+### 5.4. Trực quan hóa dữ liệu (JFreeChart)
 
-**JFreeChart Integration**:
-- Sử dụng JFreeChart để tạo biểu đồ trong Dashboard
-- Các loại biểu đồ: Bar Chart, Line Chart, Pie Chart
-- Real-time data updates
+- **JFreeChart**: Biểu đồ trong Dashboard (Line, Bar, Ring); DefaultCategoryDataset, DefaultPieDataset; ChartFactory; CategoryPlot, PiePlot.
+- **Tùy biến theo theme**: Tiêu đề, nhãn trục, legend dùng màu chữ theo ThemeManager (Light/Dark); nền và grid theo theme.
 
-**Ví dụ**:
-```java
-DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-dataset.addValue(count, "Series", "Category");
-JFreeChart chart = ChartFactory.createBarChart(...);
-```
+### 5.5. Look and Feel và theme
+
+- **UIManager**: Đặt font (Label.font, Button.font, Table.font, …), arc (Button.arc, Component.arc, TextComponent.arc), màu nền/chữ cho từng loại component.
+- **ThemeManager**: Khởi tạo theme khi chạy app; toggle Light/Dark; lưu lựa chọn; cung cấp màu (getContentBackground, getTitleForeground, …) cho GUI và biểu đồ.
+- **RoundedPanel**: Vẽ nền và viền bo góc (Graphics2D, RoundRectangle2D, antialiasing) cho card và khung biểu đồ.
 
 ---
 
@@ -675,11 +670,7 @@ Dự án **PetcareAdmin** được thiết kế và triển khai theo các best 
 4. **Security** được đảm bảo với PreparedStatement và input validation
 5. **User Experience** tốt với FlatLaf và responsive design
 
-Dự án thể hiện sự hiểu biết sâu sắc về:
-- Java Swing GUI Programming
-- JDBC và Database Programming
-- Design Patterns và Software Architecture
-- Best Practices trong Java Development
+Dự án áp dụng các kỹ thuật từ môn học: lập trình giao diện Swing (components, layout, event handling), truy cập dữ liệu JDBC (PreparedStatement, connection management, ResultSet mapping), kiến trúc đa tầng, các design patterns (Singleton, Repository, Service, DTO, Strategy, MVC, Factory), xử lý ngoại lệ và validation, trực quan hóa dữ liệu (JFreeChart), Look and Feel và theme (FlatLaf, ThemeManager).
 
 ---
 

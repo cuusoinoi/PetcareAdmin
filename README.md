@@ -1,6 +1,6 @@
 # Petcare Admin - Java Swing Application
 
-Hệ thống quản lý phòng khám thú cưng - Phần Admin (Java Swing)
+Hệ thống quản lý phòng khám thú cưng (Java Swing)
 
 [![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://www.oracle.com/java/)
 [![Swing](https://img.shields.io/badge/Swing-GUI-blue.svg)](https://docs.oracle.com/javase/tutorial/uiswing/)

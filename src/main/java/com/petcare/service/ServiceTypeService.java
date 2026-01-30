@@ -1,6 +1,9 @@
 package com.petcare.service;
 
+import com.petcare.aop.PermissionHandler;
+import com.petcare.aop.RequireAdmin;
 import com.petcare.model.domain.ServiceType;
+import com.petcare.model.domain.User;
 import com.petcare.model.entity.ServiceTypeEntity;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.repository.IServiceTypeRepository;
@@ -10,19 +13,21 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Service Type Service - business logic; Entity ↔ Domain
+ * Service Type Service - business logic; Entity ↔ Domain.
+ * Phân quyền qua AOP thủ công: method có @RequireAdmin được kiểm tra bởi PermissionHandler.
  */
-public class ServiceTypeService {
-    private static ServiceTypeService instance;
+public class ServiceTypeService implements IServiceTypeService {
+    private static IServiceTypeService instance;
     private IServiceTypeRepository repository;
 
-    private ServiceTypeService() {
+    ServiceTypeService() {
         this.repository = new ServiceTypeRepository();
     }
 
-    public static ServiceTypeService getInstance() {
+    public static IServiceTypeService getInstance() {
         if (instance == null) {
-            instance = new ServiceTypeService();
+            ServiceTypeService impl = new ServiceTypeService();
+            instance = PermissionHandler.createProxy(impl, IServiceTypeService.class);
         }
         return instance;
     }
@@ -33,12 +38,14 @@ public class ServiceTypeService {
         }
     }
 
+    @Override
     public List<ServiceType> getAllServiceTypes() throws PetcareException {
         return repository.findAll().stream()
                 .map(this::entityToDomain)
                 .collect(Collectors.toList());
     }
 
+    @Override
     public ServiceType getServiceTypeById(int id) throws PetcareException {
         ServiceTypeEntity entity = repository.findById(id);
         return entity != null ? entityToDomain(entity) : null;
@@ -47,6 +54,7 @@ public class ServiceTypeService {
     /**
      * Find by exact service name (for AddInvoiceDialog, CheckoutDialog).
      */
+    @Override
     public ServiceType getServiceTypeByName(String serviceName) throws PetcareException {
         ServiceTypeEntity entity = repository.findByName(serviceName);
         return entity != null ? entityToDomain(entity) : null;
@@ -55,12 +63,15 @@ public class ServiceTypeService {
     /**
      * Find first service type whose name starts with prefix (e.g. "Lưu chuồng", "Phụ thu trễ giờ").
      */
+    @Override
     public ServiceType getServiceTypeByNamePrefix(String prefix) throws PetcareException {
         ServiceTypeEntity entity = repository.findByNameStartsWith(prefix);
         return entity != null ? entityToDomain(entity) : null;
     }
 
-    public void createServiceType(ServiceType serviceType) throws PetcareException {
+    @RequireAdmin
+    @Override
+    public void createServiceType(ServiceType serviceType, User currentUser) throws PetcareException {
         ServiceTypeEntity entity = domainToEntity(serviceType);
         int result = repository.insert(entity);
         if (result > 0) {
@@ -70,7 +81,9 @@ public class ServiceTypeService {
         }
     }
 
-    public void updateServiceType(ServiceType serviceType) throws PetcareException {
+    @RequireAdmin
+    @Override
+    public void updateServiceType(ServiceType serviceType, User currentUser) throws PetcareException {
         ServiceTypeEntity existing = repository.findById(serviceType.getServiceTypeId());
         if (existing == null) {
             throw new PetcareException("Không tìm thấy loại dịch vụ với ID: " + serviceType.getServiceTypeId());
@@ -82,7 +95,9 @@ public class ServiceTypeService {
         }
     }
 
-    public void deleteServiceType(int id) throws PetcareException {
+    @RequireAdmin
+    @Override
+    public void deleteServiceType(int id, User currentUser) throws PetcareException {
         ServiceTypeEntity existing = repository.findById(id);
         if (existing == null) {
             throw new PetcareException("Không tìm thấy loại dịch vụ với ID: " + id);

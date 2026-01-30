@@ -1,7 +1,9 @@
 package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import com.petcare.model.domain.User;
 import com.petcare.model.exception.PetcareException;
+import com.petcare.service.IUserService;
 import com.petcare.service.UserService;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.ThemeManager;
@@ -14,15 +16,17 @@ import java.awt.*;
  */
 public class ChangePasswordDialog extends JDialog {
     private final int userId;
+    private final User currentUser;
     private JPasswordField newPasswordField;
     private JPasswordField confirmPasswordField;
     private JButton saveButton;
     private JButton cancelButton;
-    private final UserService userService = UserService.getInstance();
+    private final IUserService userService = UserService.getInstance();
 
-    public ChangePasswordDialog(JDialog parent, int userId) {
+    public ChangePasswordDialog(JDialog parent, int userId, User currentUser) {
         super(parent, true);
         this.userId = userId;
+        this.currentUser = currentUser;
         initComponents();
         setTitle("Đổi mật khẩu");
     }
@@ -108,7 +112,7 @@ public class ChangePasswordDialog extends JDialog {
             return;
         }
         try {
-            userService.changePassword(userId, newPassword);
+            userService.changePassword(userId, newPassword, currentUser);
             JOptionPane.showMessageDialog(this,
                     "Đổi mật khẩu thành công!",
                     "Thành công",

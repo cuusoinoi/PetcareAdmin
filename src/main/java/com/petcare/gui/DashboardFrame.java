@@ -84,11 +84,11 @@ public class DashboardFrame extends JFrame {
         invoicePanel = new InvoiceManagementPanel();
         printingTemplatePanel = new PrintingTemplatePanel();
         appointmentPanel = new AppointmentManagementPanel();
-        serviceTypePanel = new ServiceTypeManagementPanel();
-        medicinePanel = new MedicineManagementPanel();
-        vaccineTypePanel = new VaccineTypeManagementPanel();
-        userPanel = new UserManagementPanel();
-        settingsPanel = new SettingsManagementPanel();
+        serviceTypePanel = new ServiceTypeManagementPanel(getCurrentUser());
+        medicinePanel = new MedicineManagementPanel(getCurrentUser());
+        vaccineTypePanel = new VaccineTypeManagementPanel(getCurrentUser());
+        userPanel = new UserManagementPanel(getCurrentUser());
+        settingsPanel = new SettingsManagementPanel(getCurrentUser());
 
         // Add panels to card layout
         contentPanel.add(dashboardPanel, "DASHBOARD");
@@ -192,18 +192,30 @@ public class DashboardFrame extends JFrame {
     }
 
     public void showServiceTypeManagement() {
+        if (currentUser.getRole() != User.Role.ADMIN) {
+            JOptionPane.showMessageDialog(this, "Bạn không có quyền truy cập mục Dịch vụ.", "Phân quyền", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
         cardLayout.show(contentPanel, "SERVICE_TYPE");
         serviceTypePanel.refreshData();
         sidebar.setSelectedButton(sidebar.serviceTypeBtn);
     }
 
     public void showMedicineManagement() {
+        if (currentUser.getRole() != User.Role.ADMIN) {
+            JOptionPane.showMessageDialog(this, "Bạn không có quyền truy cập mục Thuốc.", "Phân quyền", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
         cardLayout.show(contentPanel, "MEDICINE");
         medicinePanel.refreshData();
         sidebar.setSelectedButton(sidebar.medicineBtn);
     }
 
     public void showVaccineTypeManagement() {
+        if (currentUser.getRole() != User.Role.ADMIN) {
+            JOptionPane.showMessageDialog(this, "Bạn không có quyền truy cập mục Vaccine.", "Phân quyền", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
         cardLayout.show(contentPanel, "VACCINE_TYPE");
         vaccineTypePanel.refreshData();
         sidebar.setSelectedButton(sidebar.vaccineTypeBtn);

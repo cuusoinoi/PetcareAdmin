@@ -3,6 +3,7 @@ package com.petcare.gui.dialogs;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.petcare.model.domain.User;
 import com.petcare.model.exception.PetcareException;
+import com.petcare.service.IUserService;
 import com.petcare.service.UserService;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.ThemeManager;
@@ -22,11 +23,13 @@ public class AddEditUserDialog extends JDialog {
     private JButton cancelButton;
     private boolean saved = false;
     private User user;
-    private final UserService userService = UserService.getInstance();
+    private final User currentUser;
+    private final IUserService userService = UserService.getInstance();
 
-    public AddEditUserDialog(JDialog parent, User user) {
+    public AddEditUserDialog(JDialog parent, User user, User currentUser) {
         super(parent, true);
         this.user = user;
+        this.currentUser = currentUser;
         initComponents();
         if (user != null) {
             loadUserData();
@@ -162,7 +165,7 @@ public class AddEditUserDialog extends JDialog {
                 newUser.setFullname(fullname);
                 newUser.setRole(role);
                 String plainPassword = new String(passwordField.getPassword());
-                userService.createUser(newUser, plainPassword);
+                userService.createUser(newUser, plainPassword, currentUser);
                 JOptionPane.showMessageDialog(this, "Thêm người dùng thành công!", "Thành công",
                         JOptionPane.INFORMATION_MESSAGE);
                 saved = true;
@@ -171,7 +174,7 @@ public class AddEditUserDialog extends JDialog {
                 user.setUsername(username);
                 user.setFullname(fullname);
                 user.setRole(role);
-                userService.updateUser(user);
+                userService.updateUser(user, currentUser);
                 JOptionPane.showMessageDialog(this, "Cập nhật người dùng thành công!", "Thành công",
                         JOptionPane.INFORMATION_MESSAGE);
                 saved = true;

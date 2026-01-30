@@ -1,6 +1,9 @@
 package com.petcare.service;
 
+import com.petcare.aop.PermissionHandler;
+import com.petcare.aop.RequireAdmin;
 import com.petcare.model.domain.Medicine;
+import com.petcare.model.domain.User;
 import com.petcare.model.entity.MedicineEntity;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.repository.IMedicineRepository;
@@ -10,19 +13,21 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Medicine Service - Entity ↔ Domain; Route enum mapping
+ * Medicine Service - Entity ↔ Domain; Route enum mapping.
+ * Phân quyền qua AOP thủ công: method có @RequireAdmin được kiểm tra bởi PermissionHandler.
  */
-public class MedicineService {
-    private static MedicineService instance;
+public class MedicineService implements IMedicineService {
+    private static IMedicineService instance;
     private IMedicineRepository repository;
 
-    private MedicineService() {
+    MedicineService() {
         this.repository = new MedicineRepository();
     }
 
-    public static MedicineService getInstance() {
+    public static IMedicineService getInstance() {
         if (instance == null) {
-            instance = new MedicineService();
+            MedicineService impl = new MedicineService();
+            instance = PermissionHandler.createProxy(impl, IMedicineService.class);
         }
         return instance;
     }
@@ -33,18 +38,22 @@ public class MedicineService {
         }
     }
 
+    @Override
     public List<Medicine> getAllMedicines() throws PetcareException {
         return repository.findAll().stream()
                 .map(this::entityToDomain)
                 .collect(Collectors.toList());
     }
 
+    @Override
     public Medicine getMedicineById(int id) throws PetcareException {
         MedicineEntity entity = repository.findById(id);
         return entity != null ? entityToDomain(entity) : null;
     }
 
-    public void createMedicine(Medicine medicine) throws PetcareException {
+    @RequireAdmin
+    @Override
+    public void createMedicine(Medicine medicine, User currentUser) throws PetcareException {
         MedicineEntity entity = domainToEntity(medicine);
         int result = repository.insert(entity);
         if (result > 0) {
@@ -54,7 +63,9 @@ public class MedicineService {
         }
     }
 
-    public void updateMedicine(Medicine medicine) throws PetcareException {
+    @RequireAdmin
+    @Override
+    public void updateMedicine(Medicine medicine, User currentUser) throws PetcareException {
         MedicineEntity existing = repository.findById(medicine.getMedicineId());
         if (existing == null) {
             throw new PetcareException("Không tìm thấy thuốc với ID: " + medicine.getMedicineId());
@@ -66,7 +77,9 @@ public class MedicineService {
         }
     }
 
-    public void deleteMedicine(int id) throws PetcareException {
+    @RequireAdmin
+    @Override
+    public void deleteMedicine(int id, User currentUser) throws PetcareException {
         MedicineEntity existing = repository.findById(id);
         if (existing == null) {
             throw new PetcareException("Không tìm thấy thuốc với ID: " + id);

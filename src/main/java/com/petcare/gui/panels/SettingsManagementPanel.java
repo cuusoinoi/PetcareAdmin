@@ -1,8 +1,10 @@
 package com.petcare.gui.panels;
 
 import com.petcare.model.domain.GeneralSetting;
+import com.petcare.model.domain.User;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.service.GeneralSettingService;
+import com.petcare.service.IGeneralSettingService;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
 import com.petcare.util.ThemeManager;
@@ -28,9 +30,11 @@ public class SettingsManagementPanel extends JPanel {
     private JTextField signingPlaceField;
     private JButton saveButton;
     private JButton refreshButton;
-    private final GeneralSettingService settingService = GeneralSettingService.getInstance();
+    private final IGeneralSettingService settingService = GeneralSettingService.getInstance();
+    private final User currentUser;
 
-    public SettingsManagementPanel() {
+    public SettingsManagementPanel(User currentUser) {
+        this.currentUser = currentUser;
         initComponents();
         loadSettings();
     }
@@ -244,7 +248,7 @@ public class SettingsManagementPanel extends JPanel {
             s.setDefaultDailyRate(defaultDailyRate);
             s.setSigningPlace(signingPlaceField.getText().trim());
 
-            settingService.saveSettings(s);
+            settingService.saveSettings(s, currentUser);
             JOptionPane.showMessageDialog(this, "Lưu cài đặt thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Phí trễ giờ hoặc phí lưu chuồng không hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);

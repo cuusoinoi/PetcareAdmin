@@ -2,7 +2,9 @@ package com.petcare.gui.panels;
 
 import com.petcare.gui.dialogs.AddEditMedicineDialog;
 import com.petcare.model.domain.Medicine;
+import com.petcare.model.domain.User;
 import com.petcare.model.exception.PetcareException;
+import com.petcare.service.IMedicineService;
 import com.petcare.service.MedicineService;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
@@ -31,9 +33,11 @@ public class MedicineManagementPanel extends JPanel {
     private JButton editButton;
     private JButton deleteButton;
     private JButton refreshButton;
-    private final MedicineService medicineService = MedicineService.getInstance();
+    private final IMedicineService medicineService = MedicineService.getInstance();
+    private final User currentUser;
 
-    public MedicineManagementPanel() {
+    public MedicineManagementPanel(User currentUser) {
+        this.currentUser = currentUser;
         initComponents();
         loadMedicines();
     }
@@ -208,7 +212,7 @@ public class MedicineManagementPanel extends JPanel {
     }
 
     private void showAddMedicineDialog() {
-        AddEditMedicineDialog dialog = new AddEditMedicineDialog(null, null);
+        AddEditMedicineDialog dialog = new AddEditMedicineDialog(null, null, currentUser);
         dialog.setVisible(true);
         if (dialog.isSaved()) {
             refreshData();
@@ -229,7 +233,7 @@ public class MedicineManagementPanel extends JPanel {
         try {
             Medicine medicine = medicineService.getMedicineById(medicineId);
             if (medicine != null) {
-                AddEditMedicineDialog dialog = new AddEditMedicineDialog(null, medicine);
+                AddEditMedicineDialog dialog = new AddEditMedicineDialog(null, medicine, currentUser);
                 dialog.setVisible(true);
                 if (dialog.isSaved()) {
                     refreshData();
@@ -257,7 +261,7 @@ public class MedicineManagementPanel extends JPanel {
                 JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                medicineService.deleteMedicine(medicineId);
+                medicineService.deleteMedicine(medicineId, currentUser);
                 JOptionPane.showMessageDialog(this,
                         "Xóa thuốc thành công!",
                         "Thành công",

@@ -9,6 +9,7 @@ import com.petcare.service.GeneralSettingService;
 import com.petcare.service.InvoiceService;
 import com.petcare.service.PetEnclosureService;
 import com.petcare.service.PetService;
+import com.petcare.service.IServiceTypeService;
 import com.petcare.service.ServiceTypeService;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.ThemeManager;
@@ -425,7 +426,7 @@ public class CheckoutDialog extends JDialog {
 
     private int findServiceTypeIdByName(String serviceName) {
         try {
-            ServiceTypeService svc = ServiceTypeService.getInstance();
+            IServiceTypeService svc = ServiceTypeService.getInstance();
             ServiceType s = svc.getServiceTypeByName(serviceName);
             if (s == null && serviceName.startsWith("Lưu chuồng")) {
                 s = svc.getServiceTypeByNamePrefix("Lưu chuồng");

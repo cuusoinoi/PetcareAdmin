@@ -2,7 +2,9 @@ package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.petcare.model.domain.Medicine;
+import com.petcare.model.domain.User;
 import com.petcare.model.exception.PetcareException;
+import com.petcare.service.IMedicineService;
 import com.petcare.service.MedicineService;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.ThemeManager;
@@ -20,11 +22,13 @@ public class AddEditMedicineDialog extends JDialog {
     private JButton cancelButton;
     private boolean saved = false;
     private Medicine medicine;
-    private final MedicineService medicineService = MedicineService.getInstance();
+    private final User currentUser;
+    private final IMedicineService medicineService = MedicineService.getInstance();
 
-    public AddEditMedicineDialog(JDialog parent, Medicine medicine) {
+    public AddEditMedicineDialog(JDialog parent, Medicine medicine, User currentUser) {
         super(parent, true);
         this.medicine = medicine;
+        this.currentUser = currentUser;
         initComponents();
         if (medicine != null) {
             loadMedicineData();
@@ -133,7 +137,7 @@ public class AddEditMedicineDialog extends JDialog {
                 Medicine newMedicine = new Medicine();
                 newMedicine.setMedicineName(medicineNameField.getText().trim());
                 newMedicine.setMedicineRoute(route);
-                medicineService.createMedicine(newMedicine);
+                medicineService.createMedicine(newMedicine, currentUser);
                 JOptionPane.showMessageDialog(this, "Thêm thuốc thành công!", "Thành công",
                         JOptionPane.INFORMATION_MESSAGE);
                 saved = true;
@@ -141,7 +145,7 @@ public class AddEditMedicineDialog extends JDialog {
             } else {
                 medicine.setMedicineName(medicineNameField.getText().trim());
                 medicine.setMedicineRoute(route);
-                medicineService.updateMedicine(medicine);
+                medicineService.updateMedicine(medicine, currentUser);
                 JOptionPane.showMessageDialog(this, "Cập nhật thuốc thành công!", "Thành công",
                         JOptionPane.INFORMATION_MESSAGE);
                 saved = true;

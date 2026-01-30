@@ -2,7 +2,9 @@ package com.petcare.gui.panels;
 
 import com.petcare.gui.dialogs.AddEditServiceTypeDialog;
 import com.petcare.model.domain.ServiceType;
+import com.petcare.model.domain.User;
 import com.petcare.model.exception.PetcareException;
+import com.petcare.service.IServiceTypeService;
 import com.petcare.service.ServiceTypeService;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
@@ -31,9 +33,11 @@ public class ServiceTypeManagementPanel extends JPanel {
     private JButton editButton;
     private JButton deleteButton;
     private JButton refreshButton;
-    private final ServiceTypeService serviceTypeService = ServiceTypeService.getInstance();
+    private final IServiceTypeService serviceTypeService = ServiceTypeService.getInstance();
+    private final User currentUser;
 
-    public ServiceTypeManagementPanel() {
+    public ServiceTypeManagementPanel(User currentUser) {
+        this.currentUser = currentUser;
         initComponents();
         loadServiceTypes();
     }
@@ -207,7 +211,7 @@ public class ServiceTypeManagementPanel extends JPanel {
     }
 
     private void showAddServiceDialog() {
-        AddEditServiceTypeDialog dialog = new AddEditServiceTypeDialog(null, null);
+        AddEditServiceTypeDialog dialog = new AddEditServiceTypeDialog(null, null, currentUser);
         dialog.setVisible(true);
         if (dialog.isSaved()) {
             refreshData();
@@ -228,7 +232,7 @@ public class ServiceTypeManagementPanel extends JPanel {
         try {
             ServiceType service = serviceTypeService.getServiceTypeById(serviceId);
             if (service != null) {
-                AddEditServiceTypeDialog dialog = new AddEditServiceTypeDialog(null, service);
+                AddEditServiceTypeDialog dialog = new AddEditServiceTypeDialog(null, service, currentUser);
                 dialog.setVisible(true);
                 if (dialog.isSaved()) {
                     refreshData();
@@ -256,7 +260,7 @@ public class ServiceTypeManagementPanel extends JPanel {
                 JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                serviceTypeService.deleteServiceType(serviceId);
+                serviceTypeService.deleteServiceType(serviceId, currentUser);
                 JOptionPane.showMessageDialog(this,
                         "Xóa dịch vụ thành công!",
                         "Thành công",

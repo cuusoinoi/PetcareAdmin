@@ -1,5 +1,7 @@
 package com.petcare.service;
 
+import com.petcare.aop.PermissionHandler;
+import com.petcare.aop.RequireAdmin;
 import com.petcare.model.domain.User;
 import com.petcare.model.entity.UserEntity;
 import com.petcare.model.exception.PetcareException;
@@ -13,19 +15,21 @@ import java.util.stream.Collectors;
 
 /**
  * User Service - Business logic for User.
- * Singleton; Entity ↔ Domain; BCrypt for password hashing (legacy MD5 supported on login, then upgraded).
+ * Singleton; Entity ↔ Domain; BCrypt for password hashing.
+ * Phân quyền qua AOP thủ công (proxy): method có @RequireAdmin được kiểm tra bởi PermissionHandler.
  */
-public class UserService {
-    private static UserService instance;
+public class UserService implements IUserService {
+    private static IUserService instance;
     private IUserRepository repository;
 
-    private UserService() {
+    UserService() {
         this.repository = new UserRepository();
     }
 
-    public static UserService getInstance() {
+    public static IUserService getInstance() {
         if (instance == null) {
-            instance = new UserService();
+            UserService impl = new UserService();
+            instance = PermissionHandler.createProxy(impl, IUserService.class);
         }
         return instance;
     }
@@ -41,6 +45,7 @@ public class UserService {
      * Supports BCrypt (current) and legacy MD5; on successful MD5 login, password is re-hashed to BCrypt.
      * Returns domain User if valid, null otherwise.
      */
+    @Override
     public User authenticate(String username, String plainPassword) throws PetcareException {
         UserEntity entity = repository.findByUsername(username);
         if (entity == null) {
@@ -60,21 +65,22 @@ public class UserService {
         return match ? entityToDomain(entity) : null;
     }
 
+    @Override
     public List<User> getAllUsers() throws PetcareException {
         return repository.findAll().stream()
                 .map(this::entityToDomain)
                 .collect(Collectors.toList());
     }
 
+    @Override
     public User getUserById(int id) throws PetcareException {
         UserEntity entity = repository.findById(id);
         return entity != null ? entityToDomain(entity) : null;
     }
 
-    /**
-     * Create user. Password is plain text; hashed inside.
-     */
-    public void createUser(User user, String plainPassword) throws PetcareException {
+    @RequireAdmin
+    @Override
+    public void createUser(User user, String plainPassword, User currentUser) throws PetcareException {
         if (repository.existsByUsername(user.getUsername())) {
             throw new PetcareException("Username đã tồn tại!");
         }
@@ -89,10 +95,9 @@ public class UserService {
         }
     }
 
-    /**
-     * Update user (no password change).
-     */
-    public void updateUser(User user) throws PetcareException {
+    @RequireAdmin
+    @Override
+    public void updateUser(User user, User currentUser) throws PetcareException {
         UserEntity existing = repository.findById(user.getUserId());
         if (existing == null) {
             throw new PetcareException("Không tìm thấy người dùng với ID: " + user.getUserId());
@@ -108,7 +113,9 @@ public class UserService {
         }
     }
 
-    public void deleteUser(int id) throws PetcareException {
+    @RequireAdmin
+    @Override
+    public void deleteUser(int id, User currentUser) throws PetcareException {
         UserEntity existing = repository.findById(id);
         if (existing == null) {
             throw new PetcareException("Không tìm thấy người dùng với ID: " + id);
@@ -119,7 +126,15 @@ public class UserService {
         }
     }
 
-    public void changePassword(int userId, String newPlainPassword) throws PetcareException {
+    @Override
+    public void changePassword(int userId, String newPlainPassword, User currentUser) throws PetcareException {
+        if (currentUser == null) {
+            throw new PetcareException("Không xác định người thực hiện.");
+        }
+        boolean allowed = currentUser.getUserId() == userId || currentUser.getRole() == User.Role.ADMIN;
+        if (!allowed) {
+            throw new PetcareException("Bạn không có quyền đổi mật khẩu người dùng này.");
+        }
         UserEntity existing = repository.findById(userId);
         if (existing == null) {
             throw new PetcareException("Không tìm thấy người dùng với ID: " + userId);
@@ -131,6 +146,7 @@ public class UserService {
         }
     }
 
+    @Override
     public boolean existsByUsername(String username) throws PetcareException {
         return repository.existsByUsername(username);
     }

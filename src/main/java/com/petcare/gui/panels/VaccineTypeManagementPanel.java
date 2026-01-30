@@ -1,8 +1,10 @@
 package com.petcare.gui.panels;
 
 import com.petcare.gui.dialogs.AddEditVaccineTypeDialog;
+import com.petcare.model.domain.User;
 import com.petcare.model.domain.VaccineType;
 import com.petcare.model.exception.PetcareException;
+import com.petcare.service.IVaccineTypeService;
 import com.petcare.service.VaccineTypeService;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
@@ -31,9 +33,11 @@ public class VaccineTypeManagementPanel extends JPanel {
     private JButton editButton;
     private JButton deleteButton;
     private JButton refreshButton;
-    private final VaccineTypeService vaccineTypeService = VaccineTypeService.getInstance();
+    private final IVaccineTypeService vaccineTypeService = VaccineTypeService.getInstance();
+    private final User currentUser;
 
-    public VaccineTypeManagementPanel() {
+    public VaccineTypeManagementPanel(User currentUser) {
+        this.currentUser = currentUser;
         initComponents();
         loadVaccines();
     }
@@ -206,7 +210,7 @@ public class VaccineTypeManagementPanel extends JPanel {
     }
 
     private void showAddVaccineDialog() {
-        AddEditVaccineTypeDialog dialog = new AddEditVaccineTypeDialog(null, null);
+        AddEditVaccineTypeDialog dialog = new AddEditVaccineTypeDialog(null, null, currentUser);
         dialog.setVisible(true);
         if (dialog.isSaved()) {
             refreshData();
@@ -227,7 +231,7 @@ public class VaccineTypeManagementPanel extends JPanel {
         try {
             VaccineType vaccine = vaccineTypeService.getVaccineTypeById(vaccineId);
             if (vaccine != null) {
-                AddEditVaccineTypeDialog dialog = new AddEditVaccineTypeDialog(null, vaccine);
+                AddEditVaccineTypeDialog dialog = new AddEditVaccineTypeDialog(null, vaccine, currentUser);
                 dialog.setVisible(true);
                 if (dialog.isSaved()) {
                     refreshData();
@@ -255,7 +259,7 @@ public class VaccineTypeManagementPanel extends JPanel {
                 JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                vaccineTypeService.deleteVaccineType(vaccineId);
+                vaccineTypeService.deleteVaccineType(vaccineId, currentUser);
                 JOptionPane.showMessageDialog(this,
                         "Xóa vaccine thành công!",
                         "Thành công",

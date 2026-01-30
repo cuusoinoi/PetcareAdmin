@@ -2,7 +2,9 @@ package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.petcare.model.domain.ServiceType;
+import com.petcare.model.domain.User;
 import com.petcare.model.exception.PetcareException;
+import com.petcare.service.IServiceTypeService;
 import com.petcare.service.ServiceTypeService;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.ThemeManager;
@@ -21,11 +23,13 @@ public class AddEditServiceTypeDialog extends JDialog {
     private JButton cancelButton;
     private boolean saved = false;
     private ServiceType service;
-    private final ServiceTypeService serviceTypeService = ServiceTypeService.getInstance();
+    private final User currentUser;
+    private final IServiceTypeService serviceTypeService = ServiceTypeService.getInstance();
 
-    public AddEditServiceTypeDialog(JDialog parent, ServiceType service) {
+    public AddEditServiceTypeDialog(JDialog parent, ServiceType service, User currentUser) {
         super(parent, true);
         this.service = service;
+        this.currentUser = currentUser;
         initComponents();
         if (service != null) {
             loadServiceData();
@@ -138,7 +142,7 @@ public class AddEditServiceTypeDialog extends JDialog {
                 newService.setServiceName(serviceNameField.getText().trim());
                 newService.setDescription(descriptionArea.getText().trim().isEmpty() ? null : descriptionArea.getText().trim());
                 newService.setPrice(price);
-                serviceTypeService.createServiceType(newService);
+                serviceTypeService.createServiceType(newService, currentUser);
                 JOptionPane.showMessageDialog(this, "Thêm dịch vụ thành công!", "Thành công",
                         JOptionPane.INFORMATION_MESSAGE);
                 saved = true;
@@ -147,7 +151,7 @@ public class AddEditServiceTypeDialog extends JDialog {
                 service.setServiceName(serviceNameField.getText().trim());
                 service.setDescription(descriptionArea.getText().trim().isEmpty() ? null : descriptionArea.getText().trim());
                 service.setPrice(price);
-                serviceTypeService.updateServiceType(service);
+                serviceTypeService.updateServiceType(service, currentUser);
                 JOptionPane.showMessageDialog(this, "Cập nhật dịch vụ thành công!", "Thành công",
                         JOptionPane.INFORMATION_MESSAGE);
                 saved = true;

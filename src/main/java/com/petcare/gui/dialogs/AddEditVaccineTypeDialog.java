@@ -1,8 +1,10 @@
 package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import com.petcare.model.domain.User;
 import com.petcare.model.domain.VaccineType;
 import com.petcare.model.exception.PetcareException;
+import com.petcare.service.IVaccineTypeService;
 import com.petcare.service.VaccineTypeService;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.ThemeManager;
@@ -20,11 +22,13 @@ public class AddEditVaccineTypeDialog extends JDialog {
     private JButton cancelButton;
     private boolean saved = false;
     private VaccineType vaccine;
-    private final VaccineTypeService vaccineTypeService = VaccineTypeService.getInstance();
+    private final User currentUser;
+    private final IVaccineTypeService vaccineTypeService = VaccineTypeService.getInstance();
 
-    public AddEditVaccineTypeDialog(JDialog parent, VaccineType vaccine) {
+    public AddEditVaccineTypeDialog(JDialog parent, VaccineType vaccine, User currentUser) {
         super(parent, true);
         this.vaccine = vaccine;
+        this.currentUser = currentUser;
         initComponents();
         if (vaccine != null) {
             loadVaccineData();
@@ -124,7 +128,7 @@ public class AddEditVaccineTypeDialog extends JDialog {
                 VaccineType newVaccine = new VaccineType();
                 newVaccine.setVaccineName(vaccineNameField.getText().trim());
                 newVaccine.setDescription(descriptionArea.getText().trim().isEmpty() ? null : descriptionArea.getText().trim());
-                vaccineTypeService.createVaccineType(newVaccine);
+                vaccineTypeService.createVaccineType(newVaccine, currentUser);
                 JOptionPane.showMessageDialog(this, "Thêm vaccine thành công!", "Thành công",
                         JOptionPane.INFORMATION_MESSAGE);
                 saved = true;
@@ -132,7 +136,7 @@ public class AddEditVaccineTypeDialog extends JDialog {
             } else {
                 vaccine.setVaccineName(vaccineNameField.getText().trim());
                 vaccine.setDescription(descriptionArea.getText().trim().isEmpty() ? null : descriptionArea.getText().trim());
-                vaccineTypeService.updateVaccineType(vaccine);
+                vaccineTypeService.updateVaccineType(vaccine, currentUser);
                 JOptionPane.showMessageDialog(this, "Cập nhật vaccine thành công!", "Thành công",
                         JOptionPane.INFORMATION_MESSAGE);
                 saved = true;

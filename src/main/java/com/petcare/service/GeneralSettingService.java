@@ -1,25 +1,30 @@
 package com.petcare.service;
 
+import com.petcare.aop.PermissionHandler;
+import com.petcare.aop.RequireAdmin;
 import com.petcare.model.domain.GeneralSetting;
+import com.petcare.model.domain.User;
 import com.petcare.model.entity.GeneralSettingEntity;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.repository.GeneralSettingRepository;
 import com.petcare.repository.IGeneralSettingRepository;
 
 /**
- * General Setting Service - single row config; Entity ↔ Domain
+ * General Setting Service - single row config; Entity ↔ Domain.
+ * Phân quyền qua AOP thủ công: saveSettings có @RequireAdmin được kiểm tra bởi PermissionHandler.
  */
-public class GeneralSettingService {
-    private static GeneralSettingService instance;
+public class GeneralSettingService implements IGeneralSettingService {
+    private static IGeneralSettingService instance;
     private IGeneralSettingRepository repository;
 
-    private GeneralSettingService() {
+    GeneralSettingService() {
         this.repository = new GeneralSettingRepository();
     }
 
-    public static GeneralSettingService getInstance() {
+    public static IGeneralSettingService getInstance() {
         if (instance == null) {
-            instance = new GeneralSettingService();
+            GeneralSettingService impl = new GeneralSettingService();
+            instance = PermissionHandler.createProxy(impl, IGeneralSettingService.class);
         }
         return instance;
     }
@@ -30,18 +35,15 @@ public class GeneralSettingService {
         }
     }
 
-    /**
-     * Get settings or null if none (caller can use defaults).
-     */
+    @Override
     public GeneralSetting getSettings() throws PetcareException {
         GeneralSettingEntity entity = repository.findFirst();
         return entity != null ? entityToDomain(entity) : null;
     }
 
-    /**
-     * Save or update. If no row exists, insert; else update.
-     */
-    public void saveSettings(GeneralSetting setting) throws PetcareException {
+    @RequireAdmin
+    @Override
+    public void saveSettings(GeneralSetting setting, User currentUser) throws PetcareException {
         setting.validate();
         GeneralSettingEntity entity = domainToEntity(setting);
         if (repository.exists()) {
@@ -63,6 +65,7 @@ public class GeneralSettingService {
     /**
      * For CheckoutDialog: get checkout hour (e.g. 18) and overtime fee per hour.
      */
+    @Override
     public int getCheckoutHour() throws PetcareException {
         GeneralSetting s = getSettings();
         if (s == null || s.getCheckoutHour() == null) return 18;
@@ -76,6 +79,7 @@ public class GeneralSettingService {
         return 18;
     }
 
+    @Override
     public int getOvertimeFeePerHour() throws PetcareException {
         GeneralSetting s = getSettings();
         return s != null && s.getOvertimeFeePerHour() > 0 ? s.getOvertimeFeePerHour() : 25000;

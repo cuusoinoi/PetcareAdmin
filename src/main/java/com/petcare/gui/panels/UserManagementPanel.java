@@ -4,6 +4,7 @@ import com.petcare.gui.dialogs.AddEditUserDialog;
 import com.petcare.gui.dialogs.ChangePasswordDialog;
 import com.petcare.model.domain.User;
 import com.petcare.model.exception.PetcareException;
+import com.petcare.service.IUserService;
 import com.petcare.service.UserService;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
@@ -33,10 +34,12 @@ public class UserManagementPanel extends JPanel {
     private JButton changePasswordButton;
     private JButton deleteButton;
     private JButton refreshButton;
-    private final UserService userService;
+    private final IUserService userService;
+    private final User currentUser;
 
-    public UserManagementPanel() {
+    public UserManagementPanel(User currentUser) {
         this.userService = UserService.getInstance();
+        this.currentUser = currentUser;
         initComponents();
         loadUsers();
     }
@@ -214,7 +217,7 @@ public class UserManagementPanel extends JPanel {
     }
 
     private void showAddUserDialog() {
-        AddEditUserDialog dialog = new AddEditUserDialog(null, null);
+                AddEditUserDialog dialog = new AddEditUserDialog(null, null, currentUser);
         dialog.setVisible(true);
         if (dialog.isSaved()) {
             refreshData();
@@ -235,7 +238,7 @@ public class UserManagementPanel extends JPanel {
         try {
             User user = userService.getUserById(userId);
             if (user != null) {
-                AddEditUserDialog dialog = new AddEditUserDialog(null, user);
+                AddEditUserDialog dialog = new AddEditUserDialog(null, user, currentUser);
                 dialog.setVisible(true);
                 if (dialog.isSaved()) {
                     refreshData();
@@ -257,7 +260,7 @@ public class UserManagementPanel extends JPanel {
         }
         int modelRow = userTable.convertRowIndexToModel(selectedRow);
         int userId = (Integer) tableModel.getValueAt(modelRow, 0);
-        ChangePasswordDialog dialog = new ChangePasswordDialog(null, userId);
+        ChangePasswordDialog dialog = new ChangePasswordDialog(null, userId, currentUser);
         dialog.setVisible(true);
     }
 
@@ -279,7 +282,7 @@ public class UserManagementPanel extends JPanel {
                 JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                userService.deleteUser(userId);
+                userService.deleteUser(userId, currentUser);
                 JOptionPane.showMessageDialog(this,
                         "Xóa người dùng thành công!",
                         "Thành công",

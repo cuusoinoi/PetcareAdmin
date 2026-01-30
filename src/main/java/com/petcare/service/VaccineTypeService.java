@@ -1,5 +1,8 @@
 package com.petcare.service;
 
+import com.petcare.aop.PermissionHandler;
+import com.petcare.aop.RequireAdmin;
+import com.petcare.model.domain.User;
 import com.petcare.model.domain.VaccineType;
 import com.petcare.model.entity.VaccineTypeEntity;
 import com.petcare.model.exception.PetcareException;
@@ -10,19 +13,21 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Vaccine Type Service - Entity ↔ Domain
+ * Vaccine Type Service - Entity ↔ Domain.
+ * Phân quyền qua AOP thủ công: method có @RequireAdmin được kiểm tra bởi PermissionHandler.
  */
-public class VaccineTypeService {
-    private static VaccineTypeService instance;
+public class VaccineTypeService implements IVaccineTypeService {
+    private static IVaccineTypeService instance;
     private IVaccineTypeRepository repository;
 
-    private VaccineTypeService() {
+    VaccineTypeService() {
         this.repository = new VaccineTypeRepository();
     }
 
-    public static VaccineTypeService getInstance() {
+    public static IVaccineTypeService getInstance() {
         if (instance == null) {
-            instance = new VaccineTypeService();
+            VaccineTypeService impl = new VaccineTypeService();
+            instance = PermissionHandler.createProxy(impl, IVaccineTypeService.class);
         }
         return instance;
     }
@@ -33,18 +38,22 @@ public class VaccineTypeService {
         }
     }
 
+    @Override
     public List<VaccineType> getAllVaccineTypes() throws PetcareException {
         return repository.findAll().stream()
                 .map(this::entityToDomain)
                 .collect(Collectors.toList());
     }
 
+    @Override
     public VaccineType getVaccineTypeById(int id) throws PetcareException {
         VaccineTypeEntity entity = repository.findById(id);
         return entity != null ? entityToDomain(entity) : null;
     }
 
-    public void createVaccineType(VaccineType vaccineType) throws PetcareException {
+    @RequireAdmin
+    @Override
+    public void createVaccineType(VaccineType vaccineType, User currentUser) throws PetcareException {
         VaccineTypeEntity entity = domainToEntity(vaccineType);
         int result = repository.insert(entity);
         if (result > 0) {
@@ -54,7 +63,9 @@ public class VaccineTypeService {
         }
     }
 
-    public void updateVaccineType(VaccineType vaccineType) throws PetcareException {
+    @RequireAdmin
+    @Override
+    public void updateVaccineType(VaccineType vaccineType, User currentUser) throws PetcareException {
         VaccineTypeEntity existing = repository.findById(vaccineType.getVaccineId());
         if (existing == null) {
             throw new PetcareException("Không tìm thấy vaccine với ID: " + vaccineType.getVaccineId());
@@ -66,7 +77,9 @@ public class VaccineTypeService {
         }
     }
 
-    public void deleteVaccineType(int id) throws PetcareException {
+    @RequireAdmin
+    @Override
+    public void deleteVaccineType(int id, User currentUser) throws PetcareException {
         VaccineTypeEntity existing = repository.findById(id);
         if (existing == null) {
             throw new PetcareException("Không tìm thấy vaccine với ID: " + id);

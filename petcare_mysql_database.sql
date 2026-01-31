@@ -13,6 +13,10 @@ USE petcare;
 -- =====================================================
 
 DROP TABLE IF EXISTS prescriptions;
+DROP TABLE IF EXISTS invoice_vaccination_details;
+DROP TABLE IF EXISTS invoice_medicine_details;
+DROP TABLE IF EXISTS medical_record_services;
+DROP TABLE IF EXISTS medical_record_medicines;
 DROP TABLE IF EXISTS diagnoses;
 DROP TABLE IF EXISTS treatment_sessions;
 DROP TABLE IF EXISTS treatment_courses;
@@ -56,14 +60,16 @@ CREATE TABLE service_types (
 CREATE TABLE medicines (
     medicine_id INT(11) AUTO_INCREMENT PRIMARY KEY,
     medicine_name VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_vietnamese_ci NOT NULL,
-    medicine_route ENUM('PO', 'IM', 'IV', 'SC') CHARACTER SET utf8 COLLATE utf8_vietnamese_ci NOT NULL
+    medicine_route ENUM('PO', 'IM', 'IV', 'SC') CHARACTER SET utf8 COLLATE utf8_vietnamese_ci NOT NULL,
+    unit_price INT(11) NOT NULL DEFAULT 0
 );
 
 -- Bảng vaccine
 CREATE TABLE vaccines (
     vaccine_id INT(11) AUTO_INCREMENT PRIMARY KEY,
     vaccine_name VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_vietnamese_ci NOT NULL,
-    description TEXT CHARACTER SET utf8 COLLATE utf8_vietnamese_ci DEFAULT NULL
+    description TEXT CHARACTER SET utf8 COLLATE utf8_vietnamese_ci DEFAULT NULL,
+    unit_price INT(11) NOT NULL DEFAULT 0
 );
 
 -- Bảng cài đặt chung
@@ -165,6 +171,7 @@ CREATE TABLE invoices (
     customer_id INT(11) NOT NULL,
     pet_id INT(11) NOT NULL,
     pet_enclosure_id INT(11) DEFAULT NULL,
+    medical_record_id INT(11) DEFAULT NULL,
     invoice_date DATETIME NOT NULL,
     discount INT(11) DEFAULT 0,
     subtotal INT(11) NOT NULL,
@@ -172,7 +179,8 @@ CREATE TABLE invoices (
     total_amount INT(11) NOT NULL,
     FOREIGN KEY (customer_id) REFERENCES customers(customer_id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (pet_id) REFERENCES pets(pet_id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (pet_enclosure_id) REFERENCES pet_enclosures(pet_enclosure_id) ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY (pet_enclosure_id) REFERENCES pet_enclosures(pet_enclosure_id) ON UPDATE CASCADE ON DELETE SET NULL,
+    FOREIGN KEY (medical_record_id) REFERENCES medical_records(medical_record_id) ON UPDATE CASCADE ON DELETE SET NULL
 );
 
 -- Bảng chi tiết hóa đơn
@@ -187,10 +195,11 @@ CREATE TABLE invoice_details (
     FOREIGN KEY (service_type_id) REFERENCES service_types(service_type_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
--- Bảng tiêm chủng thú cưng
+-- Bảng tiêm chủng thú cưng (gắn với lượt khám)
 CREATE TABLE pet_vaccinations (
     pet_vaccination_id INT(11) AUTO_INCREMENT PRIMARY KEY,
     vaccine_id INT(11) NOT NULL,
+    medical_record_id INT(11) DEFAULT NULL,
     customer_id INT(11) NOT NULL,
     pet_id INT(11) NOT NULL,
     doctor_id INT(11) NOT NULL,
@@ -198,19 +207,22 @@ CREATE TABLE pet_vaccinations (
     next_vaccination_date DATE DEFAULT NULL,
     notes TEXT CHARACTER SET utf8 COLLATE utf8_vietnamese_ci DEFAULT NULL,
     FOREIGN KEY (vaccine_id) REFERENCES vaccines(vaccine_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (medical_record_id) REFERENCES medical_records(medical_record_id) ON UPDATE CASCADE ON DELETE SET NULL,
     FOREIGN KEY (customer_id) REFERENCES customers(customer_id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (pet_id) REFERENCES pets(pet_id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (doctor_id) REFERENCES doctors(doctor_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
--- Bảng liệu trình điều trị
+-- Bảng liệu trình điều trị (gắn với lượt khám)
 CREATE TABLE treatment_courses (
     treatment_course_id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    medical_record_id INT(11) DEFAULT NULL,
     customer_id INT(11) NOT NULL,
     pet_id INT(11) NOT NULL,
     start_date DATE NOT NULL,
     end_date DATE,
     status ENUM('0', '1') CHARACTER SET utf8 COLLATE utf8_vietnamese_ci NOT NULL COMMENT '1 = Đang điều trị, 0 = Kết thúc',
+    FOREIGN KEY (medical_record_id) REFERENCES medical_records(medical_record_id) ON UPDATE CASCADE ON DELETE SET NULL,
     FOREIGN KEY (customer_id) REFERENCES customers(customer_id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (pet_id) REFERENCES pets(pet_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
@@ -254,6 +266,54 @@ CREATE TABLE prescriptions (
     notes TEXT CHARACTER SET utf8 COLLATE utf8_vietnamese_ci,
     FOREIGN KEY (treatment_session_id) REFERENCES treatment_sessions(treatment_session_id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (medicine_id) REFERENCES medicines(medicine_id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+-- Thuốc kê trong lượt khám
+CREATE TABLE medical_record_medicines (
+    record_medicine_id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    medical_record_id INT(11) NOT NULL,
+    medicine_id INT(11) NOT NULL,
+    quantity INT(11) NOT NULL,
+    unit_price INT(11) NOT NULL,
+    total_price INT(11) NOT NULL,
+    FOREIGN KEY (medical_record_id) REFERENCES medical_records(medical_record_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (medicine_id) REFERENCES medicines(medicine_id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+-- Dịch vụ đã thêm trong lượt khám
+CREATE TABLE medical_record_services (
+    record_service_id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    medical_record_id INT(11) NOT NULL,
+    service_type_id INT(11) NOT NULL,
+    quantity INT(11) NOT NULL,
+    unit_price INT(11) NOT NULL,
+    total_price INT(11) NOT NULL,
+    FOREIGN KEY (medical_record_id) REFERENCES medical_records(medical_record_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (service_type_id) REFERENCES service_types(service_type_id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+-- Chi tiết thuốc trên hóa đơn (xuất hóa đơn từ lượt khám)
+CREATE TABLE invoice_medicine_details (
+    detail_id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    invoice_id INT(11) NOT NULL,
+    medicine_id INT(11) NOT NULL,
+    quantity INT(11) NOT NULL,
+    unit_price INT(11) NOT NULL,
+    total_price INT(11) NOT NULL,
+    FOREIGN KEY (invoice_id) REFERENCES invoices(invoice_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (medicine_id) REFERENCES medicines(medicine_id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+-- Chi tiết tiêm chủng trên hóa đơn (từ lượt khám)
+CREATE TABLE invoice_vaccination_details (
+    detail_id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    invoice_id INT(11) NOT NULL,
+    vaccine_id INT(11) NOT NULL,
+    quantity INT(11) NOT NULL,
+    unit_price INT(11) NOT NULL,
+    total_price INT(11) NOT NULL,
+    FOREIGN KEY (invoice_id) REFERENCES invoices(invoice_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (vaccine_id) REFERENCES vaccines(vaccine_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 -- Bảng đặt lịch hẹn (Appointments)
@@ -341,23 +401,23 @@ INSERT INTO general_settings (
 );
 
 -- === MEDICINES ===
-INSERT INTO medicines (medicine_name, medicine_route) VALUES
-('Amoxicillin 250mg', 'PO'),
-('Cefotaxime 1g', 'IM'),
-('Vitamin C 500mg', 'IV'),
-('Ivermectin 1%', 'SC'),
-('Metronidazole 250mg', 'PO'),
-('Dexamethasone 4mg', 'IM'),
-('Prednisolone 5mg', 'PO'),
-('Enrofloxacin 50mg', 'PO');
+INSERT INTO medicines (medicine_name, medicine_route, unit_price) VALUES
+('Amoxicillin 250mg', 'PO', 15000),
+('Cefotaxime 1g', 'IM', 45000),
+('Vitamin C 500mg', 'IV', 25000),
+('Ivermectin 1%', 'SC', 35000),
+('Metronidazole 250mg', 'PO', 12000),
+('Dexamethasone 4mg', 'IM', 18000),
+('Prednisolone 5mg', 'PO', 8000),
+('Enrofloxacin 50mg', 'PO', 22000);
 
 -- === VACCINES ===
-INSERT INTO vaccines (vaccine_name, description) VALUES
-('Vacxin Dại Rabisin', 'Phòng chống bệnh dại cho chó mèo, tiêm định kỳ 12 tháng/lần.'),
-('Vacxin 7 bệnh DHPPiL', 'Phòng 7 bệnh phổ biến cho chó: Carré, Parvo, Viêm gan...'),
-('Vacxin Care', 'Phòng bệnh Care (sài sốt) ở chó, nguy hiểm và dễ lây lan.'),
-('Vacxin Parvo', 'Phòng bệnh Parvo gây tiêu chảy, nôn mửa nghiêm trọng ở chó.'),
-('Vacxin 4 bệnh mèo FVRCP', 'Phòng 4 bệnh cho mèo: viêm mũi, calici, chlamydia, panleukopenia.');
+INSERT INTO vaccines (vaccine_name, description, unit_price) VALUES
+('Vacxin Dại Rabisin', 'Phòng chống bệnh dại cho chó mèo, tiêm định kỳ 12 tháng/lần.', 150000),
+('Vacxin 7 bệnh DHPPiL', 'Phòng 7 bệnh phổ biến cho chó: Carré, Parvo, Viêm gan...', 200000),
+('Vacxin Care', 'Phòng bệnh Care (sài sốt) ở chó, nguy hiểm và dễ lây lan.', 180000),
+('Vacxin Parvo', 'Phòng bệnh Parvo gây tiêu chảy, nôn mửa nghiêm trọng ở chó.', 120000),
+('Vacxin 4 bệnh mèo FVRCP', 'Phòng 4 bệnh cho mèo: viêm mũi, calici, chlamydia, panleukopenia.', 220000);
 
 -- === CUSTOMERS ===
 INSERT INTO customers (customer_name, customer_phone_number, customer_identity_card, customer_address, customer_note) VALUES
@@ -419,75 +479,96 @@ INSERT INTO pets (customer_id, pet_name, pet_species, pet_gender, pet_dob, pet_w
 
 -- === MEDICAL RECORDS ===
 INSERT INTO medical_records (customer_id, pet_id, doctor_id, medical_record_type, medical_record_visit_date, medical_record_summary, medical_record_details) VALUES
-(1, 1, 1, 'Khám', '2026-01-10', 'Khám tổng quát định kỳ cho Mochi.', 'Sức khỏe ổn định, cân nặng đạt chuẩn, không có dấu hiệu bất thường.'),
-(1, 2, 2, 'Vaccine', '2026-01-12', 'Tiêm phòng dại cho Pudding.', 'Đã tiêm 1 mũi Rabisin, theo dõi 30 phút sau tiêm, phản ứng tốt.'),
-(2, 3, 3, 'Điều trị', '2026-01-08', 'Điều trị viêm da dị ứng cho Mimi.', 'Bôi thuốc kháng viêm trong 7 ngày, tránh thức ăn có hải sản.'),
-(3, 4, 4, 'Khám', '2026-01-15', 'Khám lần đầu cho Max.', 'Cún khỏe mạnh, đề nghị tiêm phòng vaccine 7 bệnh.'),
-(4, 5, 5, 'Điều trị', '2026-01-05', 'Điều trị viêm tai cho Luna.', 'Làm sạch tai, kê thuốc nhỏ tai và kháng sinh uống 5 ngày.'),
-(5, 6, 2, 'Vaccine', '2026-01-02', 'Tiêm phòng 4 bệnh cho Kitty.', 'Đã tiêm FVRCP, không có phản ứng phụ.'),
-(6, 8, 1, 'Khám', '2025-12-20', 'Khám sức khỏe cho Snowball.', 'Ổn định, cân nặng 5.2kg, mắt trong.'),
-(7, 9, 2, 'Vaccine', '2025-12-22', 'Tiêm phòng 7 bệnh cho Rocky.', 'Tiêm DHPPiL, theo dõi tốt.'),
-(8, 10, 5, 'Điều trị', '2025-12-25', 'Điều trị rối loạn tiêu hóa cho Chloe.', 'Kê thuốc men tiêu hóa 5 ngày, ăn cháo loãng.'),
-(9, 11, 4, 'Khám', '2026-01-01', 'Khám tổng quát cho Cooper.', 'Sức khỏe tốt, đề xuất tẩy giun định kỳ.'),
-(10, 12, 3, 'Điều trị', '2026-01-05', 'Viêm da nhẹ ở tai phải Bella.', 'Bôi thuốc hằng ngày, kiểm tra lại sau 1 tuần.'),
-(11, 13, 1, 'Khám', '2026-01-07', 'Khám định kỳ cho Charlie.', 'Đề xuất tiêm phòng dại.'),
-(12, 14, 4, 'Vaccine', '2026-01-10', 'Tiêm phòng dại cho Tom.', 'Tiêm Rabisin, theo dõi tốt.'),
-(13, 15, 5, 'Điều trị', '2026-01-14', 'Điều trị nấm ngoài da cho Nala.', 'Tắm bằng dung dịch đặc trị, 3 lần/tuần.'),
-(14, 16, 6, 'Khám', '2026-01-18', 'Khám kiểm tra sau điều trị Duke.', 'Tình trạng da đã cải thiện 95%.'),
-(15, 17, 7, 'Vaccine', '2026-01-20', 'Tiêm phòng 7 bệnh cho Buddy.', 'Không phản ứng phụ, sức khỏe tốt.'),
-(16, 18, 1, 'Điều trị', '2025-12-28', 'Điều trị cảm lạnh cho Sophie.', 'Giữ ấm, vitamin C và kháng sinh 3 ngày.'),
-(17, 19, 8, 'Khám', '2026-01-02', 'Khám sức khỏe tổng quát Teddy.', 'Ổn định, cân nặng đạt chuẩn giống Pomeranian.'),
-(18, 20, 2, 'Điều trị', '2026-01-08', 'Điều trị stress do xa chủ cho Daisy.', 'Bổ sung vitamin, tạo môi trường thoải mái.'),
-(19, 3, 3, 'Vaccine', '2026-01-15', 'Tiêm vaccine 4 bệnh mèo cho Mimi.', 'Hoàn tất FVRCP, theo dõi tốt.');
+(1, 1, 1, 'Khám', '2026-01-20', 'Khám tổng quát định kỳ cho Mochi.', 'Sức khỏe ổn định, cân nặng đạt chuẩn, không có dấu hiệu bất thường.'),
+(1, 2, 2, 'Vaccine', '2026-01-22', 'Tiêm phòng dại cho Pudding.', 'Đã tiêm 1 mũi Rabisin, theo dõi 30 phút sau tiêm, phản ứng tốt.'),
+(2, 3, 3, 'Điều trị', '2026-01-18', 'Điều trị viêm da dị ứng cho Mimi.', 'Bôi thuốc kháng viêm trong 7 ngày, tránh thức ăn có hải sản.'),
+(3, 4, 4, 'Khám', '2026-01-25', 'Khám lần đầu cho Max.', 'Cún khỏe mạnh, đề nghị tiêm phòng vaccine 7 bệnh.'),
+(4, 5, 5, 'Điều trị', '2026-01-16', 'Điều trị viêm tai cho Luna.', 'Làm sạch tai, kê thuốc nhỏ tai và kháng sinh uống 5 ngày.'),
+(5, 6, 2, 'Vaccine', '2026-01-15', 'Tiêm phòng 4 bệnh cho Kitty.', 'Đã tiêm FVRCP, không có phản ứng phụ.'),
+(6, 8, 1, 'Khám', '2026-01-16', 'Khám sức khỏe cho Snowball.', 'Ổn định, cân nặng 5.2kg, mắt trong.'),
+(7, 9, 2, 'Vaccine', '2026-01-17', 'Tiêm phòng 7 bệnh cho Rocky.', 'Tiêm DHPPiL, theo dõi tốt.'),
+(8, 10, 5, 'Điều trị', '2026-01-17', 'Điều trị rối loạn tiêu hóa cho Chloe.', 'Kê thuốc men tiêu hóa 5 ngày, ăn cháo loãng.'),
+(9, 11, 4, 'Khám', '2026-01-19', 'Khám tổng quát cho Cooper.', 'Sức khỏe tốt, đề xuất tẩy giun định kỳ.'),
+(10, 12, 3, 'Điều trị', '2026-01-16', 'Viêm da nhẹ ở tai phải Bella.', 'Bôi thuốc hằng ngày, kiểm tra lại sau 1 tuần.'),
+(11, 13, 1, 'Khám', '2026-01-21', 'Khám định kỳ cho Charlie.', 'Đề xuất tiêm phòng dại.'),
+(12, 14, 4, 'Vaccine', '2026-01-22', 'Tiêm phòng dại cho Tom.', 'Tiêm Rabisin, theo dõi tốt.'),
+(13, 15, 5, 'Điều trị', '2026-01-24', 'Điều trị nấm ngoài da cho Nala.', 'Tắm bằng dung dịch đặc trị, 3 lần/tuần.'),
+(14, 16, 6, 'Khám', '2026-01-26', 'Khám kiểm tra sau điều trị Duke.', 'Tình trạng da đã cải thiện 95%.'),
+(15, 17, 7, 'Vaccine', '2026-01-27', 'Tiêm phòng 7 bệnh cho Buddy.', 'Không phản ứng phụ, sức khỏe tốt.'),
+(16, 18, 1, 'Điều trị', '2026-01-17', 'Điều trị cảm lạnh cho Sophie.', 'Giữ ấm, vitamin C và kháng sinh 3 ngày.'),
+(17, 19, 8, 'Khám', '2026-01-19', 'Khám sức khỏe tổng quát Teddy.', 'Ổn định, cân nặng đạt chuẩn giống Pomeranian.'),
+(18, 20, 2, 'Điều trị', '2026-01-21', 'Điều trị stress do xa chủ cho Daisy.', 'Bổ sung vitamin, tạo môi trường thoải mái.'),
+(19, 3, 3, 'Vaccine', '2026-01-25', 'Tiêm vaccine 4 bệnh mèo cho Mimi.', 'Hoàn tất FVRCP, theo dõi tốt.');
 
 -- === VACCINATION RECORDS ===
 INSERT INTO vaccination_records (medical_record_id, vaccine_name, batch_number, next_injection_date) VALUES
-(2, 'Rabisin (Phòng dại)', 'RBS-2026-01', '2027-01-12'),
-(6, 'FVRCP (Phòng 4 bệnh mèo)', 'FVR-2026-01', '2027-01-02'),
-(8, 'DHPPiL (Phòng 7 bệnh)', 'DHP-2025-12', '2026-12-22'),
-(13, 'Rabisin (Phòng dại)', 'RBS-2026-01B', '2027-01-10'),
-(16, 'DHPPiL (Phòng 7 bệnh)', 'DHP-2026-01', '2027-01-20'),
-(20, 'FVRCP (Phòng 4 bệnh mèo)', 'FVR-2026-01B', '2027-01-15');
+(2, 'Rabisin (Phòng dại)', 'RBS-2026-01', '2027-01-22'),
+(6, 'FVRCP (Phòng 4 bệnh mèo)', 'FVR-2026-01', '2027-01-15'),
+(8, 'DHPPiL (Phòng 7 bệnh)', 'DHP-2026-01', '2027-01-17'),
+(13, 'Rabisin (Phòng dại)', 'RBS-2026-01B', '2027-01-22'),
+(16, 'DHPPiL (Phòng 7 bệnh)', 'DHP-2026-01', '2027-01-27'),
+(20, 'FVRCP (Phòng 4 bệnh mèo)', 'FVR-2026-01B', '2027-01-25');
+
+-- === MEDICAL RECORD MEDICINES ===
+INSERT INTO medical_record_medicines (medical_record_id, medicine_id, quantity, unit_price, total_price) VALUES
+(3, 7, 14, 8000, 112000),
+(3, 1, 14, 15000, 210000),
+(4, 8, 10, 22000, 220000),
+(4, 6, 2, 18000, 36000),
+(10, 7, 7, 8000, 56000),
+(13, 4, 3, 35000, 105000),
+(16, 3, 5, 25000, 125000);
+
+-- === MEDICAL RECORD SERVICES ===
+INSERT INTO medical_record_services (medical_record_id, service_type_id, quantity, unit_price, total_price) VALUES
+(1, 6, 1, 150000, 150000),
+(2, 7, 1, 250000, 250000),
+(3, 8, 1, 80000, 80000),
+(5, 6, 1, 150000, 150000),
+(5, 8, 1, 80000, 80000),
+(9, 6, 1, 150000, 150000),
+(11, 6, 1, 150000, 150000),
+(12, 7, 1, 250000, 250000);
 
 -- === PET ENCLOSURES ===
 INSERT INTO pet_enclosures (customer_id, pet_id, pet_enclosure_number, check_in_date, check_out_date, daily_rate, deposit, emergency_limit, pet_enclosure_note, pet_enclosure_status) VALUES
-(1, 1, 101, '2026-01-05 09:00:00', '2026-01-08 10:00:00', 80000, 100000, 500000, 'Gửi 3 ngày, thú cưng ngoan, ăn uống tốt.', 'Check Out'),
-(2, 3, 102, '2026-01-10 08:30:00', '2026-01-15 09:00:00', 100000, 150000, 1000000, 'Mèo VIP, chuồng có điều hòa, camera.', 'Check Out'),
-(3, 4, 103, '2026-01-18 10:00:00', NULL, 85000, 120000, 800000, 'Cún lần đầu gửi, cần quan sát kỹ.', 'Check In'),
-(4, 5, 104, '2026-01-12 14:00:00', '2026-01-16 09:00:00', 90000, 100000, 600000, 'Thú cưng sợ tiếng ồn, đặt phòng yên tĩnh.', 'Check Out'),
-(5, 6, 105, '2026-01-20 09:00:00', NULL, 95000, 130000, 700000, 'Mèo đang theo dõi sức khỏe.', 'Check In'),
-(6, 8, 106, '2025-12-20 08:00:00', '2025-12-23 10:00:00', 80000, 100000, 500000, 'Gửi 3 ngày trong dịp Noel.', 'Check Out'),
-(7, 9, 107, '2025-12-22 09:00:00', '2025-12-26 11:00:00', 120000, 200000, 1000000, 'Chó lớn, cần phòng rộng.', 'Check Out'),
-(8, 10, 108, '2025-12-25 08:30:00', '2025-12-28 09:00:00', 85000, 100000, 600000, 'Có camera theo dõi 24/7.', 'Check Out'),
-(9, 11, 109, '2026-01-01 09:00:00', '2026-01-04 09:00:00', 110000, 150000, 800000, 'Chó Golden, cần nhiều không gian.', 'Check Out'),
-(10, 12, 110, '2026-01-05 10:00:00', '2026-01-08 10:00:00', 90000, 120000, 600000, 'Mèo lông dài, chải lông mỗi ngày.', 'Check Out'),
-(11, 13, 111, '2026-01-10 09:00:00', NULL, 85000, 100000, 500000, 'Đang điều trị ve, cần theo dõi.', 'Check In'),
-(12, 14, 112, '2026-01-12 08:00:00', '2026-01-15 09:00:00', 80000, 100000, 400000, 'Mèo nhỏ, rất ngoan.', 'Check Out'),
-(13, 15, 113, '2026-01-14 10:00:00', '2026-01-18 09:00:00', 85000, 110000, 500000, 'Mèo mới, cần quan sát.', 'Check Out'),
-(14, 16, 114, '2026-01-18 09:00:00', '2026-01-21 09:00:00', 115000, 180000, 900000, 'Chó Becgie, cần phòng riêng.', 'Check Out'),
-(15, 17, 115, '2026-01-20 09:30:00', NULL, 110000, 160000, 800000, 'Đang gửi dài hạn.', 'Check In'),
-(16, 18, 116, '2025-12-28 08:00:00', '2025-12-31 09:00:00', 100000, 120000, 600000, 'Mèo không lông, cần giữ ấm.', 'Check Out'),
-(17, 19, 117, '2026-01-02 08:30:00', '2026-01-05 09:00:00', 75000, 80000, 400000, 'Chó nhỏ, hay sủa ban đêm.', 'Check Out'),
-(18, 20, 118, '2026-01-08 08:00:00', '2026-01-11 09:00:00', 75000, 80000, 400000, 'Chó nhút nhát, cần nhẹ nhàng.', 'Check Out'),
-(19, 4, 119, '2026-01-22 10:00:00', NULL, 85000, 120000, 700000, 'Gửi trong khi chủ đi du lịch.', 'Check In'),
-(20, 6, 120, '2026-01-21 09:00:00', NULL, 95000, 130000, 700000, 'Mèo VIP, có yêu cầu đặc biệt.', 'Check In');
+(1, 1, 101, '2026-01-18 09:00:00', '2026-01-21 10:00:00', 80000, 100000, 500000, 'Gửi 3 ngày, thú cưng ngoan, ăn uống tốt.', 'Check Out'),
+(2, 3, 102, '2026-01-20 08:30:00', '2026-01-25 09:00:00', 100000, 150000, 1000000, 'Mèo VIP, chuồng có điều hòa, camera.', 'Check Out'),
+(3, 4, 103, '2026-01-26 10:00:00', NULL, 85000, 120000, 800000, 'Cún lần đầu gửi, cần quan sát kỹ.', 'Check In'),
+(4, 5, 104, '2026-01-22 14:00:00', '2026-01-26 09:00:00', 90000, 100000, 600000, 'Thú cưng sợ tiếng ồn, đặt phòng yên tĩnh.', 'Check Out'),
+(5, 6, 105, '2026-01-28 09:00:00', NULL, 95000, 130000, 700000, 'Mèo đang theo dõi sức khỏe.', 'Check In'),
+(6, 8, 106, '2026-01-15 08:00:00', '2026-01-18 10:00:00', 80000, 100000, 500000, 'Gửi 3 ngày.', 'Check Out'),
+(7, 9, 107, '2026-01-16 09:00:00', '2026-01-20 11:00:00', 120000, 200000, 1000000, 'Chó lớn, cần phòng rộng.', 'Check Out'),
+(8, 10, 108, '2026-01-17 08:30:00', '2026-01-20 09:00:00', 85000, 100000, 600000, 'Có camera theo dõi 24/7.', 'Check Out'),
+(9, 11, 109, '2026-01-19 09:00:00', '2026-01-22 09:00:00', 110000, 150000, 800000, 'Chó Golden, cần nhiều không gian.', 'Check Out'),
+(10, 12, 110, '2026-01-20 10:00:00', '2026-01-23 10:00:00', 90000, 120000, 600000, 'Mèo lông dài, chải lông mỗi ngày.', 'Check Out'),
+(11, 13, 111, '2026-01-22 09:00:00', NULL, 85000, 100000, 500000, 'Đang điều trị ve, cần theo dõi.', 'Check In'),
+(12, 14, 112, '2026-01-22 08:00:00', '2026-01-25 09:00:00', 80000, 100000, 400000, 'Mèo nhỏ, rất ngoan.', 'Check Out'),
+(13, 15, 113, '2026-01-24 10:00:00', '2026-01-28 09:00:00', 85000, 110000, 500000, 'Mèo mới, cần quan sát.', 'Check Out'),
+(14, 16, 114, '2026-01-26 09:00:00', '2026-01-29 09:00:00', 115000, 180000, 900000, 'Chó Becgie, cần phòng riêng.', 'Check Out'),
+(15, 17, 115, '2026-01-27 09:30:00', NULL, 110000, 160000, 800000, 'Đang gửi dài hạn.', 'Check In'),
+(16, 18, 116, '2026-01-17 08:00:00', '2026-01-20 09:00:00', 100000, 120000, 600000, 'Mèo không lông, cần giữ ấm.', 'Check Out'),
+(17, 19, 117, '2026-01-19 08:30:00', '2026-01-22 09:00:00', 75000, 80000, 400000, 'Chó nhỏ, hay sủa ban đêm.', 'Check Out'),
+(18, 20, 118, '2026-01-21 08:00:00', '2026-01-24 09:00:00', 75000, 80000, 400000, 'Chó nhút nhát, cần nhẹ nhàng.', 'Check Out'),
+(19, 4, 119, '2026-01-28 10:00:00', NULL, 85000, 120000, 700000, 'Gửi trong khi chủ đi du lịch.', 'Check In'),
+(20, 6, 120, '2026-01-27 09:00:00', NULL, 95000, 130000, 700000, 'Mèo VIP, có yêu cầu đặc biệt.', 'Check In');
 
 -- === INVOICES ===
-INSERT INTO invoices (customer_id, pet_id, pet_enclosure_id, invoice_date, discount, subtotal, deposit, total_amount) VALUES
-(1, 1, 1, '2026-01-08 11:00:00', 0, 340000, 100000, 240000),
-(2, 3, 2, '2026-01-15 10:30:00', 50000, 650000, 150000, 450000),
-(4, 5, 4, '2026-01-16 09:30:00', 0, 460000, 100000, 360000),
-(6, 8, 6, '2025-12-23 11:00:00', 0, 340000, 100000, 240000),
-(7, 9, 7, '2025-12-26 11:30:00', 100000, 680000, 200000, 380000),
-(8, 10, 8, '2025-12-28 10:00:00', 0, 355000, 100000, 255000),
-(9, 11, 9, '2026-01-04 09:30:00', 0, 530000, 150000, 380000),
-(10, 12, 10, '2026-01-08 09:45:00', 0, 370000, 120000, 250000),
-(12, 14, 12, '2026-01-15 09:15:00', 0, 340000, 100000, 240000),
-(13, 15, 13, '2026-01-18 10:30:00', 30000, 440000, 110000, 300000),
-(14, 16, 14, '2026-01-21 09:40:00', 0, 545000, 180000, 365000),
-(16, 18, 16, '2025-12-31 09:00:00', 0, 400000, 120000, 280000),
-(17, 19, 17, '2026-01-05 09:00:00', 0, 325000, 80000, 245000),
-(18, 20, 18, '2026-01-11 09:00:00', 0, 325000, 80000, 245000);
+INSERT INTO invoices (customer_id, pet_id, pet_enclosure_id, medical_record_id, invoice_date, discount, subtotal, deposit, total_amount) VALUES
+(1, 1, 1, NULL, '2026-01-21 11:00:00', 0, 340000, 100000, 240000),
+(2, 3, 2, NULL, '2026-01-25 10:30:00', 50000, 650000, 150000, 450000),
+(4, 5, 4, NULL, '2026-01-26 09:30:00', 0, 460000, 100000, 360000),
+(6, 8, 6, NULL, '2026-01-18 11:00:00', 0, 340000, 100000, 240000),
+(7, 9, 7, NULL, '2026-01-20 11:30:00', 100000, 680000, 200000, 380000),
+(8, 10, 8, NULL, '2026-01-20 10:00:00', 0, 355000, 100000, 255000),
+(9, 11, 9, NULL, '2026-01-22 09:30:00', 0, 530000, 150000, 380000),
+(10, 12, 10, NULL, '2026-01-23 09:45:00', 0, 370000, 120000, 250000),
+(12, 14, 12, NULL, '2026-01-25 09:15:00', 0, 340000, 100000, 240000),
+(13, 15, 13, NULL, '2026-01-28 10:30:00', 30000, 440000, 110000, 300000),
+(14, 16, 14, NULL, '2026-01-29 09:40:00', 0, 545000, 180000, 365000),
+(16, 18, 16, NULL, '2026-01-20 09:00:00', 0, 400000, 120000, 280000),
+(17, 19, 17, NULL, '2026-01-22 09:00:00', 0, 325000, 80000, 245000),
+(18, 20, 18, NULL, '2026-01-24 09:00:00', 0, 325000, 80000, 245000);
 
 -- === INVOICE DETAILS ===
 INSERT INTO invoice_details (invoice_id, service_type_id, quantity, unit_price, total_price) VALUES
@@ -521,25 +602,25 @@ INSERT INTO invoice_details (invoice_id, service_type_id, quantity, unit_price, 
 (14, 8, 1, 100000, 100000);
 
 -- === PET VACCINATIONS ===
-INSERT INTO pet_vaccinations (vaccine_id, customer_id, pet_id, doctor_id, vaccination_date, next_vaccination_date, notes) VALUES
-(1, 1, 1, 1, '2026-01-10', '2027-01-10', 'Tiêm phòng dại định kỳ hàng năm.'),
-(2, 1, 2, 2, '2026-01-12', '2027-01-12', 'Tiêm 7 bệnh lần đầu.'),
-(5, 2, 3, 1, '2025-12-20', NULL, 'Tiêm FVRCP cho mèo, theo dõi phản ứng.'),
-(4, 3, 4, 3, '2026-01-15', '2026-02-15', 'Tiêm Parvo mũi tăng cường.');
+INSERT INTO pet_vaccinations (vaccine_id, medical_record_id, customer_id, pet_id, doctor_id, vaccination_date, next_vaccination_date, notes) VALUES
+(1, 1, 1, 1, 1, '2026-01-20', '2027-01-20', 'Tiêm phòng dại định kỳ hàng năm.'),
+(2, 2, 1, 2, 2, '2026-01-22', '2027-01-22', 'Tiêm 7 bệnh lần đầu.'),
+(5, 6, 2, 3, 1, '2026-01-15', NULL, 'Tiêm FVRCP cho mèo, theo dõi phản ứng.'),
+(4, 4, 3, 4, 3, '2026-01-25', '2026-02-25', 'Tiêm Parvo mũi tăng cường.');
 
 -- === TREATMENT COURSES ===
-INSERT INTO treatment_courses (customer_id, pet_id, start_date, end_date, status) VALUES
-(2, 3, '2026-01-08', NULL, '1'),
-(4, 5, '2026-01-05', '2026-01-12', '0'),
-(5, 7, '2026-01-15', NULL, '1');
+INSERT INTO treatment_courses (medical_record_id, customer_id, pet_id, start_date, end_date, status) VALUES
+(3, 2, 3, '2026-01-18', NULL, '1'),
+(4, 4, 5, '2026-01-16', '2026-01-23', '0'),
+(NULL, 5, 7, '2026-01-25', NULL, '1');
 
 -- === TREATMENT SESSIONS ===
 INSERT INTO treatment_sessions (treatment_course_id, doctor_id, treatment_session_datetime, temperature, weight, pulse_rate, respiratory_rate, overall_notes) VALUES
-(1, 3, '2026-01-09 09:00:00', 38.8, 4.2, 95, 28, 'Mèo sốt nhẹ do viêm da, bắt đầu điều trị.'),
-(1, 3, '2026-01-12 09:30:00', 38.2, 4.3, 88, 24, 'Đã giảm sốt, da đang lành.'),
-(2, 5, '2026-01-06 10:00:00', 39.2, 8.8, 100, 32, 'Viêm tai nặng, cần điều trị tích cực.'),
-(2, 5, '2026-01-10 10:00:00', 38.5, 8.9, 92, 26, 'Cải thiện rõ rệt, tiếp tục thuốc.'),
-(3, 4, '2026-01-16 08:45:00', 37.5, 7.8, 85, 22, 'Khám định kỳ, béo phì nhẹ.');
+(1, 3, '2026-01-19 09:00:00', 38.8, 4.2, 95, 28, 'Mèo sốt nhẹ do viêm da, bắt đầu điều trị.'),
+(1, 3, '2026-01-22 09:30:00', 38.2, 4.3, 88, 24, 'Đã giảm sốt, da đang lành.'),
+(2, 5, '2026-01-17 10:00:00', 39.2, 8.8, 100, 32, 'Viêm tai nặng, cần điều trị tích cực.'),
+(2, 5, '2026-01-21 10:00:00', 38.5, 8.9, 92, 26, 'Cải thiện rõ rệt, tiếp tục thuốc.'),
+(3, 4, '2026-01-26 08:45:00', 37.5, 7.8, 85, 22, 'Khám định kỳ, béo phì nhẹ.');
 
 -- === DIAGNOSES ===
 INSERT INTO diagnoses (treatment_session_id, diagnosis_name, diagnosis_type, clinical_tests, notes) VALUES

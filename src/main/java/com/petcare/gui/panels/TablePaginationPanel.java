@@ -40,7 +40,7 @@ public class TablePaginationPanel extends JPanel {
         this.model = (DefaultTableModel) table.getModel();
         this.sorter = new TableRowSorter<>(this.model);
         sorter.setComparator(0, numericComparator());
-        sorter.setSortKeys(Collections.singletonList(new RowSorter.SortKey(0, SortOrder.ASCENDING)));
+        sorter.setSortKeys(Collections.singletonList(new RowSorter.SortKey(0, SortOrder.DESCENDING)));
         table.setRowSorter(sorter);
 
         setLayout(new FlowLayout(FlowLayout.LEFT, 10, 5));

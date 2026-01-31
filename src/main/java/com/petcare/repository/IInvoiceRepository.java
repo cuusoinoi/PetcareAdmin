@@ -33,7 +33,13 @@ public interface IInvoiceRepository {
 
     long sumTotalAmountThisYear() throws PetcareException;
 
+    /** Tổng doanh thu theo chi tiết hóa đơn (cùng nguồn với biểu đồ theo dịch vụ) để số liệu khớp. */
+    long sumDetailTotalPriceThisYear() throws PetcareException;
+
     long sumTotalAmountByMonth(int year, int month) throws PetcareException;
+
+    /** Doanh thu tháng theo chi tiết hóa đơn (cùng nguồn với card và biểu đồ tròn). */
+    long sumDetailTotalPriceByMonth(int year, int month) throws PetcareException;
 
     List<ServiceRevenueDto> getRevenueByServiceTypeThisYear() throws PetcareException;
 }

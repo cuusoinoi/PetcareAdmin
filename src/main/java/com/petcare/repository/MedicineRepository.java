@@ -21,7 +21,7 @@ public class MedicineRepository implements IMedicineRepository {
     @Override
     public List<MedicineEntity> findAll() throws PetcareException {
         List<MedicineEntity> list = new ArrayList<>();
-        String query = "SELECT medicine_id, medicine_name, medicine_route FROM medicines ORDER BY medicine_name";
+        String query = "SELECT medicine_id, medicine_name, medicine_route FROM medicines ORDER BY medicine_id DESC";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query);
              ResultSet rs = ps.executeQuery()) {

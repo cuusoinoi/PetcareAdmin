@@ -21,7 +21,7 @@ public class ServiceTypeRepository implements IServiceTypeRepository {
     @Override
     public List<ServiceTypeEntity> findAll() throws PetcareException {
         List<ServiceTypeEntity> list = new ArrayList<>();
-        String query = "SELECT service_type_id, service_name, description, price FROM service_types ORDER BY service_name";
+        String query = "SELECT service_type_id, service_name, description, price FROM service_types ORDER BY service_type_id DESC";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query);
              ResultSet rs = ps.executeQuery()) {

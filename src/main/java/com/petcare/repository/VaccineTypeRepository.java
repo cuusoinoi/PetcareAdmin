@@ -20,7 +20,7 @@ public class VaccineTypeRepository implements IVaccineTypeRepository {
     @Override
     public List<VaccineTypeEntity> findAll() throws PetcareException {
         List<VaccineTypeEntity> list = new ArrayList<>();
-        String query = "SELECT vaccine_id, vaccine_name, description FROM vaccines ORDER BY vaccine_name";
+        String query = "SELECT vaccine_id, vaccine_name, description FROM vaccines ORDER BY vaccine_id DESC";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query);
              ResultSet rs = ps.executeQuery()) {

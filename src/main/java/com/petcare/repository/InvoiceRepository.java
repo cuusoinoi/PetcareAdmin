@@ -239,6 +239,21 @@ public class InvoiceRepository implements IInvoiceRepository {
     }
 
     @Override
+    public long sumDetailTotalPriceThisYear() throws PetcareException {
+        String query = "SELECT COALESCE(SUM(id.total_price), 0) as total FROM invoice_details id " +
+                "INNER JOIN invoices i ON id.invoice_id = i.invoice_id " +
+                "WHERE YEAR(i.invoice_date) = YEAR(CURRENT_DATE)";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getLong("total");
+        } catch (SQLException ex) {
+            throw new PetcareException("Lỗi khi tính doanh thu năm theo chi tiết", ex);
+        }
+        return 0;
+    }
+
+    @Override
     public long sumTotalAmountByMonth(int year, int month) throws PetcareException {
         String query = "SELECT SUM(total_amount) as total FROM invoices WHERE YEAR(invoice_date) = ? AND MONTH(invoice_date) = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -250,6 +265,24 @@ public class InvoiceRepository implements IInvoiceRepository {
             }
         } catch (SQLException ex) {
             throw new PetcareException("Lỗi khi tính doanh thu tháng", ex);
+        }
+        return 0;
+    }
+
+    @Override
+    public long sumDetailTotalPriceByMonth(int year, int month) throws PetcareException {
+        String query = "SELECT COALESCE(SUM(id.total_price), 0) as total FROM invoice_details id " +
+                "INNER JOIN invoices i ON id.invoice_id = i.invoice_id " +
+                "WHERE YEAR(i.invoice_date) = ? AND MONTH(i.invoice_date) = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setInt(1, year);
+            ps.setInt(2, month);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getLong("total");
+            }
+        } catch (SQLException ex) {
+            throw new PetcareException("Lỗi khi tính doanh thu tháng theo chi tiết", ex);
         }
         return 0;
     }

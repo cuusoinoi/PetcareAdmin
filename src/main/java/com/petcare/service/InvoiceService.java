@@ -92,12 +92,13 @@ public class InvoiceService {
         }
     }
 
+    /** Doanh thu năm (tổng từ chi tiết hóa đơn, khớp với biểu đồ theo loại dịch vụ). */
     public long getRevenueThisYear() throws PetcareException {
-        return repository.sumTotalAmountThisYear();
+        return repository.sumDetailTotalPriceThisYear();
     }
 
     public long getRevenueByMonth(int year, int month) throws PetcareException {
-        return repository.sumTotalAmountByMonth(year, month);
+        return repository.sumDetailTotalPriceByMonth(year, month);
     }
 
     public Map<String, Long> getMonthlyRevenueStats() throws PetcareException {
@@ -108,7 +109,7 @@ public class InvoiceService {
             cal.add(Calendar.MONTH, -i);
             int year = cal.get(Calendar.YEAR);
             int month = cal.get(Calendar.MONTH) + 1;
-            long revenue = repository.sumTotalAmountByMonth(year, month);
+            long revenue = repository.sumDetailTotalPriceByMonth(year, month);
             result.put(String.format("%04d-%02d", year, month), revenue);
         }
         return result;

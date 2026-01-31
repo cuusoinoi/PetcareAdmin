@@ -35,7 +35,7 @@ public class AppointmentRepository implements IAppointmentRepository {
         if (statusCodeOrNull != null && !statusCodeOrNull.isEmpty()) {
             sql.append(" AND a.status = ?");
         }
-        sql.append(" ORDER BY a.appointment_date DESC");
+        sql.append(" ORDER BY a.appointment_id DESC");
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {

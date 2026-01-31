@@ -2,6 +2,7 @@ package com.petcare.repository;
 
 import com.petcare.model.entity.PetVaccinationEntity;
 import com.petcare.model.entity.PetVaccinationListDto;
+import com.petcare.model.entity.VaccinationForInvoiceDto;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.persistence.DatabaseConnection;
 
@@ -55,7 +56,7 @@ public class PetVaccinationRepository implements IPetVaccinationRepository {
 
     @Override
     public PetVaccinationEntity findById(int id) throws PetcareException {
-        String query = "SELECT pet_vaccination_id, vaccine_id, customer_id, pet_id, doctor_id, " +
+        String query = "SELECT pet_vaccination_id, vaccine_id, medical_record_id, customer_id, pet_id, doctor_id, " +
                 "vaccination_date, next_vaccination_date, notes FROM pet_vaccinations WHERE pet_vaccination_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
@@ -72,9 +73,34 @@ public class PetVaccinationRepository implements IPetVaccinationRepository {
     }
 
     @Override
+    public List<VaccinationForInvoiceDto> findByMedicalRecordId(int medicalRecordId) throws PetcareException {
+        String query = "SELECT pv.vaccine_id, v.vaccine_name, v.unit_price " +
+                "FROM pet_vaccinations pv " +
+                "INNER JOIN vaccines v ON pv.vaccine_id = v.vaccine_id " +
+                "WHERE pv.medical_record_id = ? ORDER BY pv.pet_vaccination_id";
+        List<VaccinationForInvoiceDto> list = new ArrayList<>();
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setInt(1, medicalRecordId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    VaccinationForInvoiceDto dto = new VaccinationForInvoiceDto();
+                    dto.setVaccineId(rs.getInt("vaccine_id"));
+                    dto.setVaccineName(rs.getString("vaccine_name"));
+                    dto.setUnitPrice(rs.getInt("unit_price"));
+                    list.add(dto);
+                }
+            }
+        } catch (SQLException ex) {
+            throw new PetcareException("Lỗi khi tải tiêm chủng theo lượt khám", ex);
+        }
+        return list;
+    }
+
+    @Override
     public int insert(PetVaccinationEntity entity) throws PetcareException {
-        String query = "INSERT INTO pet_vaccinations (vaccine_id, customer_id, pet_id, doctor_id, " +
-                "vaccination_date, next_vaccination_date, notes) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO pet_vaccinations (vaccine_id, medical_record_id, customer_id, pet_id, doctor_id, " +
+                "vaccination_date, next_vaccination_date, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             bindEntity(ps, entity);
@@ -94,12 +120,12 @@ public class PetVaccinationRepository implements IPetVaccinationRepository {
 
     @Override
     public int update(PetVaccinationEntity entity) throws PetcareException {
-        String query = "UPDATE pet_vaccinations SET vaccine_id=?, customer_id=?, pet_id=?, doctor_id=?, " +
+        String query = "UPDATE pet_vaccinations SET vaccine_id=?, medical_record_id=?, customer_id=?, pet_id=?, doctor_id=?, " +
                 "vaccination_date=?, next_vaccination_date=?, notes=? WHERE pet_vaccination_id=?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
             bindEntity(ps, entity);
-            ps.setInt(8, entity.getPetVaccinationId());
+            ps.setInt(9, entity.getPetVaccinationId());
             return ps.executeUpdate();
         } catch (SQLException ex) {
             throw new PetcareException("Lỗi khi cập nhật bản ghi tiêm chủng", ex);
@@ -120,18 +146,25 @@ public class PetVaccinationRepository implements IPetVaccinationRepository {
 
     private void bindEntity(PreparedStatement ps, PetVaccinationEntity e) throws SQLException {
         ps.setInt(1, e.getVaccineId());
-        ps.setInt(2, e.getCustomerId());
-        ps.setInt(3, e.getPetId());
-        ps.setInt(4, e.getDoctorId());
-        ps.setDate(5, e.getVaccinationDate() != null ? new java.sql.Date(e.getVaccinationDate().getTime()) : null);
-        ps.setDate(6, e.getNextVaccinationDate() != null ? new java.sql.Date(e.getNextVaccinationDate().getTime()) : null);
-        ps.setString(7, e.getNotes());
+        if (e.getMedicalRecordId() != null) {
+            ps.setInt(2, e.getMedicalRecordId());
+        } else {
+            ps.setNull(2, java.sql.Types.INTEGER);
+        }
+        ps.setInt(3, e.getCustomerId());
+        ps.setInt(4, e.getPetId());
+        ps.setInt(5, e.getDoctorId());
+        ps.setDate(6, e.getVaccinationDate() != null ? new java.sql.Date(e.getVaccinationDate().getTime()) : null);
+        ps.setDate(7, e.getNextVaccinationDate() != null ? new java.sql.Date(e.getNextVaccinationDate().getTime()) : null);
+        ps.setString(8, e.getNotes());
     }
 
     private PetVaccinationEntity mapResultSetToEntity(ResultSet rs) throws SQLException {
         PetVaccinationEntity e = new PetVaccinationEntity();
         e.setPetVaccinationId(rs.getInt("pet_vaccination_id"));
         e.setVaccineId(rs.getInt("vaccine_id"));
+        int mrId = rs.getInt("medical_record_id");
+        e.setMedicalRecordId(rs.wasNull() || mrId <= 0 ? null : mrId);
         e.setCustomerId(rs.getInt("customer_id"));
         e.setPetId(rs.getInt("pet_id"));
         e.setDoctorId(rs.getInt("doctor_id"));

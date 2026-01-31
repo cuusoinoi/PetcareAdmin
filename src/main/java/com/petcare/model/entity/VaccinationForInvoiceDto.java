@@ -1,17 +1,12 @@
 package com.petcare.model.entity;
 
 /**
- * Vaccine Type Entity - DTO mapping to vaccines table (loại vaccine)
- * vaccine_id, vaccine_name, description, unit_price
+ * DTO for vaccination line when creating invoice from visit (vaccine_id, vaccine_name, unit_price from vaccines).
  */
-public class VaccineTypeEntity {
+public class VaccinationForInvoiceDto {
     private int vaccineId;
     private String vaccineName;
-    private String description;
     private int unitPrice;
-
-    public VaccineTypeEntity() {
-    }
 
     public int getVaccineId() {
         return vaccineId;
@@ -27,14 +22,6 @@ public class VaccineTypeEntity {
 
     public void setVaccineName(String vaccineName) {
         this.vaccineName = vaccineName;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public int getUnitPrice() {

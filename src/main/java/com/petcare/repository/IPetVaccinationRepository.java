@@ -2,6 +2,7 @@ package com.petcare.repository;
 
 import com.petcare.model.entity.PetVaccinationEntity;
 import com.petcare.model.entity.PetVaccinationListDto;
+import com.petcare.model.entity.VaccinationForInvoiceDto;
 import com.petcare.model.exception.PetcareException;
 
 import java.util.List;
@@ -14,6 +15,8 @@ public interface IPetVaccinationRepository {
     List<PetVaccinationListDto> findAllForList() throws PetcareException;
 
     PetVaccinationEntity findById(int id) throws PetcareException;
+
+    List<VaccinationForInvoiceDto> findByMedicalRecordId(int medicalRecordId) throws PetcareException;
 
     int insert(PetVaccinationEntity entity) throws PetcareException;
 

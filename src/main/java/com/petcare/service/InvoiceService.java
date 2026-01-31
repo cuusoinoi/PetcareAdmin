@@ -1,11 +1,17 @@
 package com.petcare.service;
 
 import com.petcare.model.domain.InvoiceDetailItem;
+import com.petcare.model.domain.InvoiceMedicineItem;
+import com.petcare.model.domain.InvoiceVaccinationItem;
 import com.petcare.model.entity.InvoiceDetailEntity;
 import com.petcare.model.entity.InvoiceDetailListDto;
 import com.petcare.model.entity.InvoiceEntity;
 import com.petcare.model.entity.InvoiceInfoDto;
 import com.petcare.model.entity.InvoiceListDto;
+import com.petcare.model.entity.InvoiceMedicineDetailEntity;
+import com.petcare.model.entity.InvoiceMedicineDetailListDto;
+import com.petcare.model.entity.InvoiceVaccinationDetailEntity;
+import com.petcare.model.entity.InvoiceVaccinationDetailListDto;
 import com.petcare.model.entity.ServiceRevenueDto;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.repository.IInvoiceRepository;
@@ -49,12 +55,25 @@ public class InvoiceService {
         return repository.findEntityById(invoiceId);
     }
 
+    /** Tìm hóa đơn theo lưu chuồng (null nếu chưa có hóa đơn). */
+    public Integer getInvoiceIdByPetEnclosureId(int petEnclosureId) throws PetcareException {
+        return repository.findInvoiceIdByPetEnclosureId(petEnclosureId);
+    }
+
     public InvoiceInfoDto getInvoiceInfo(int invoiceId) throws PetcareException {
         return repository.findInfoById(invoiceId);
     }
 
     public List<InvoiceDetailListDto> getInvoiceDetails(int invoiceId) throws PetcareException {
         return repository.findDetailsByInvoiceId(invoiceId);
+    }
+
+    public List<InvoiceMedicineDetailListDto> getInvoiceMedicineDetails(int invoiceId) throws PetcareException {
+        return repository.findMedicineDetailsByInvoiceId(invoiceId);
+    }
+
+    public List<InvoiceVaccinationDetailListDto> getInvoiceVaccinationDetails(int invoiceId) throws PetcareException {
+        return repository.findVaccinationDetailsByInvoiceId(invoiceId);
     }
 
     public int createInvoice(int customerId, int petId, Integer petEnclosureId, Date invoiceDate,
@@ -64,6 +83,7 @@ public class InvoiceService {
         entity.setCustomerId(customerId);
         entity.setPetId(petId);
         entity.setPetEnclosureId(petEnclosureId);
+        entity.setMedicalRecordId(null);
         entity.setInvoiceDate(invoiceDate);
         entity.setDiscount(discount);
         entity.setSubtotal(subtotal);
@@ -81,6 +101,61 @@ public class InvoiceService {
             detail.setUnitPrice(item.getUnitPrice());
             detail.setTotalPrice(item.getTotalPrice());
             repository.insertDetail(detail);
+        }
+        return invoiceId;
+    }
+
+    /** Tạo hóa đơn gắn với lượt khám: dịch vụ (details) + thuốc (medicineDetails) + tiêm chủng (vaccinationDetails). */
+    public int createInvoiceFromVisit(int customerId, int petId, Integer medicalRecordId,
+                                       Date invoiceDate, int discount, int subtotal, int deposit, int totalAmount,
+                                       List<InvoiceDetailItem> details, List<InvoiceMedicineItem> medicineDetails,
+                                       List<InvoiceVaccinationItem> vaccinationDetails) throws PetcareException {
+        InvoiceEntity entity = new InvoiceEntity();
+        entity.setCustomerId(customerId);
+        entity.setPetId(petId);
+        entity.setPetEnclosureId(null);
+        entity.setMedicalRecordId(medicalRecordId);
+        entity.setInvoiceDate(invoiceDate);
+        entity.setDiscount(discount);
+        entity.setSubtotal(subtotal);
+        entity.setDeposit(deposit);
+        entity.setTotalAmount(totalAmount);
+        int invoiceId = repository.insert(entity);
+        if (invoiceId <= 0) {
+            throw new PetcareException("Không thể tạo hóa đơn");
+        }
+        if (details != null) {
+            for (InvoiceDetailItem item : details) {
+                InvoiceDetailEntity detail = new InvoiceDetailEntity();
+                detail.setInvoiceId(invoiceId);
+                detail.setServiceTypeId(item.getServiceTypeId());
+                detail.setQuantity(item.getQuantity());
+                detail.setUnitPrice(item.getUnitPrice());
+                detail.setTotalPrice(item.getTotalPrice());
+                repository.insertDetail(detail);
+            }
+        }
+        if (medicineDetails != null) {
+            for (InvoiceMedicineItem item : medicineDetails) {
+                InvoiceMedicineDetailEntity med = new InvoiceMedicineDetailEntity();
+                med.setInvoiceId(invoiceId);
+                med.setMedicineId(item.getMedicineId());
+                med.setQuantity(item.getQuantity());
+                med.setUnitPrice(item.getUnitPrice());
+                med.setTotalPrice(item.getTotalPrice());
+                repository.insertMedicineDetail(med);
+            }
+        }
+        if (vaccinationDetails != null) {
+            for (InvoiceVaccinationItem item : vaccinationDetails) {
+                InvoiceVaccinationDetailEntity vac = new InvoiceVaccinationDetailEntity();
+                vac.setInvoiceId(invoiceId);
+                vac.setVaccineId(item.getVaccineId());
+                vac.setQuantity(item.getQuantity());
+                vac.setUnitPrice(item.getUnitPrice());
+                vac.setTotalPrice(item.getTotalPrice());
+                repository.insertVaccinationDetail(vac);
+            }
         }
         return invoiceId;
     }

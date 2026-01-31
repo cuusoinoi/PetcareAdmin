@@ -9,6 +9,8 @@ import com.petcare.model.domain.PetEnclosure;
 import com.petcare.model.entity.InvoiceDetailListDto;
 import com.petcare.model.entity.InvoiceEntity;
 import com.petcare.model.entity.InvoiceInfoDto;
+import com.petcare.model.entity.InvoiceMedicineDetailListDto;
+import com.petcare.model.entity.InvoiceVaccinationDetailListDto;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.service.CustomerService;
 import com.petcare.service.DoctorService;
@@ -60,6 +62,8 @@ public class PrintHelper {
         InvoiceInfoDto info = InvoiceService.getInstance().getInvoiceInfo(invoiceId);
         if (info == null) throw new PetcareException("Không tìm thấy hóa đơn #" + invoiceId);
         List<InvoiceDetailListDto> details = InvoiceService.getInstance().getInvoiceDetails(invoiceId);
+        List<InvoiceMedicineDetailListDto> medicineDetails = InvoiceService.getInstance().getInvoiceMedicineDetails(invoiceId);
+        List<InvoiceVaccinationDetailListDto> vaccinationDetails = InvoiceService.getInstance().getInvoiceVaccinationDetails(invoiceId);
         GeneralSetting settings = GeneralSettingService.getInstance().getSettings();
         String clinicName = settings != null ? settings.getClinicName() : "UIT PETCARE";
         String addr1 = settings != null ? settings.getClinicAddress1() : "";
@@ -84,6 +88,34 @@ public class PrintHelper {
         if (rows.length() == 0) {
             rows.append("<tr><td colspan=\"5\" style=\"text-align: center;\">Không có dịch vụ</td></tr>");
         }
+        StringBuilder medRows = new StringBuilder();
+        if (medicineDetails != null && !medicineDetails.isEmpty()) {
+            int sttMed = 1;
+            for (InvoiceMedicineDetailListDto d : medicineDetails) {
+                medRows.append("<tr><td class=\"number\">").append(sttMed++)
+                        .append("</td><td>").append(escapeHtml(d.getMedicineName() != null ? d.getMedicineName() : "Thuốc"))
+                        .append("</td><td class=\"number\">").append(d.getQuantity())
+                        .append("</td><td class=\"number\">").append(fmt(d.getUnitPrice()))
+                        .append("</td><td class=\"number\">").append(fmt(d.getTotalPrice())).append("</td></tr>");
+            }
+        }
+        String medicineTableHtml = (medicineDetails != null && !medicineDetails.isEmpty())
+                ? "<p style=\"margin-top:15px;\"><strong>Chi tiết thuốc</strong></p><table><thead><tr><th style=\"width:50px\">STT</th><th>Thuốc</th><th style=\"width:80px\">Số lượng</th><th style=\"width:120px\">Đơn giá</th><th style=\"width:120px\">Thành tiền</th></tr></thead><tbody>" + medRows + "</tbody></table>"
+                : "";
+        StringBuilder vacRows = new StringBuilder();
+        if (vaccinationDetails != null && !vaccinationDetails.isEmpty()) {
+            int sttVac = 1;
+            for (InvoiceVaccinationDetailListDto d : vaccinationDetails) {
+                vacRows.append("<tr><td class=\"number\">").append(sttVac++)
+                        .append("</td><td>").append(escapeHtml(d.getVaccineName() != null ? d.getVaccineName() : "Vaccine"))
+                        .append("</td><td class=\"number\">").append(d.getQuantity())
+                        .append("</td><td class=\"number\">").append(fmt(d.getUnitPrice()))
+                        .append("</td><td class=\"number\">").append(fmt(d.getTotalPrice())).append("</td></tr>");
+            }
+        }
+        String vaccinationTableHtml = (vaccinationDetails != null && !vaccinationDetails.isEmpty())
+                ? "<p style=\"margin-top:15px;\"><strong>Chi tiết tiêm chủng</strong></p><table><thead><tr><th style=\"width:50px\">STT</th><th>Vaccine</th><th style=\"width:80px\">Số lượng</th><th style=\"width:120px\">Đơn giá</th><th style=\"width:120px\">Thành tiền</th></tr></thead><tbody>" + vacRows + "</tbody></table>"
+                : "";
 
         String discountRow = (info.getDiscount() > 0)
                 ? "<tr><td colspan=\"4\" style=\"text-align: right;\">Giảm giá:</td><td class=\"number\">-" + fmt(info.getDiscount()) + " VNĐ</td></tr>"
@@ -101,8 +133,8 @@ public class PrintHelper {
                 "<div class=\"info-row\"><span class=\"info-label\">Điện thoại:</span><span>" + escapeHtml(info.getCustomerPhoneNumber()) + "</span></div></div>" +
                 "<div class=\"info-right\"><div class=\"info-row\"><span class=\"info-label\">Thú cưng:</span><span>" + escapeHtml(info.getPetName()) + "</span></div>" +
                 "<div class=\"info-row\"><span class=\"info-label\">Ngày lập:</span><span>" + escapeHtml(invoiceDateStr) + "</span></div></div></div>" +
-                "<table><thead><tr><th style=\"width:50px\">STT</th><th>Dịch vụ</th><th style=\"width:80px\">Số lượng</th><th style=\"width:120px\">Đơn giá</th><th style=\"width:120px\">Thành tiền</th></tr></thead><tbody>" + rows + "</tbody>" +
-                "<tfoot><tr><td colspan=\"4\" style=\"text-align:right\">Tổng tiền dịch vụ:</td><td class=\"number\">" + fmt(info.getSubtotal()) + " VNĐ</td></tr>" + discountRow + depositRow +
+                "<table><thead><tr><th style=\"width:50px\">STT</th><th>Dịch vụ</th><th style=\"width:80px\">Số lượng</th><th style=\"width:120px\">Đơn giá</th><th style=\"width:120px\">Thành tiền</th></tr></thead><tbody>" + rows + "</tbody></table>" + medicineTableHtml + vaccinationTableHtml +
+                "<table><tfoot><tr><td colspan=\"4\" style=\"text-align:right\">Tổng tiền:</td><td class=\"number\">" + fmt(info.getSubtotal()) + " VNĐ</td></tr>" + discountRow + depositRow +
                 "<tr class=\"total-row\"><td colspan=\"4\" style=\"text-align:right\">CÒN PHẢI THANH TOÁN:</td><td class=\"number\">" + fmt(info.getTotalAmount()) + " VNĐ</td></tr></tfoot></table>" +
                 "<p><strong>Phương thức thanh toán:</strong> Tiền mặt</p>" +
                 "<div class=\"signature\"><div class=\"signature-box\"><p>Khách hàng</p><p><em>(Ký, ghi rõ họ tên)</em></p></div>" +
@@ -157,9 +189,22 @@ public class PrintHelper {
         if (peId == null || peId <= 0) {
             return "<p>Hóa đơn này không gắn lưu chuồng. Không thể tạo giấy cam kết.</p>";
         }
-        Customer customer = CustomerService.getInstance().getCustomerById(invoice.getCustomerId());
-        Pet pet = PetService.getInstance().getPetById(invoice.getPetId());
-        PetEnclosure enclosure = PetEnclosureService.getInstance().getEnclosureById(peId);
+        return buildCommitmentHtmlFromEnclosure(peId, invoice.getCustomerId(), invoice.getPetId(),
+                invoice.getInvoiceDate() != null ? invoice.getInvoiceDate() : new java.util.Date());
+    }
+
+    /** Xây giấy cam kết trực tiếp từ lưu chuồng (dùng cho màn Mẫu in lưu chuồng). */
+    public static String buildCommitmentHtmlByEnclosureId(int enclosureId) throws PetcareException {
+        PetEnclosure enclosure = PetEnclosureService.getInstance().getEnclosureById(enclosureId);
+        if (enclosure == null) return "<p>Không tìm thấy thông tin lưu chuồng.</p>";
+        java.util.Date dateForHeader = enclosure.getCheckInDate() != null ? enclosure.getCheckInDate() : new java.util.Date();
+        return buildCommitmentHtmlFromEnclosure(enclosureId, enclosure.getCustomerId(), enclosure.getPetId(), dateForHeader);
+    }
+
+    private static String buildCommitmentHtmlFromEnclosure(int enclosureId, int customerId, int petId, java.util.Date dateForHeader) throws PetcareException {
+        Customer customer = CustomerService.getInstance().getCustomerById(customerId);
+        Pet pet = PetService.getInstance().getPetById(petId);
+        PetEnclosure enclosure = PetEnclosureService.getInstance().getEnclosureById(enclosureId);
         GeneralSetting settings = GeneralSettingService.getInstance().getSettings();
         if (enclosure == null) return "<p>Không tìm thấy thông tin lưu chuồng.</p>";
 
@@ -173,7 +218,7 @@ public class PrintHelper {
 
         SimpleDateFormat sdfDate = new SimpleDateFormat("dd/MM/yyyy");
         SimpleDateFormat sdfDateTime = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        String invoiceDateStr = invoice.getInvoiceDate() != null ? sdfDate.format(invoice.getInvoiceDate()) : "";
+        String invoiceDateStr = dateForHeader != null ? sdfDate.format(dateForHeader) : "";
         String checkInStr = enclosure.getCheckInDate() != null ? sdfDateTime.format(enclosure.getCheckInDate()) : "-";
         String checkOutStr = enclosure.getCheckOutDate() != null ? sdfDateTime.format(enclosure.getCheckOutDate()) : "-";
         String note = enclosure.getPetEnclosureNote() != null && !enclosure.getPetEnclosureNote().isEmpty() ? enclosure.getPetEnclosureNote() : "Không có";

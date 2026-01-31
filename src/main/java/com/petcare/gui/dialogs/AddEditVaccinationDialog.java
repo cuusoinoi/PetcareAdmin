@@ -1,12 +1,16 @@
 package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import com.petcare.model.domain.MedicalRecord;
 import com.petcare.model.domain.PetVaccination;
+import com.petcare.model.entity.MedicalRecordListDto;
 import com.petcare.service.CustomerService;
 import com.petcare.service.DoctorService;
+import com.petcare.service.MedicalRecordService;
 import com.petcare.service.PetService;
 import com.petcare.service.PetVaccinationService;
 import com.petcare.service.VaccineTypeService;
+import com.petcare.util.DatePickerHelper;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
 import com.petcare.util.ThemeManager;
@@ -22,6 +26,7 @@ import java.util.Date;
  */
 public class AddEditVaccinationDialog extends JDialog {
     private JComboBox<String> vaccineCombo;
+    private JComboBox<String> medicalRecordCombo;
     private JComboBox<String> customerCombo;
     private JComboBox<String> petCombo;
     private JComboBox<String> doctorCombo;
@@ -38,6 +43,7 @@ public class AddEditVaccinationDialog extends JDialog {
         this.vaccination = vaccination;
         initComponents();
         loadVaccines();
+        loadMedicalRecords();
         loadCustomers();
         loadDoctors();
 
@@ -68,6 +74,16 @@ public class AddEditVaccinationDialog extends JDialog {
         vaccineCombo.setForeground(ThemeManager.getTextFieldForeground());
         vaccineCombo.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         formPanel.add(vaccineCombo);
+
+        // Lượt khám (tùy chọn)
+        formPanel.add(createLabel("Lượt khám:"));
+        medicalRecordCombo = new JComboBox<>();
+        medicalRecordCombo.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        medicalRecordCombo.setBackground(ThemeManager.getTextFieldBackground());
+        medicalRecordCombo.setForeground(ThemeManager.getTextFieldForeground());
+        medicalRecordCombo.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
+        medicalRecordCombo.addActionListener(e -> onMedicalRecordSelected());
+        formPanel.add(medicalRecordCombo);
 
         // Customer
         formPanel.add(createLabel("Khách hàng *:"));
@@ -101,17 +117,19 @@ public class AddEditVaccinationDialog extends JDialog {
         formPanel.add(createLabel("Ngày tiêm * (dd/MM/yyyy):"));
         vaccinationDateField = createTextField();
         vaccinationDateField.putClientProperty("JTextField.placeholderText", "dd/MM/yyyy");
-        formPanel.add(vaccinationDateField);
+        formPanel.add(DatePickerHelper.wrapDateField(this, vaccinationDateField));
 
         // Next Vaccination Date
         formPanel.add(createLabel("Ngày tiêm tiếp theo (dd/MM/yyyy):"));
         nextVaccinationDateField = createTextField();
         nextVaccinationDateField.putClientProperty("JTextField.placeholderText", "dd/MM/yyyy");
-        formPanel.add(nextVaccinationDateField);
+        formPanel.add(DatePickerHelper.wrapDateField(this, nextVaccinationDateField));
 
         // Notes
         formPanel.add(createLabel("Ghi chú:"));
-        notesArea = new JTextArea(3, 20);
+        notesArea = new JTextArea(2, 25);
+        notesArea.setLineWrap(true);
+        notesArea.setWrapStyleWord(true);
         notesArea.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         notesArea.setBackground(ThemeManager.getTextFieldBackground());
         notesArea.setForeground(ThemeManager.getTextFieldForeground());
@@ -129,7 +147,8 @@ public class AddEditVaccinationDialog extends JDialog {
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
         buttonPanel.setBackground(ThemeManager.getContentBackground());
 
-        saveButton = new JButton(EmojiFontHelper.withEmoji("💾", "Lưu"));
+        saveButton = new JButton("Lưu");
+        saveButton.setIcon(EmojiFontHelper.createEmojiIcon("💾", Color.WHITE));
         saveButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         saveButton.setBackground(new Color(139, 69, 19));
         saveButton.setForeground(Color.WHITE);
@@ -220,6 +239,67 @@ public class AddEditVaccinationDialog extends JDialog {
         }
     }
 
+    private void loadMedicalRecords() {
+        medicalRecordCombo.removeAllItems();
+        medicalRecordCombo.addItem("-- Không gắn lượt khám --");
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            for (MedicalRecordListDto dto : MedicalRecordService.getInstance().getRecordsForList()) {
+                String dateStr = dto.getVisitDate() != null ? sdf.format(dto.getVisitDate()) : "";
+                medicalRecordCombo.addItem(dto.getMedicalRecordId() + " - " + dateStr + " - " + (dto.getCustomerName() != null ? dto.getCustomerName() : "") + " - " + (dto.getPetName() != null ? dto.getPetName() : ""));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Khi chọn lượt khám: điền sẵn Khách hàng, Thú cưng, Bác sĩ và Ngày tiêm từ hồ sơ đó.
+     */
+    private void onMedicalRecordSelected() {
+        if (medicalRecordCombo.getSelectedIndex() <= 0) return;
+        if (customerCombo.getItemCount() == 0 || doctorCombo.getItemCount() == 0) return; // Chưa load xong
+        String sel = (String) medicalRecordCombo.getSelectedItem();
+        if (sel == null || !sel.contains(" - ")) return;
+        int medicalRecordId = Integer.parseInt(sel.split(" - ")[0]);
+        try {
+            MedicalRecord record = MedicalRecordService.getInstance().getRecordById(medicalRecordId);
+            if (record == null) return;
+            // Khách hàng
+            for (int i = 0; i < customerCombo.getItemCount(); i++) {
+                String item = customerCombo.getItemAt(i);
+                if (item.startsWith(record.getCustomerId() + " - ")) {
+                    customerCombo.setSelectedIndex(i);
+                    break;
+                }
+            }
+            loadPetsByCustomer();
+            // Thú cưng
+            for (int i = 0; i < petCombo.getItemCount(); i++) {
+                String item = petCombo.getItemAt(i);
+                if (item.startsWith(record.getPetId() + " - ")) {
+                    petCombo.setSelectedIndex(i);
+                    break;
+                }
+            }
+            // Bác sĩ
+            for (int i = 0; i < doctorCombo.getItemCount(); i++) {
+                String item = doctorCombo.getItemAt(i);
+                if (item.startsWith(record.getDoctorId() + " - ")) {
+                    doctorCombo.setSelectedIndex(i);
+                    break;
+                }
+            }
+            // Ngày tiêm = ngày khám của lượt khám
+            if (record.getMedicalRecordVisitDate() != null) {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                vaccinationDateField.setText(sdf.format(record.getMedicalRecordVisitDate()));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
     private void loadVaccinationData() {
         if (vaccination != null) {
             // Set vaccine
@@ -228,6 +308,17 @@ public class AddEditVaccinationDialog extends JDialog {
                 if (item.startsWith(String.valueOf(vaccination.getVaccineId()))) {
                     vaccineCombo.setSelectedIndex(i);
                     break;
+                }
+            }
+
+            // Set medical record
+            if (vaccination.getMedicalRecordId() != null) {
+                for (int i = 0; i < medicalRecordCombo.getItemCount(); i++) {
+                    String item = medicalRecordCombo.getItemAt(i);
+                    if (item.startsWith(String.valueOf(vaccination.getMedicalRecordId()))) {
+                        medicalRecordCombo.setSelectedIndex(i);
+                        break;
+                    }
                 }
             }
 
@@ -309,6 +400,12 @@ public class AddEditVaccinationDialog extends JDialog {
             String vaccineSelected = (String) vaccineCombo.getSelectedItem();
             int vaccineId = Integer.parseInt(vaccineSelected.split(" - ")[0]);
 
+            Integer medicalRecordId = null;
+            if (medicalRecordCombo.getSelectedIndex() > 0) {
+                String mrSelected = (String) medicalRecordCombo.getSelectedItem();
+                medicalRecordId = Integer.parseInt(mrSelected.split(" - ")[0]);
+            }
+
             String customerSelected = (String) customerCombo.getSelectedItem();
             int customerId = Integer.parseInt(customerSelected.split(" - ")[0]);
 
@@ -346,6 +443,7 @@ public class AddEditVaccinationDialog extends JDialog {
             if (vaccination == null) {
                 PetVaccination newVaccination = new PetVaccination();
                 newVaccination.setVaccineId(vaccineId);
+                newVaccination.setMedicalRecordId(medicalRecordId);
                 newVaccination.setCustomerId(customerId);
                 newVaccination.setPetId(petId);
                 newVaccination.setDoctorId(doctorId);
@@ -358,6 +456,7 @@ public class AddEditVaccinationDialog extends JDialog {
                 dispose();
             } else {
                 vaccination.setVaccineId(vaccineId);
+                vaccination.setMedicalRecordId(medicalRecordId);
                 vaccination.setCustomerId(customerId);
                 vaccination.setPetId(petId);
                 vaccination.setDoctorId(doctorId);

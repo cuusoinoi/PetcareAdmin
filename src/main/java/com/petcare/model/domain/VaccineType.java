@@ -9,6 +9,7 @@ public class VaccineType {
     private int vaccineId;
     private String vaccineName;
     private String description;
+    private int unitPrice;
 
     public VaccineType() {
     }
@@ -44,5 +45,13 @@ public class VaccineType {
 
     public void setDescription(String description) {
         this.description = description != null ? description.trim() : null;
+    }
+
+    public int getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(int unitPrice) {
+        this.unitPrice = unitPrice;
     }
 }

@@ -20,7 +20,7 @@ public class VaccineTypeRepository implements IVaccineTypeRepository {
     @Override
     public List<VaccineTypeEntity> findAll() throws PetcareException {
         List<VaccineTypeEntity> list = new ArrayList<>();
-        String query = "SELECT vaccine_id, vaccine_name, description FROM vaccines ORDER BY vaccine_id DESC";
+        String query = "SELECT vaccine_id, vaccine_name, description, unit_price FROM vaccines ORDER BY vaccine_id DESC";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query);
              ResultSet rs = ps.executeQuery()) {
@@ -35,7 +35,7 @@ public class VaccineTypeRepository implements IVaccineTypeRepository {
 
     @Override
     public VaccineTypeEntity findById(int id) throws PetcareException {
-        String query = "SELECT vaccine_id, vaccine_name, description FROM vaccines WHERE vaccine_id = ?";
+        String query = "SELECT vaccine_id, vaccine_name, description, unit_price FROM vaccines WHERE vaccine_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setInt(1, id);
@@ -52,11 +52,12 @@ public class VaccineTypeRepository implements IVaccineTypeRepository {
 
     @Override
     public int insert(VaccineTypeEntity entity) throws PetcareException {
-        String query = "INSERT INTO vaccines (vaccine_name, description) VALUES (?, ?)";
+        String query = "INSERT INTO vaccines (vaccine_name, description, unit_price) VALUES (?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, entity.getVaccineName());
             ps.setString(2, entity.getDescription());
+            ps.setInt(3, entity.getUnitPrice());
             int result = ps.executeUpdate();
             if (result > 0) {
                 try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -73,12 +74,13 @@ public class VaccineTypeRepository implements IVaccineTypeRepository {
 
     @Override
     public int update(VaccineTypeEntity entity) throws PetcareException {
-        String query = "UPDATE vaccines SET vaccine_name = ?, description = ? WHERE vaccine_id = ?";
+        String query = "UPDATE vaccines SET vaccine_name = ?, description = ?, unit_price = ? WHERE vaccine_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setString(1, entity.getVaccineName());
             ps.setString(2, entity.getDescription());
-            ps.setInt(3, entity.getVaccineId());
+            ps.setInt(3, entity.getUnitPrice());
+            ps.setInt(4, entity.getVaccineId());
             return ps.executeUpdate();
         } catch (SQLException ex) {
             throw new PetcareException("Lỗi khi cập nhật vaccine", ex);
@@ -102,6 +104,7 @@ public class VaccineTypeRepository implements IVaccineTypeRepository {
         e.setVaccineId(rs.getInt("vaccine_id"));
         e.setVaccineName(rs.getString("vaccine_name"));
         e.setDescription(rs.getString("description"));
+        e.setUnitPrice(rs.getInt("unit_price"));
         return e;
     }
 }

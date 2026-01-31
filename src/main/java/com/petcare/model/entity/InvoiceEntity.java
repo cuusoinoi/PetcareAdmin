@@ -10,6 +10,7 @@ public class InvoiceEntity {
     private int customerId;
     private int petId;
     private Integer petEnclosureId;
+    private Integer medicalRecordId;
     private Date invoiceDate;
     private int discount;
     private int subtotal;
@@ -49,6 +50,14 @@ public class InvoiceEntity {
 
     public void setPetEnclosureId(Integer petEnclosureId) {
         this.petEnclosureId = petEnclosureId;
+    }
+
+    public Integer getMedicalRecordId() {
+        return medicalRecordId;
+    }
+
+    public void setMedicalRecordId(Integer medicalRecordId) {
+        this.medicalRecordId = medicalRecordId;
     }
 
     public Date getInvoiceDate() {

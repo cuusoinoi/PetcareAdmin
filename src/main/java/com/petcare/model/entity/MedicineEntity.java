@@ -8,6 +8,7 @@ public class MedicineEntity {
     private int medicineId;
     private String medicineName;
     private String medicineRoute;
+    private int unitPrice;
 
     public MedicineEntity() {
     }
@@ -34,5 +35,13 @@ public class MedicineEntity {
 
     public void setMedicineRoute(String medicineRoute) {
         this.medicineRoute = medicineRoute;
+    }
+
+    public int getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(int unitPrice) {
+        this.unitPrice = unitPrice;
     }
 }

@@ -55,7 +55,9 @@ public class AddEditServiceTypeDialog extends JDialog {
         formPanel.add(serviceNameField);
 
         formPanel.add(createLabel("Mô tả:"));
-        descriptionArea = new JTextArea(3, GUIUtil.TEXT_FIELD_COLUMNS);
+        descriptionArea = new JTextArea(2, GUIUtil.TEXT_FIELD_COLUMNS);
+        descriptionArea.setLineWrap(true);
+        descriptionArea.setWrapStyleWord(true);
         descriptionArea.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         descriptionArea.setBackground(ThemeManager.getTextFieldBackground());
         descriptionArea.setForeground(ThemeManager.getTextFieldForeground());
@@ -77,7 +79,8 @@ public class AddEditServiceTypeDialog extends JDialog {
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
         buttonPanel.setBackground(ThemeManager.getContentBackground());
 
-        saveButton = new JButton(EmojiFontHelper.withEmoji("💾", "Lưu"));
+        saveButton = new JButton("Lưu");
+        saveButton.setIcon(EmojiFontHelper.createEmojiIcon("💾", Color.WHITE));
         saveButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         saveButton.setBackground(new Color(139, 69, 19));
         saveButton.setForeground(Color.WHITE);

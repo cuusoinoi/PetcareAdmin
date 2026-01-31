@@ -184,10 +184,11 @@ public class AddInvoiceDialog extends JDialog {
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
         buttonPanel.setBackground(ThemeManager.getContentBackground());
 
-        saveButton = new JButton(EmojiFontHelper.withEmoji("💾", "Lưu"));
+        saveButton = new JButton("Lưu");
+        saveButton.setIcon(EmojiFontHelper.createEmojiIcon("💾", Color.WHITE));
         saveButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         saveButton.setBackground(new Color(139, 69, 19));
-        saveButton.setForeground(Color.WHITE); // nút Lưu màu nâu, chữ trắng
+        saveButton.setForeground(Color.WHITE);
         saveButton.setBorderPainted(false);
         saveButton.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         saveButton.addActionListener(e -> saveInvoice());

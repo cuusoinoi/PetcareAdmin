@@ -52,7 +52,7 @@ public class MedicalRecordManagementPanel extends JPanel {
                 BorderFactory.createEmptyBorder(15, 20, 15, 20)
         ));
 
-        titleLabel = new JLabel("Quản lý Hồ sơ Khám bệnh");
+        titleLabel = new JLabel("Quản lý Khám bệnh");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
         titleLabel.setForeground(ThemeManager.getTitleForeground());
         headerPanel.add(titleLabel, BorderLayout.WEST);
@@ -113,8 +113,8 @@ public class MedicalRecordManagementPanel extends JPanel {
         GUIUtil.setToolbarButtonSize(addButton);
         addButton.addActionListener(e -> showAddRecordDialog());
         sideButtonPanel.add(addButton);
-        editButton = new JButton("Sửa");
-        editButton.setIcon(EmojiFontHelper.createEmojiIcon("✏️", iconColor));
+        editButton = new JButton("Thêm dịch vụ & Kê đơn");
+        editButton.setIcon(EmojiFontHelper.createEmojiIcon("💊", iconColor));
         editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         GUIUtil.setToolbarButtonSize(editButton);
         editButton.addActionListener(e -> showEditRecordDialog());
@@ -174,7 +174,7 @@ public class MedicalRecordManagementPanel extends JPanel {
             }
             java.awt.Color iconColor = ThemeManager.getIconColor();
             addButton.setIcon(EmojiFontHelper.createEmojiIcon("➕", iconColor));
-            editButton.setIcon(EmojiFontHelper.createEmojiIcon("✏️", iconColor));
+            editButton.setIcon(EmojiFontHelper.createEmojiIcon("💊", iconColor));
             if (printButton != null) printButton.setIcon(EmojiFontHelper.createEmojiIcon("🖨️", iconColor));
             deleteButton.setIcon(EmojiFontHelper.createEmojiIcon("🗑️", iconColor));
             refreshButton.setIcon(EmojiFontHelper.createEmojiIcon("🔄", iconColor));
@@ -234,7 +234,7 @@ public class MedicalRecordManagementPanel extends JPanel {
         int selectedRow = recordTable.getSelectedRow();
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this,
-                    "Vui lòng chọn hồ sơ cần sửa!",
+                    "Vui lòng chọn lượt khám cần thêm dịch vụ hoặc kê đơn!",
                     "Thông báo",
                     JOptionPane.WARNING_MESSAGE);
             return;

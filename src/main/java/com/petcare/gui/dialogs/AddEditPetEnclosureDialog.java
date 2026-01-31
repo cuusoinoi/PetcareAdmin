@@ -5,6 +5,7 @@ import com.petcare.model.domain.PetEnclosure;
 import com.petcare.service.CustomerService;
 import com.petcare.service.PetEnclosureService;
 import com.petcare.service.PetService;
+import com.petcare.util.DatePickerHelper;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
 import com.petcare.util.ThemeManager;
@@ -89,7 +90,7 @@ public class AddEditPetEnclosureDialog extends JDialog {
         formPanel.add(createLabel("Ngày Check-in * (dd/MM/yyyy HH:mm):"));
         checkInDateField = createTextField();
         checkInDateField.putClientProperty("JTextField.placeholderText", "dd/MM/yyyy HH:mm");
-        formPanel.add(checkInDateField);
+        formPanel.add(DatePickerHelper.wrapDateTimeField(this, checkInDateField));
 
         // Daily Rate
         formPanel.add(createLabel("Phí/ngày (VNĐ) *:"));
@@ -110,7 +111,9 @@ public class AddEditPetEnclosureDialog extends JDialog {
 
         // Note
         formPanel.add(createLabel("Ghi chú:"));
-        noteArea = new JTextArea(3, 20);
+        noteArea = new JTextArea(2, 25);
+        noteArea.setLineWrap(true);
+        noteArea.setWrapStyleWord(true);
         noteArea.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         noteArea.setBackground(ThemeManager.getTextFieldBackground());
         noteArea.setForeground(ThemeManager.getTextFieldForeground());
@@ -128,7 +131,8 @@ public class AddEditPetEnclosureDialog extends JDialog {
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
         buttonPanel.setBackground(ThemeManager.getContentBackground());
 
-        saveButton = new JButton(EmojiFontHelper.withEmoji("💾", "Lưu"));
+        saveButton = new JButton("Lưu");
+        saveButton.setIcon(EmojiFontHelper.createEmojiIcon("💾", Color.WHITE));
         saveButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         saveButton.setBackground(new Color(139, 69, 19));
         saveButton.setForeground(Color.WHITE);

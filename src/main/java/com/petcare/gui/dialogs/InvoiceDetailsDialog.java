@@ -3,6 +3,8 @@ package com.petcare.gui.dialogs;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.petcare.model.entity.InvoiceDetailListDto;
 import com.petcare.model.entity.InvoiceInfoDto;
+import com.petcare.model.entity.InvoiceMedicineDetailListDto;
+import com.petcare.model.entity.InvoiceVaccinationDetailListDto;
 import com.petcare.service.InvoiceService;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.PrintHelper;
@@ -27,7 +29,7 @@ public class InvoiceDetailsDialog extends JDialog {
     }
 
     private void initComponents(int invoiceId) {
-        setSize(700, 500);
+        setSize(720, 560);
         setLocationRelativeTo(getParent());
         setLayout(new BorderLayout());
         setTitle("Chi tiết Hóa đơn #" + invoiceId);
@@ -37,12 +39,14 @@ public class InvoiceDetailsDialog extends JDialog {
         mainPanel.setBackground(ThemeManager.getContentBackground());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Invoice info
+        // Invoice info (khách, thú cưng, ngày)
         JPanel infoPanel = new JPanel(new java.awt.GridLayout(0, 2, 15, 10));
         infoPanel.setBackground(ThemeManager.getContentBackground());
+        int totalServices = 0, totalMedicines = 0, totalVaccinations = 0;
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        InvoiceInfoDto invoiceInfo = null;
         try {
-            InvoiceInfoDto invoiceInfo = InvoiceService.getInstance().getInvoiceInfo(invoiceId);
+            invoiceInfo = InvoiceService.getInstance().getInvoiceInfo(invoiceId);
             if (invoiceInfo != null) {
                 String invoiceDateStr = invoiceInfo.getInvoiceDate() != null ? sdf.format(invoiceInfo.getInvoiceDate()) : "";
                 infoPanel.add(createInfoLabel("Khách hàng:"));
@@ -57,22 +61,15 @@ public class InvoiceDetailsDialog extends JDialog {
                 }
                 infoPanel.add(createInfoLabel("Ngày hóa đơn:"));
                 infoPanel.add(createInfoValue(invoiceDateStr));
-                infoPanel.add(createInfoLabel("Tổng tiền:"));
-                infoPanel.add(createInfoValue(formatCurrency(invoiceInfo.getSubtotal())));
-                infoPanel.add(createInfoLabel("Giảm giá:"));
-                infoPanel.add(createInfoValue(formatCurrency(invoiceInfo.getDiscount())));
-                infoPanel.add(createInfoLabel("Đặt cọc:"));
-                infoPanel.add(createInfoValue(formatCurrency(invoiceInfo.getDeposit())));
-                infoPanel.add(createInfoLabel("Thành tiền:"));
-                JLabel totalLabel = createInfoValue(formatCurrency(invoiceInfo.getTotalAmount()));
-                totalLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
-                totalLabel.setForeground(ThemeManager.isDarkMode() ? new Color(255, 180, 100) : new Color(139, 69, 19));
-                infoPanel.add(totalLabel);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
         mainPanel.add(infoPanel, BorderLayout.NORTH);
+
+        // Tables + summary in scrollable content
+        JPanel contentPanel = new JPanel(new BorderLayout(0, 15));
+        contentPanel.setBackground(ThemeManager.getContentBackground());
 
         // Invoice details table
         String[] columns = {"Dịch vụ", "Số lượng", "Đơn giá", "Thành tiền"};
@@ -85,6 +82,7 @@ public class InvoiceDetailsDialog extends JDialog {
         try {
             List<InvoiceDetailListDto> details = InvoiceService.getInstance().getInvoiceDetails(invoiceId);
             for (InvoiceDetailListDto dto : details) {
+                totalServices += dto.getTotalPrice();
                 tableModel.addRow(new Object[]{
                         dto.getServiceName() != null ? dto.getServiceName() : "",
                         dto.getQuantity(),
@@ -102,10 +100,113 @@ public class InvoiceDetailsDialog extends JDialog {
         detailsTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
         ThemeManager.applyTableTheme(detailsTable);
 
-        JScrollPane scrollPane = new JScrollPane(detailsTable);
-        scrollPane.setBackground(ThemeManager.getContentBackground());
-        scrollPane.setBorder(BorderFactory.createTitledBorder("Chi tiết dịch vụ"));
-        mainPanel.add(scrollPane, BorderLayout.CENTER);
+        JScrollPane detailsScroll = new JScrollPane(detailsTable);
+        detailsScroll.setBackground(ThemeManager.getContentBackground());
+        detailsScroll.setBorder(BorderFactory.createTitledBorder("Chi tiết dịch vụ"));
+        detailsScroll.setPreferredSize(new Dimension(0, 120));
+        JPanel tablesPanel = new JPanel(new BorderLayout(0, 10));
+        tablesPanel.setBackground(ThemeManager.getContentBackground());
+        tablesPanel.add(detailsScroll, BorderLayout.NORTH);
+
+        // Medicine details table
+        String[] medColumns = {"Thuốc", "Số lượng", "Đơn giá", "Thành tiền"};
+        DefaultTableModel medTableModel = new DefaultTableModel(medColumns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        try {
+            List<InvoiceMedicineDetailListDto> medDetails = InvoiceService.getInstance().getInvoiceMedicineDetails(invoiceId);
+            for (InvoiceMedicineDetailListDto dto : medDetails) {
+                totalMedicines += dto.getTotalPrice();
+                medTableModel.addRow(new Object[]{
+                        dto.getMedicineName() != null ? dto.getMedicineName() : "",
+                        dto.getQuantity(),
+                        formatCurrency(dto.getUnitPrice()),
+                        formatCurrency(dto.getTotalPrice())
+                });
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        JTable medTable = new JTable(medTableModel);
+        medTable.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        medTable.setRowHeight(30);
+        medTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+        ThemeManager.applyTableTheme(medTable);
+        JScrollPane medScroll = new JScrollPane(medTable);
+        medScroll.setBackground(ThemeManager.getContentBackground());
+        medScroll.setBorder(BorderFactory.createTitledBorder("Chi tiết thuốc"));
+        medScroll.setPreferredSize(new Dimension(0, 100));
+        tablesPanel.add(medScroll, BorderLayout.CENTER);
+
+        // Vaccination details table
+        String[] vacColumns = {"Vaccine", "Số lượng", "Đơn giá", "Thành tiền"};
+        DefaultTableModel vacTableModel = new DefaultTableModel(vacColumns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        try {
+            List<InvoiceVaccinationDetailListDto> vacDetails = InvoiceService.getInstance().getInvoiceVaccinationDetails(invoiceId);
+            for (InvoiceVaccinationDetailListDto dto : vacDetails) {
+                totalVaccinations += dto.getTotalPrice();
+                vacTableModel.addRow(new Object[]{
+                        dto.getVaccineName() != null ? dto.getVaccineName() : "",
+                        dto.getQuantity(),
+                        formatCurrency(dto.getUnitPrice()),
+                        formatCurrency(dto.getTotalPrice())
+                });
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        JTable vacTable = new JTable(vacTableModel);
+        vacTable.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        vacTable.setRowHeight(30);
+        vacTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+        ThemeManager.applyTableTheme(vacTable);
+        JScrollPane vacScroll = new JScrollPane(vacTable);
+        vacScroll.setBackground(ThemeManager.getContentBackground());
+        vacScroll.setBorder(BorderFactory.createTitledBorder("Chi tiết tiêm chủng"));
+        vacScroll.setPreferredSize(new Dimension(0, 100));
+        tablesPanel.add(vacScroll, BorderLayout.SOUTH);
+
+        contentPanel.add(tablesPanel, BorderLayout.CENTER);
+
+        // Tổng kê: tổng dịch vụ, tổng thuốc, tổng vaccine, tổng tiền, giảm giá, đặt cọc, thành tiền
+        JPanel summaryPanel = new JPanel(new java.awt.GridLayout(0, 2, 12, 8));
+        summaryPanel.setBackground(ThemeManager.getContentBackground());
+        summaryPanel.setBorder(BorderFactory.createTitledBorder("Tổng kê"));
+        summaryPanel.add(createInfoLabel("Tổng dịch vụ:"));
+        summaryPanel.add(createInfoValue(formatCurrency(totalServices)));
+        summaryPanel.add(createInfoLabel("Tổng thuốc:"));
+        summaryPanel.add(createInfoValue(formatCurrency(totalMedicines)));
+        summaryPanel.add(createInfoLabel("Tổng tiêm chủng:"));
+        summaryPanel.add(createInfoValue(formatCurrency(totalVaccinations)));
+        summaryPanel.add(createInfoLabel("Tổng tiền (trước giảm):"));
+        int subtotal = totalServices + totalMedicines + totalVaccinations;
+        summaryPanel.add(createInfoValue(formatCurrency(invoiceInfo != null ? invoiceInfo.getSubtotal() : subtotal)));
+        summaryPanel.add(createInfoLabel("Giảm giá:"));
+        summaryPanel.add(createInfoValue(formatCurrency(invoiceInfo != null ? invoiceInfo.getDiscount() : 0)));
+        summaryPanel.add(createInfoLabel("Đặt cọc:"));
+        summaryPanel.add(createInfoValue(formatCurrency(invoiceInfo != null ? invoiceInfo.getDeposit() : 0)));
+        summaryPanel.add(createInfoLabel("Còn phải thanh toán:"));
+        JLabel finalLabel = createInfoValue(formatCurrency(invoiceInfo != null ? invoiceInfo.getTotalAmount() : subtotal));
+        finalLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        finalLabel.setForeground(ThemeManager.isDarkMode() ? new Color(255, 180, 100) : new Color(139, 69, 19));
+        summaryPanel.add(finalLabel);
+
+        contentPanel.add(summaryPanel, BorderLayout.SOUTH);
+
+        JScrollPane mainScroll = new JScrollPane(contentPanel);
+        mainScroll.setBorder(null);
+        mainScroll.getViewport().setBackground(ThemeManager.getContentBackground());
+        mainScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        mainScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        mainPanel.add(mainScroll, BorderLayout.CENTER);
 
         add(mainPanel, BorderLayout.CENTER);
 

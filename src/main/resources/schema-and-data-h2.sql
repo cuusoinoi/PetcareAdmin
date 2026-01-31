@@ -6,6 +6,10 @@
 
 -- Drop (theo thứ tự FK)
 DROP TABLE IF EXISTS prescriptions;
+DROP TABLE IF EXISTS invoice_vaccination_details;
+DROP TABLE IF EXISTS invoice_medicine_details;
+DROP TABLE IF EXISTS medical_record_services;
+DROP TABLE IF EXISTS medical_record_medicines;
 DROP TABLE IF EXISTS diagnoses;
 DROP TABLE IF EXISTS treatment_sessions;
 DROP TABLE IF EXISTS treatment_courses;
@@ -49,14 +53,16 @@ CREATE TABLE service_types (
 CREATE TABLE medicines (
     medicine_id INT AUTO_INCREMENT PRIMARY KEY,
     medicine_name VARCHAR(255) NOT NULL,
-    medicine_route VARCHAR(10) NOT NULL
+    medicine_route VARCHAR(10) NOT NULL,
+    unit_price INT NOT NULL DEFAULT 0
 );
 
 -- Vaccines
 CREATE TABLE vaccines (
     vaccine_id INT AUTO_INCREMENT PRIMARY KEY,
     vaccine_name VARCHAR(255) NOT NULL,
-    description TEXT
+    description TEXT,
+    unit_price INT NOT NULL DEFAULT 0
 );
 
 -- General settings
@@ -158,6 +164,7 @@ CREATE TABLE invoices (
     customer_id INT NOT NULL,
     pet_id INT NOT NULL,
     pet_enclosure_id INT,
+    medical_record_id INT,
     invoice_date TIMESTAMP NOT NULL,
     discount INT DEFAULT 0,
     subtotal INT NOT NULL,
@@ -165,7 +172,8 @@ CREATE TABLE invoices (
     total_amount INT NOT NULL,
     FOREIGN KEY (customer_id) REFERENCES customers(customer_id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (pet_id) REFERENCES pets(pet_id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (pet_enclosure_id) REFERENCES pet_enclosures(pet_enclosure_id) ON UPDATE CASCADE ON DELETE SET NULL
+    FOREIGN KEY (pet_enclosure_id) REFERENCES pet_enclosures(pet_enclosure_id) ON UPDATE CASCADE ON DELETE SET NULL,
+    FOREIGN KEY (medical_record_id) REFERENCES medical_records(medical_record_id) ON UPDATE CASCADE ON DELETE SET NULL
 );
 
 -- Invoice details
@@ -180,10 +188,11 @@ CREATE TABLE invoice_details (
     FOREIGN KEY (service_type_id) REFERENCES service_types(service_type_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
--- Pet vaccinations
+-- Pet vaccinations (gắn với lượt khám)
 CREATE TABLE pet_vaccinations (
     pet_vaccination_id INT AUTO_INCREMENT PRIMARY KEY,
     vaccine_id INT NOT NULL,
+    medical_record_id INT,
     customer_id INT NOT NULL,
     pet_id INT NOT NULL,
     doctor_id INT NOT NULL,
@@ -191,19 +200,22 @@ CREATE TABLE pet_vaccinations (
     next_vaccination_date DATE,
     notes TEXT,
     FOREIGN KEY (vaccine_id) REFERENCES vaccines(vaccine_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (medical_record_id) REFERENCES medical_records(medical_record_id) ON UPDATE CASCADE ON DELETE SET NULL,
     FOREIGN KEY (customer_id) REFERENCES customers(customer_id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (pet_id) REFERENCES pets(pet_id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (doctor_id) REFERENCES doctors(doctor_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
--- Treatment courses
+-- Treatment courses (gắn với lượt khám)
 CREATE TABLE treatment_courses (
     treatment_course_id INT AUTO_INCREMENT PRIMARY KEY,
+    medical_record_id INT,
     customer_id INT NOT NULL,
     pet_id INT NOT NULL,
     start_date DATE NOT NULL,
     end_date DATE,
     status VARCHAR(1) NOT NULL,
+    FOREIGN KEY (medical_record_id) REFERENCES medical_records(medical_record_id) ON UPDATE CASCADE ON DELETE SET NULL,
     FOREIGN KEY (customer_id) REFERENCES customers(customer_id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (pet_id) REFERENCES pets(pet_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
@@ -234,7 +246,7 @@ CREATE TABLE diagnoses (
     FOREIGN KEY (treatment_session_id) REFERENCES treatment_sessions(treatment_session_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
--- Prescriptions
+-- Prescriptions (liên kết treatment_session - giữ cho tương thích)
 CREATE TABLE prescriptions (
     prescription_id INT AUTO_INCREMENT PRIMARY KEY,
     treatment_session_id INT NOT NULL,
@@ -247,6 +259,54 @@ CREATE TABLE prescriptions (
     notes TEXT,
     FOREIGN KEY (treatment_session_id) REFERENCES treatment_sessions(treatment_session_id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (medicine_id) REFERENCES medicines(medicine_id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+-- Thuốc kê trong lượt khám (hóa đơn thuốc gắn lượt khám)
+CREATE TABLE medical_record_medicines (
+    record_medicine_id INT AUTO_INCREMENT PRIMARY KEY,
+    medical_record_id INT NOT NULL,
+    medicine_id INT NOT NULL,
+    quantity INT NOT NULL,
+    unit_price INT NOT NULL,
+    total_price INT NOT NULL,
+    FOREIGN KEY (medical_record_id) REFERENCES medical_records(medical_record_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (medicine_id) REFERENCES medicines(medicine_id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+-- Dịch vụ đã thêm trong lượt khám
+CREATE TABLE medical_record_services (
+    record_service_id INT AUTO_INCREMENT PRIMARY KEY,
+    medical_record_id INT NOT NULL,
+    service_type_id INT NOT NULL,
+    quantity INT NOT NULL,
+    unit_price INT NOT NULL,
+    total_price INT NOT NULL,
+    FOREIGN KEY (medical_record_id) REFERENCES medical_records(medical_record_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (service_type_id) REFERENCES service_types(service_type_id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+-- Chi tiết thuốc trên hóa đơn (khi xuất hóa đơn từ lượt khám)
+CREATE TABLE invoice_medicine_details (
+    detail_id INT AUTO_INCREMENT PRIMARY KEY,
+    invoice_id INT NOT NULL,
+    medicine_id INT NOT NULL,
+    quantity INT NOT NULL,
+    unit_price INT NOT NULL,
+    total_price INT NOT NULL,
+    FOREIGN KEY (invoice_id) REFERENCES invoices(invoice_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (medicine_id) REFERENCES medicines(medicine_id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+-- Chi tiết tiêm chủng trên hóa đơn (từ lượt khám)
+CREATE TABLE invoice_vaccination_details (
+    detail_id INT AUTO_INCREMENT PRIMARY KEY,
+    invoice_id INT NOT NULL,
+    vaccine_id INT NOT NULL,
+    quantity INT NOT NULL,
+    unit_price INT NOT NULL,
+    total_price INT NOT NULL,
+    FOREIGN KEY (invoice_id) REFERENCES invoices(invoice_id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (vaccine_id) REFERENCES vaccines(vaccine_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 -- Appointments
@@ -334,23 +394,23 @@ INSERT INTO general_settings (
 );
 
 -- === MEDICINES ===
-INSERT INTO medicines (medicine_name, medicine_route) VALUES
-('Amoxicillin 250mg', 'PO'),
-('Cefotaxime 1g', 'IM'),
-('Vitamin C 500mg', 'IV'),
-('Ivermectin 1%', 'SC'),
-('Metronidazole 250mg', 'PO'),
-('Dexamethasone 4mg', 'IM'),
-('Prednisolone 5mg', 'PO'),
-('Enrofloxacin 50mg', 'PO');
+INSERT INTO medicines (medicine_name, medicine_route, unit_price) VALUES
+('Amoxicillin 250mg', 'PO', 15000),
+('Cefotaxime 1g', 'IM', 45000),
+('Vitamin C 500mg', 'IV', 25000),
+('Ivermectin 1%', 'SC', 35000),
+('Metronidazole 250mg', 'PO', 12000),
+('Dexamethasone 4mg', 'IM', 18000),
+('Prednisolone 5mg', 'PO', 8000),
+('Enrofloxacin 50mg', 'PO', 22000);
 
 -- === VACCINES ===
-INSERT INTO vaccines (vaccine_name, description) VALUES
-('Vacxin Dại Rabisin', 'Phòng chống bệnh dại cho chó mèo, tiêm định kỳ 12 tháng/lần.'),
-('Vacxin 7 bệnh DHPPiL', 'Phòng 7 bệnh phổ biến cho chó: Carré, Parvo, Viêm gan...'),
-('Vacxin Care', 'Phòng bệnh Care (sài sốt) ở chó, nguy hiểm và dễ lây lan.'),
-('Vacxin Parvo', 'Phòng bệnh Parvo gây tiêu chảy, nôn mửa nghiêm trọng ở chó.'),
-('Vacxin 4 bệnh mèo FVRCP', 'Phòng 4 bệnh cho mèo: viêm mũi, calici, chlamydia, panleukopenia.');
+INSERT INTO vaccines (vaccine_name, description, unit_price) VALUES
+('Vacxin Dại Rabisin', 'Phòng chống bệnh dại cho chó mèo, tiêm định kỳ 12 tháng/lần.', 150000),
+('Vacxin 7 bệnh DHPPiL', 'Phòng 7 bệnh phổ biến cho chó: Carré, Parvo, Viêm gan...', 200000),
+('Vacxin Care', 'Phòng bệnh Care (sài sốt) ở chó, nguy hiểm và dễ lây lan.', 180000),
+('Vacxin Parvo', 'Phòng bệnh Parvo gây tiêu chảy, nôn mửa nghiêm trọng ở chó.', 120000),
+('Vacxin 4 bệnh mèo FVRCP', 'Phòng 4 bệnh cho mèo: viêm mũi, calici, chlamydia, panleukopenia.', 220000);
 
 -- === CUSTOMERS ===
 INSERT INTO customers (customer_name, customer_phone_number, customer_identity_card, customer_address, customer_note) VALUES

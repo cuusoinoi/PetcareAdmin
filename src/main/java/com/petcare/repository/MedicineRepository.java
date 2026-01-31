@@ -21,7 +21,7 @@ public class MedicineRepository implements IMedicineRepository {
     @Override
     public List<MedicineEntity> findAll() throws PetcareException {
         List<MedicineEntity> list = new ArrayList<>();
-        String query = "SELECT medicine_id, medicine_name, medicine_route FROM medicines ORDER BY medicine_id DESC";
+        String query = "SELECT medicine_id, medicine_name, medicine_route, unit_price FROM medicines ORDER BY medicine_id DESC";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query);
              ResultSet rs = ps.executeQuery()) {
@@ -36,7 +36,7 @@ public class MedicineRepository implements IMedicineRepository {
 
     @Override
     public MedicineEntity findById(int id) throws PetcareException {
-        String query = "SELECT medicine_id, medicine_name, medicine_route FROM medicines WHERE medicine_id = ?";
+        String query = "SELECT medicine_id, medicine_name, medicine_route, unit_price FROM medicines WHERE medicine_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setInt(1, id);
@@ -53,11 +53,12 @@ public class MedicineRepository implements IMedicineRepository {
 
     @Override
     public int insert(MedicineEntity entity) throws PetcareException {
-        String query = "INSERT INTO medicines (medicine_name, medicine_route) VALUES (?, ?)";
+        String query = "INSERT INTO medicines (medicine_name, medicine_route, unit_price) VALUES (?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, entity.getMedicineName());
             ps.setString(2, entity.getMedicineRoute());
+            ps.setInt(3, entity.getUnitPrice());
             int result = ps.executeUpdate();
             if (result > 0) {
                 try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -74,12 +75,13 @@ public class MedicineRepository implements IMedicineRepository {
 
     @Override
     public int update(MedicineEntity entity) throws PetcareException {
-        String query = "UPDATE medicines SET medicine_name = ?, medicine_route = ? WHERE medicine_id = ?";
+        String query = "UPDATE medicines SET medicine_name = ?, medicine_route = ?, unit_price = ? WHERE medicine_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setString(1, entity.getMedicineName());
             ps.setString(2, entity.getMedicineRoute());
-            ps.setInt(3, entity.getMedicineId());
+            ps.setInt(3, entity.getUnitPrice());
+            ps.setInt(4, entity.getMedicineId());
             return ps.executeUpdate();
         } catch (SQLException ex) {
             throw new PetcareException("Lỗi khi cập nhật thuốc", ex);
@@ -103,6 +105,7 @@ public class MedicineRepository implements IMedicineRepository {
         e.setMedicineId(rs.getInt("medicine_id"));
         e.setMedicineName(rs.getString("medicine_name"));
         e.setMedicineRoute(rs.getString("medicine_route"));
+        e.setUnitPrice(rs.getInt("unit_price"));
         return e;
     }
 }

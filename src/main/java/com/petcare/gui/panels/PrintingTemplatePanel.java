@@ -1,8 +1,9 @@
 package com.petcare.gui.panels;
 
-import com.petcare.model.entity.InvoiceListDto;
+import com.petcare.model.entity.PetEnclosureListDto;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.service.InvoiceService;
+import com.petcare.service.PetEnclosureService;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.PrintHelper;
 import com.petcare.util.ThemeManager;
@@ -17,12 +18,13 @@ public class PrintingTemplatePanel extends JPanel {
     private JPanel headerPanel;
     private JLabel titleLabel;
     private JPanel filterPanel;
-    private JComboBox<InvoiceListDto> invoiceCombo;
+    private JComboBox<PetEnclosureListDto> enclosureCombo;
     private JButton btnCommit;
     private JButton btnInvoice;
     private JButton btnPrint;
     private JScrollPane scrollPane;
     private JEditorPane previewPane;
+    private final PetEnclosureService enclosureService = PetEnclosureService.getInstance();
     private final InvoiceService invoiceService = InvoiceService.getInstance();
     private static final SimpleDateFormat SDF_DATE_TIME = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     private String lastPreviewFragment;
@@ -52,33 +54,34 @@ public class PrintingTemplatePanel extends JPanel {
         filterPanel.setBackground(ThemeManager.getFormBackground());
         filterPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        JLabel lblInvoice = new JLabel("Chọn hóa đơn:");
-        lblInvoice.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        lblInvoice.setForeground(ThemeManager.getTitleForeground());
-        filterPanel.add(lblInvoice);
+        JLabel lblEnclosure = new JLabel("Chọn lưu chuồng:");
+        lblEnclosure.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblEnclosure.setForeground(ThemeManager.getTitleForeground());
+        filterPanel.add(lblEnclosure);
 
-        invoiceCombo = new JComboBox<>();
-        invoiceCombo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        invoiceCombo.setPreferredSize(new java.awt.Dimension(380, 28));
-        invoiceCombo.setBackground(ThemeManager.getTextFieldBackground());
-        invoiceCombo.setForeground(ThemeManager.getTableForeground());
-        invoiceCombo.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
+        enclosureCombo = new JComboBox<>();
+        enclosureCombo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        enclosureCombo.setPreferredSize(new java.awt.Dimension(380, 28));
+        enclosureCombo.setBackground(ThemeManager.getTextFieldBackground());
+        enclosureCombo.setForeground(ThemeManager.getTableForeground());
+        enclosureCombo.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
             JLabel l = new JLabel();
-            l.setFont(invoiceCombo.getFont());
+            l.setFont(enclosureCombo.getFont());
             l.setOpaque(true);
             l.setBackground(isSelected ? ThemeManager.getButtonBackground() : ThemeManager.getTextFieldBackground());
             l.setForeground(isSelected ? ThemeManager.getButtonForeground() : ThemeManager.getTableForeground());
             if (value != null) {
+                int num = value.getPetEnclosureNumber();
                 String petName = value.getPetName() != null ? value.getPetName() : "";
                 String custName = value.getCustomerName() != null ? value.getCustomerName() : "";
-                String dateStr = value.getInvoiceDate() != null ? SDF_DATE_TIME.format(value.getInvoiceDate()) : "";
-                l.setText(petName + " (" + custName + ") - " + dateStr);
+                String dateStr = value.getCheckInDate() != null ? SDF_DATE_TIME.format(value.getCheckInDate()) : "";
+                l.setText("Chuồng " + num + " - " + petName + " (" + custName + ") - " + dateStr);
             } else {
-                l.setText("-- Chọn hóa đơn --");
+                l.setText("-- Chọn lưu chuồng --");
             }
             return l;
         });
-        filterPanel.add(invoiceCombo);
+        filterPanel.add(enclosureCombo);
 
         Color iconColor = ThemeManager.getIconColor();
         btnCommit = new JButton("Xem Giấy cam kết");
@@ -131,13 +134,13 @@ public class PrintingTemplatePanel extends JPanel {
     }
 
     private void showCommitment() {
-        InvoiceListDto dto = (InvoiceListDto) invoiceCombo.getSelectedItem();
+        PetEnclosureListDto dto = (PetEnclosureListDto) enclosureCombo.getSelectedItem();
         if (dto == null) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn hóa đơn!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn lưu chuồng!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
         try {
-            String html = PrintHelper.buildCommitmentHtml(dto.getInvoiceId());
+            String html = PrintHelper.buildCommitmentHtmlByEnclosureId(dto.getPetEnclosureId());
             lastPreviewFragment = html;
             previewPane.setText(wrapHtml(html));
             previewPane.setCaretPosition(0);
@@ -147,13 +150,18 @@ public class PrintingTemplatePanel extends JPanel {
     }
 
     private void showInvoiceTemplate() {
-        InvoiceListDto dto = (InvoiceListDto) invoiceCombo.getSelectedItem();
+        PetEnclosureListDto dto = (PetEnclosureListDto) enclosureCombo.getSelectedItem();
         if (dto == null) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn hóa đơn!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn lưu chuồng!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
         try {
-            String html = PrintHelper.buildInvoiceTemplateHtml(dto.getInvoiceId());
+            Integer invoiceId = invoiceService.getInvoiceIdByPetEnclosureId(dto.getPetEnclosureId());
+            if (invoiceId == null) {
+                JOptionPane.showMessageDialog(this, "Lưu chuồng này chưa có hóa đơn. Vui lòng xuất hóa đơn từ màn Thanh toán / Check-out trước.", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            String html = PrintHelper.buildInvoiceTemplateHtml(invoiceId);
             lastPreviewFragment = html;
             previewPane.setText(wrapHtml(html));
             previewPane.setCaretPosition(0);
@@ -164,7 +172,7 @@ public class PrintingTemplatePanel extends JPanel {
 
     private void printCurrentPage() {
         String html = previewPane.getText();
-        if (html == null || html.trim().isEmpty() || html.contains("Chọn hóa đơn và bấm")) {
+        if (html == null || html.trim().isEmpty() || html.contains("Chọn lưu chuồng và bấm")) {
             JOptionPane.showMessageDialog(this, "Chưa có nội dung để in! Hãy xem Giấy cam kết hoặc Hóa đơn trước.", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -216,26 +224,26 @@ public class PrintingTemplatePanel extends JPanel {
                         .replace("color:#ff8a80", "color:#dc3545");
             }
         } else {
-            inner = "<p style='margin:0'>Chọn hóa đơn và bấm \"Xem Giấy cam kết\" hoặc \"Xem Hóa đơn\".</p>";
+            inner = "<p style='margin:0'>Chọn lưu chuồng và bấm \"Xem Giấy cam kết\" hoặc \"Xem Hóa đơn\".</p>";
         }
         return "<html><head><meta charset=\"UTF-8\">" + styleBlock + "</head><body style='font-family: Times New Roman, serif; padding: 20px; background: " + bgHex + "; color: " + fgHex + ";'>" + inner + "</body></html>";
     }
 
     public void refreshData() {
         try {
-            List<InvoiceListDto> list = invoiceService.getInvoicesForList();
-            InvoiceListDto selected = (InvoiceListDto) invoiceCombo.getSelectedItem();
-            invoiceCombo.removeAllItems();
-            for (InvoiceListDto dto : list) {
-                invoiceCombo.addItem(dto);
+            List<PetEnclosureListDto> list = enclosureService.getEnclosuresForList();
+            PetEnclosureListDto selected = (PetEnclosureListDto) enclosureCombo.getSelectedItem();
+            enclosureCombo.removeAllItems();
+            for (PetEnclosureListDto dto : list) {
+                enclosureCombo.addItem(dto);
             }
             if (selected != null && list.contains(selected)) {
-                invoiceCombo.setSelectedItem(selected);
-            } else if (invoiceCombo.getItemCount() > 0) {
-                invoiceCombo.setSelectedIndex(0);
+                enclosureCombo.setSelectedItem(selected);
+            } else if (enclosureCombo.getItemCount() > 0) {
+                enclosureCombo.setSelectedIndex(0);
             }
         } catch (PetcareException ex) {
-            JOptionPane.showMessageDialog(this, "Lỗi khi tải danh sách hóa đơn: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Lỗi khi tải danh sách lưu chuồng: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -250,10 +258,10 @@ public class PrintingTemplatePanel extends JPanel {
         }
         if (titleLabel != null) titleLabel.setForeground(ThemeManager.getTitleForeground());
         if (filterPanel != null) filterPanel.setBackground(ThemeManager.getFormBackground());
-        if (invoiceCombo != null) {
-            invoiceCombo.setBackground(ThemeManager.getTextFieldBackground());
-            invoiceCombo.setForeground(ThemeManager.getTableForeground());
-            invoiceCombo.repaint();
+        if (enclosureCombo != null) {
+            enclosureCombo.setBackground(ThemeManager.getTextFieldBackground());
+            enclosureCombo.setForeground(ThemeManager.getTableForeground());
+            enclosureCombo.repaint();
         }
         Color iconColor = ThemeManager.getIconColor();
         if (btnCommit != null) {

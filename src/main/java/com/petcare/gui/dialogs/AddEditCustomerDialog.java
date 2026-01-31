@@ -79,7 +79,9 @@ public class AddEditCustomerDialog extends JDialog {
 
         // Note
         formPanel.add(createLabel("Ghi chú:"));
-        noteArea = new JTextArea(3, GUIUtil.TEXT_FIELD_COLUMNS);
+        noteArea = new JTextArea(2, GUIUtil.TEXT_FIELD_COLUMNS);
+        noteArea.setLineWrap(true);
+        noteArea.setWrapStyleWord(true);
         noteArea.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         noteArea.setBackground(ThemeManager.getTextFieldBackground());
         noteArea.setForeground(ThemeManager.getTextFieldForeground());
@@ -97,7 +99,8 @@ public class AddEditCustomerDialog extends JDialog {
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
         buttonPanel.setBackground(ThemeManager.getContentBackground());
 
-        saveButton = new JButton(EmojiFontHelper.withEmoji("💾", "Lưu"));
+        saveButton = new JButton("Lưu");
+        saveButton.setIcon(EmojiFontHelper.createEmojiIcon("💾", Color.WHITE));
         saveButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         saveButton.setBackground(new Color(139, 69, 19));
         saveButton.setForeground(Color.WHITE);

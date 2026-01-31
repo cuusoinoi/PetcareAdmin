@@ -1,6 +1,7 @@
 package com.petcare.gui.panels;
 
 import com.petcare.gui.dialogs.AddInvoiceDialog;
+import com.petcare.gui.dialogs.AddInvoiceFromVisitDialog;
 import com.petcare.gui.dialogs.InvoiceDetailsDialog;
 import com.petcare.model.entity.InvoiceListDto;
 import com.petcare.model.exception.PetcareException;
@@ -11,6 +12,7 @@ import com.petcare.util.ThemeManager;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
+import java.awt.Window;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -31,6 +33,7 @@ public class InvoiceManagementPanel extends JPanel {
     private JLabel titleLabel;
     private JTextField searchField;
     private JButton addButton;
+    private JButton addFromVisitButton;
     private JButton viewButton;
     private JButton deleteButton;
     private JButton refreshButton;
@@ -112,6 +115,12 @@ public class InvoiceManagementPanel extends JPanel {
         GUIUtil.setToolbarButtonSize(addButton);
         addButton.addActionListener(e -> showAddInvoiceDialog());
         sideButtonPanel.add(addButton);
+        addFromVisitButton = new JButton("Xuất từ lượt khám");
+        addFromVisitButton.setIcon(EmojiFontHelper.createEmojiIcon("📋", iconColor));
+        addFromVisitButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        GUIUtil.setToolbarButtonSize(addFromVisitButton);
+        addFromVisitButton.addActionListener(e -> showAddInvoiceFromVisitDialog());
+        sideButtonPanel.add(addFromVisitButton);
         viewButton = new JButton("Xem chi tiết");
         viewButton.setIcon(EmojiFontHelper.createEmojiIcon("👁️", iconColor));
         viewButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -167,6 +176,7 @@ public class InvoiceManagementPanel extends JPanel {
             }
             java.awt.Color iconColor = ThemeManager.getIconColor();
             addButton.setIcon(EmojiFontHelper.createEmojiIcon("➕", iconColor));
+            if (addFromVisitButton != null) addFromVisitButton.setIcon(EmojiFontHelper.createEmojiIcon("📋", iconColor));
             viewButton.setIcon(EmojiFontHelper.createEmojiIcon("👁️", iconColor));
             deleteButton.setIcon(EmojiFontHelper.createEmojiIcon("🗑️", iconColor));
             refreshButton.setIcon(EmojiFontHelper.createEmojiIcon("🔄", iconColor));
@@ -210,6 +220,15 @@ public class InvoiceManagementPanel extends JPanel {
 
     private void showAddInvoiceDialog() {
         AddInvoiceDialog dialog = new AddInvoiceDialog(null);
+        dialog.setVisible(true);
+        if (dialog.isSaved()) {
+            refreshData();
+        }
+    }
+
+    private void showAddInvoiceFromVisitDialog() {
+        Window owner = SwingUtilities.getWindowAncestor(this);
+        AddInvoiceFromVisitDialog dialog = new AddInvoiceFromVisitDialog(owner);
         dialog.setVisible(true);
         if (dialog.isSaved()) {
             refreshData();

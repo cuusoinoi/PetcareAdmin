@@ -6,6 +6,7 @@ import com.petcare.model.domain.Pet;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.service.CustomerService;
 import com.petcare.service.PetService;
+import com.petcare.util.DatePickerHelper;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
 import com.petcare.util.ThemeManager;
@@ -104,7 +105,7 @@ public class AddEditPetDialog extends JDialog {
         formPanel.add(createLabel("Ngày sinh (dd/MM/yyyy):"));
         dobField = createTextField();
         dobField.putClientProperty("JTextField.placeholderText", "dd/MM/yyyy");
-        formPanel.add(dobField);
+        formPanel.add(DatePickerHelper.wrapDateField(this, dobField));
 
         // Weight
         formPanel.add(createLabel("Cân nặng (kg):"));
@@ -159,7 +160,8 @@ public class AddEditPetDialog extends JDialog {
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
         buttonPanel.setBackground(ThemeManager.getContentBackground());
 
-        saveButton = new JButton(EmojiFontHelper.withEmoji("💾", "Lưu"));
+        saveButton = new JButton("Lưu");
+        saveButton.setIcon(EmojiFontHelper.createEmojiIcon("💾", Color.WHITE));
         saveButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         saveButton.setBackground(new Color(139, 69, 19));
         saveButton.setForeground(Color.WHITE);

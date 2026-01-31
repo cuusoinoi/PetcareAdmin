@@ -76,7 +76,7 @@ public class Sidebar extends JPanel {
         doctorBtn.addActionListener(e -> dashboard.showDoctorManagement());
         menuPanel.add(doctorBtn);
         menuPanel.add(createSeparator("KHÁM & ĐIỀU TRỊ"));
-        medicalRecordBtn = createMenuButton("📋", "Hồ sơ khám bệnh", false);
+        medicalRecordBtn = createMenuButton("📋", "Khám bệnh", false);
         medicalRecordBtn.addActionListener(e -> dashboard.showMedicalRecordManagement());
         menuPanel.add(medicalRecordBtn);
         vaccinationBtn = createMenuButton("💉", "Tiêm chủng", false);

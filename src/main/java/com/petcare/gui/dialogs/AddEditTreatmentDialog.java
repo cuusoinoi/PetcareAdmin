@@ -2,9 +2,12 @@ package com.petcare.gui.dialogs;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.petcare.model.domain.TreatmentCourse;
+import com.petcare.model.entity.MedicalRecordListDto;
 import com.petcare.service.CustomerService;
+import com.petcare.service.MedicalRecordService;
 import com.petcare.service.PetService;
 import com.petcare.service.TreatmentCourseService;
+import com.petcare.util.DatePickerHelper;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
 import com.petcare.util.ThemeManager;
@@ -19,6 +22,7 @@ import java.util.Date;
  * Dialog for adding/editing treatment course
  */
 public class AddEditTreatmentDialog extends JDialog {
+    private JComboBox<String> medicalRecordCombo;
     private JComboBox<String> customerCombo;
     private JComboBox<String> petCombo;
     private JTextField startDateField;
@@ -33,6 +37,7 @@ public class AddEditTreatmentDialog extends JDialog {
         super(parent, true);
         this.course = course;
         initComponents();
+        loadMedicalRecords();
         loadCustomers();
 
         if (course != null) {
@@ -54,6 +59,15 @@ public class AddEditTreatmentDialog extends JDialog {
         JPanel formPanel = new JPanel(new GridLayout(0, 2, 15, 15));
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         formPanel.setBackground(ThemeManager.getContentBackground());
+
+        // Lượt khám (tùy chọn)
+        formPanel.add(createLabel("Lượt khám:"));
+        medicalRecordCombo = new JComboBox<>();
+        medicalRecordCombo.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        medicalRecordCombo.setBackground(ThemeManager.getTextFieldBackground());
+        medicalRecordCombo.setForeground(ThemeManager.getTextFieldForeground());
+        medicalRecordCombo.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
+        formPanel.add(medicalRecordCombo);
 
         // Customer
         formPanel.add(createLabel("Khách hàng *:"));
@@ -78,13 +92,13 @@ public class AddEditTreatmentDialog extends JDialog {
         formPanel.add(createLabel("Ngày bắt đầu * (dd/MM/yyyy):"));
         startDateField = createTextField();
         startDateField.putClientProperty("JTextField.placeholderText", "dd/MM/yyyy");
-        formPanel.add(startDateField);
+        formPanel.add(DatePickerHelper.wrapDateField(this, startDateField));
 
         // End Date
         formPanel.add(createLabel("Ngày kết thúc (dd/MM/yyyy):"));
         endDateField = createTextField();
         endDateField.putClientProperty("JTextField.placeholderText", "dd/MM/yyyy");
-        formPanel.add(endDateField);
+        formPanel.add(DatePickerHelper.wrapDateField(this, endDateField));
 
         // Status
         formPanel.add(createLabel("Trạng thái:"));
@@ -104,7 +118,8 @@ public class AddEditTreatmentDialog extends JDialog {
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
         buttonPanel.setBackground(ThemeManager.getContentBackground());
 
-        saveButton = new JButton(EmojiFontHelper.withEmoji("💾", "Lưu"));
+        saveButton = new JButton("Lưu");
+        saveButton.setIcon(EmojiFontHelper.createEmojiIcon("💾", Color.WHITE));
         saveButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         saveButton.setBackground(new Color(139, 69, 19));
         saveButton.setForeground(Color.WHITE);
@@ -144,6 +159,20 @@ public class AddEditTreatmentDialog extends JDialog {
         return field;
     }
 
+    private void loadMedicalRecords() {
+        medicalRecordCombo.removeAllItems();
+        medicalRecordCombo.addItem("-- Không gắn lượt khám --");
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            for (MedicalRecordListDto dto : MedicalRecordService.getInstance().getRecordsForList()) {
+                String dateStr = dto.getVisitDate() != null ? sdf.format(dto.getVisitDate()) : "";
+                medicalRecordCombo.addItem(dto.getMedicalRecordId() + " - " + dateStr + " - " + (dto.getCustomerName() != null ? dto.getCustomerName() : "") + " - " + (dto.getPetName() != null ? dto.getPetName() : ""));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
     private void loadCustomers() {
         customerCombo.removeAllItems();
         customerCombo.addItem("-- Chọn khách hàng --");
@@ -173,6 +202,17 @@ public class AddEditTreatmentDialog extends JDialog {
 
     private void loadCourseData() {
         if (course != null) {
+            // Set medical record
+            if (course.getMedicalRecordId() != null) {
+                for (int i = 0; i < medicalRecordCombo.getItemCount(); i++) {
+                    String item = medicalRecordCombo.getItemAt(i);
+                    if (item.startsWith(String.valueOf(course.getMedicalRecordId()))) {
+                        medicalRecordCombo.setSelectedIndex(i);
+                        break;
+                    }
+                }
+            }
+
             // Set customer
             for (int i = 0; i < customerCombo.getItemCount(); i++) {
                 String item = customerCombo.getItemAt(i);
@@ -230,6 +270,12 @@ public class AddEditTreatmentDialog extends JDialog {
 
         try {
             // Get IDs
+            Integer medicalRecordId = null;
+            if (medicalRecordCombo.getSelectedIndex() > 0) {
+                String mrSelected = (String) medicalRecordCombo.getSelectedItem();
+                medicalRecordId = Integer.parseInt(mrSelected.split(" - ")[0]);
+            }
+
             String customerSelected = (String) customerCombo.getSelectedItem();
             int customerId = Integer.parseInt(customerSelected.split(" - ")[0]);
 
@@ -265,6 +311,7 @@ public class AddEditTreatmentDialog extends JDialog {
             TreatmentCourseService service = TreatmentCourseService.getInstance();
             if (course == null) {
                 TreatmentCourse newCourse = new TreatmentCourse();
+                newCourse.setMedicalRecordId(medicalRecordId);
                 newCourse.setCustomerId(customerId);
                 newCourse.setPetId(petId);
                 newCourse.setStartDate(startDate);
@@ -275,6 +322,7 @@ public class AddEditTreatmentDialog extends JDialog {
                 saved = true;
                 dispose();
             } else {
+                course.setMedicalRecordId(medicalRecordId);
                 course.setCustomerId(customerId);
                 course.setPetId(petId);
                 course.setStartDate(startDate);

@@ -219,7 +219,7 @@ public class CheckoutDialog extends JDialog {
         checkoutButton = new JButton(EmojiFontHelper.withEmoji("✅", "Check-out & Tạo hóa đơn"));
         checkoutButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
         checkoutButton.setBackground(new Color(40, 167, 69));
-        checkoutButton.setForeground(Color.WHITE); // nút Check-out màu xanh, chữ trắng
+        checkoutButton.setForeground(Color.WHITE);
         checkoutButton.setBorderPainted(false);
         checkoutButton.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         checkoutButton.addActionListener(e -> processCheckout());

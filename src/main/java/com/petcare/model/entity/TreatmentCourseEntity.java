@@ -7,6 +7,7 @@ import java.util.Date;
  */
 public class TreatmentCourseEntity {
     private int treatmentCourseId;
+    private Integer medicalRecordId;
     private int customerId;
     private int petId;
     private Date startDate;
@@ -22,6 +23,14 @@ public class TreatmentCourseEntity {
 
     public void setTreatmentCourseId(int treatmentCourseId) {
         this.treatmentCourseId = treatmentCourseId;
+    }
+
+    public Integer getMedicalRecordId() {
+        return medicalRecordId;
+    }
+
+    public void setMedicalRecordId(Integer medicalRecordId) {
+        this.medicalRecordId = medicalRecordId;
     }
 
     public int getCustomerId() {

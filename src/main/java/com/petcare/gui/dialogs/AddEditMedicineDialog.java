@@ -19,6 +19,7 @@ import java.awt.*;
 public class AddEditMedicineDialog extends JDialog {
     private JTextField medicineNameField;
     private JComboBox<String> routeCombo;
+    private JTextField unitPriceField;
     private JButton saveButton;
     private JButton cancelButton;
     private boolean saved = false;
@@ -65,13 +66,19 @@ public class AddEditMedicineDialog extends JDialog {
         routeCombo.addItem("Tiêm dưới da");
         formPanel.add(routeCombo);
 
+        formPanel.add(createLabel("Đơn giá (VNĐ) *:"));
+        unitPriceField = createTextField();
+        unitPriceField.setText("0");
+        formPanel.add(unitPriceField);
+
         add(formPanel, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
         buttonPanel.setBackground(ThemeManager.getContentBackground());
 
-        saveButton = new JButton(EmojiFontHelper.withEmoji("💾", "Lưu"));
+        saveButton = new JButton("Lưu");
+        saveButton.setIcon(EmojiFontHelper.createEmojiIcon("💾", Color.WHITE));
         saveButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         saveButton.setBackground(new Color(139, 69, 19));
         saveButton.setForeground(Color.WHITE);
@@ -117,6 +124,7 @@ public class AddEditMedicineDialog extends JDialog {
             if (medicine.getMedicineRoute() != null) {
                 routeCombo.setSelectedItem(medicine.getMedicineRoute().getLabel());
             }
+            unitPriceField.setText(String.valueOf(medicine.getUnitPrice()));
         }
     }
 
@@ -131,6 +139,15 @@ public class AddEditMedicineDialog extends JDialog {
             routeCombo.requestFocus();
             return;
         }
+        int unitPrice;
+        try {
+            unitPrice = Integer.parseInt(unitPriceField.getText().trim());
+            if (unitPrice < 0) unitPrice = 0;
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Đơn giá phải là số nguyên (VNĐ)!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            unitPriceField.requestFocus();
+            return;
+        }
         String routeLabel = (String) routeCombo.getSelectedItem();
         Medicine.Route route = getRouteByLabel(routeLabel);
         try {
@@ -138,6 +155,7 @@ public class AddEditMedicineDialog extends JDialog {
                 Medicine newMedicine = new Medicine();
                 newMedicine.setMedicineName(medicineNameField.getText().trim());
                 newMedicine.setMedicineRoute(route);
+                newMedicine.setUnitPrice(unitPrice);
                 medicineService.createMedicine(newMedicine, currentUser);
                 JOptionPane.showMessageDialog(this, "Thêm thuốc thành công!", "Thành công",
                         JOptionPane.INFORMATION_MESSAGE);
@@ -146,6 +164,7 @@ public class AddEditMedicineDialog extends JDialog {
             } else {
                 medicine.setMedicineName(medicineNameField.getText().trim());
                 medicine.setMedicineRoute(route);
+                medicine.setUnitPrice(unitPrice);
                 medicineService.updateMedicine(medicine, currentUser);
                 JOptionPane.showMessageDialog(this, "Cập nhật thuốc thành công!", "Thành công",
                         JOptionPane.INFORMATION_MESSAGE);

@@ -92,6 +92,7 @@ public class TreatmentCourseService {
     private TreatmentCourse entityToDomain(TreatmentCourseEntity e) {
         TreatmentCourse tc = new TreatmentCourse();
         tc.setTreatmentCourseId(e.getTreatmentCourseId());
+        tc.setMedicalRecordId(e.getMedicalRecordId());
         tc.setCustomerId(e.getCustomerId());
         tc.setPetId(e.getPetId());
         tc.setStartDate(e.getStartDate());
@@ -103,6 +104,7 @@ public class TreatmentCourseService {
     private TreatmentCourseEntity domainToEntity(TreatmentCourse tc) {
         TreatmentCourseEntity e = new TreatmentCourseEntity();
         e.setTreatmentCourseId(tc.getTreatmentCourseId());
+        e.setMedicalRecordId(tc.getMedicalRecordId());
         e.setCustomerId(tc.getCustomerId());
         e.setPetId(tc.getPetId());
         e.setStartDate(tc.getStartDate());

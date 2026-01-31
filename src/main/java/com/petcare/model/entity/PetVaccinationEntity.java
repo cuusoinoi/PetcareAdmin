@@ -8,6 +8,7 @@ import java.util.Date;
 public class PetVaccinationEntity {
     private int petVaccinationId;
     private int vaccineId;
+    private Integer medicalRecordId;
     private int customerId;
     private int petId;
     private int doctorId;
@@ -32,6 +33,14 @@ public class PetVaccinationEntity {
 
     public void setVaccineId(int vaccineId) {
         this.vaccineId = vaccineId;
+    }
+
+    public Integer getMedicalRecordId() {
+        return medicalRecordId;
+    }
+
+    public void setMedicalRecordId(Integer medicalRecordId) {
+        this.medicalRecordId = medicalRecordId;
     }
 
     public int getCustomerId() {

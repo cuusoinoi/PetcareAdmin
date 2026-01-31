@@ -10,6 +10,7 @@ public class Medicine {
     private int medicineId;
     private String medicineName;
     private Route medicineRoute;
+    private int unitPrice;
 
     public enum Route {
         PO("PO", "Uống"),
@@ -84,5 +85,13 @@ public class Medicine {
             throw new PetcareException("Đường dùng không được để trống");
         }
         this.medicineRoute = medicineRoute;
+    }
+
+    public int getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(int unitPrice) {
+        this.unitPrice = unitPrice;
     }
 }

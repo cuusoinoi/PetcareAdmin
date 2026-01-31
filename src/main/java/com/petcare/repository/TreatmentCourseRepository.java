@@ -54,7 +54,7 @@ public class TreatmentCourseRepository implements ITreatmentCourseRepository {
 
     @Override
     public TreatmentCourseEntity findById(int id) throws PetcareException {
-        String query = "SELECT treatment_course_id, customer_id, pet_id, start_date, end_date, status " +
+        String query = "SELECT treatment_course_id, medical_record_id, customer_id, pet_id, start_date, end_date, status " +
                 "FROM treatment_courses WHERE treatment_course_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
@@ -72,7 +72,7 @@ public class TreatmentCourseRepository implements ITreatmentCourseRepository {
 
     @Override
     public int insert(TreatmentCourseEntity entity) throws PetcareException {
-        String query = "INSERT INTO treatment_courses (customer_id, pet_id, start_date, end_date, status) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO treatment_courses (medical_record_id, customer_id, pet_id, start_date, end_date, status) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             bindEntity(ps, entity);
@@ -92,11 +92,11 @@ public class TreatmentCourseRepository implements ITreatmentCourseRepository {
 
     @Override
     public int update(TreatmentCourseEntity entity) throws PetcareException {
-        String query = "UPDATE treatment_courses SET customer_id=?, pet_id=?, start_date=?, end_date=?, status=? WHERE treatment_course_id=?";
+        String query = "UPDATE treatment_courses SET medical_record_id=?, customer_id=?, pet_id=?, start_date=?, end_date=?, status=? WHERE treatment_course_id=?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
             bindEntity(ps, entity);
-            ps.setInt(6, entity.getTreatmentCourseId());
+            ps.setInt(7, entity.getTreatmentCourseId());
             return ps.executeUpdate();
         } catch (SQLException ex) {
             throw new PetcareException("Lỗi khi cập nhật liệu trình", ex);
@@ -190,16 +190,23 @@ public class TreatmentCourseRepository implements ITreatmentCourseRepository {
     }
 
     private void bindEntity(PreparedStatement ps, TreatmentCourseEntity e) throws SQLException {
-        ps.setInt(1, e.getCustomerId());
-        ps.setInt(2, e.getPetId());
-        ps.setDate(3, e.getStartDate() != null ? new java.sql.Date(e.getStartDate().getTime()) : null);
-        ps.setDate(4, e.getEndDate() != null ? new java.sql.Date(e.getEndDate().getTime()) : null);
-        ps.setString(5, e.getStatus());
+        if (e.getMedicalRecordId() != null) {
+            ps.setInt(1, e.getMedicalRecordId());
+        } else {
+            ps.setNull(1, java.sql.Types.INTEGER);
+        }
+        ps.setInt(2, e.getCustomerId());
+        ps.setInt(3, e.getPetId());
+        ps.setDate(4, e.getStartDate() != null ? new java.sql.Date(e.getStartDate().getTime()) : null);
+        ps.setDate(5, e.getEndDate() != null ? new java.sql.Date(e.getEndDate().getTime()) : null);
+        ps.setString(6, e.getStatus());
     }
 
     private TreatmentCourseEntity mapResultSetToEntity(ResultSet rs) throws SQLException {
         TreatmentCourseEntity e = new TreatmentCourseEntity();
         e.setTreatmentCourseId(rs.getInt("treatment_course_id"));
+        int mrId = rs.getInt("medical_record_id");
+        e.setMedicalRecordId(rs.wasNull() || mrId <= 0 ? null : mrId);
         e.setCustomerId(rs.getInt("customer_id"));
         e.setPetId(rs.getInt("pet_id"));
         if (rs.getDate("start_date") != null) {

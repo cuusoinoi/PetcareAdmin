@@ -9,6 +9,7 @@ import com.petcare.service.CustomerService;
 import com.petcare.service.DoctorService;
 import com.petcare.service.PetService;
 import com.petcare.service.ServiceTypeService;
+import com.petcare.util.DatePickerHelper;
 import com.petcare.util.EmojiFontHelper;
 import com.petcare.util.GUIUtil;
 import com.petcare.util.ThemeManager;
@@ -118,13 +119,13 @@ public class AddEditAppointmentDialog extends JDialog {
         formPanel.add(createLabel("Ngày hẹn * (dd/MM/yyyy):"));
         appointmentDateField = createTextField();
         appointmentDateField.putClientProperty("JTextField.placeholderText", "dd/MM/yyyy");
-        formPanel.add(appointmentDateField);
+        formPanel.add(DatePickerHelper.wrapDateField(this, appointmentDateField));
 
         // Appointment Time
         formPanel.add(createLabel("Giờ hẹn * (HH:mm):"));
         appointmentTimeField = createTextField();
         appointmentTimeField.putClientProperty("JTextField.placeholderText", "HH:mm");
-        formPanel.add(appointmentTimeField);
+        formPanel.add(DatePickerHelper.wrapTimeField(this, appointmentTimeField));
 
         // Status
         formPanel.add(createLabel("Trạng thái:"));
@@ -141,7 +142,9 @@ public class AddEditAppointmentDialog extends JDialog {
 
         // Notes
         formPanel.add(createLabel("Ghi chú:"));
-        notesArea = new JTextArea(3, 20);
+        notesArea = new JTextArea(2, 25);
+        notesArea.setLineWrap(true);
+        notesArea.setWrapStyleWord(true);
         notesArea.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         notesArea.setBackground(ThemeManager.getTextFieldBackground());
         notesArea.setForeground(ThemeManager.getTextFieldForeground());
@@ -159,7 +162,8 @@ public class AddEditAppointmentDialog extends JDialog {
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
         buttonPanel.setBackground(ThemeManager.getContentBackground());
 
-        saveButton = new JButton(EmojiFontHelper.withEmoji("💾", "Lưu"));
+        saveButton = new JButton("Lưu");
+        saveButton.setIcon(EmojiFontHelper.createEmojiIcon("💾", Color.WHITE));
         saveButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         saveButton.setBackground(new Color(139, 69, 19));
         saveButton.setForeground(Color.WHITE);

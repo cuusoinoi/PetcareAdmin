@@ -18,6 +18,7 @@ import java.awt.*;
  */
 public class AddEditVaccineTypeDialog extends JDialog {
     private JTextField vaccineNameField;
+    private JTextField unitPriceField;
     private JTextArea descriptionArea;
     private JButton saveButton;
     private JButton cancelButton;
@@ -53,8 +54,16 @@ public class AddEditVaccineTypeDialog extends JDialog {
         vaccineNameField = createTextField();
         formPanel.add(vaccineNameField);
 
+        formPanel.add(createLabel("Đơn giá (VNĐ) *:"));
+        unitPriceField = createTextField();
+        unitPriceField.setText("0");
+        unitPriceField.putClientProperty("JTextField.placeholderText", "0");
+        formPanel.add(unitPriceField);
+
         formPanel.add(createLabel("Mô tả:"));
-        descriptionArea = new JTextArea(3, GUIUtil.TEXT_FIELD_COLUMNS);
+        descriptionArea = new JTextArea(2, GUIUtil.TEXT_FIELD_COLUMNS);
+        descriptionArea.setLineWrap(true);
+        descriptionArea.setWrapStyleWord(true);
         descriptionArea.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         descriptionArea.setBackground(ThemeManager.getTextFieldBackground());
         descriptionArea.setForeground(ThemeManager.getTextFieldForeground());
@@ -71,7 +80,8 @@ public class AddEditVaccineTypeDialog extends JDialog {
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
         buttonPanel.setBackground(ThemeManager.getContentBackground());
 
-        saveButton = new JButton(EmojiFontHelper.withEmoji("💾", "Lưu"));
+        saveButton = new JButton("Lưu");
+        saveButton.setIcon(EmojiFontHelper.createEmojiIcon("💾", Color.WHITE));
         saveButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         saveButton.setBackground(new Color(139, 69, 19));
         saveButton.setForeground(Color.WHITE);
@@ -114,6 +124,7 @@ public class AddEditVaccineTypeDialog extends JDialog {
     private void loadVaccineData() {
         if (vaccine != null) {
             vaccineNameField.setText(vaccine.getVaccineName());
+            unitPriceField.setText(String.valueOf(vaccine.getUnitPrice()));
             descriptionArea.setText(vaccine.getDescription() != null ? vaccine.getDescription() : "");
         }
     }
@@ -124,10 +135,24 @@ public class AddEditVaccineTypeDialog extends JDialog {
             vaccineNameField.requestFocus();
             return;
         }
+        int unitPrice;
+        try {
+            unitPrice = Integer.parseInt(unitPriceField.getText().trim());
+            if (unitPrice < 0) {
+                JOptionPane.showMessageDialog(this, "Đơn giá không được âm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                unitPriceField.requestFocus();
+                return;
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Đơn giá phải là số!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            unitPriceField.requestFocus();
+            return;
+        }
         try {
             if (vaccine == null) {
                 VaccineType newVaccine = new VaccineType();
                 newVaccine.setVaccineName(vaccineNameField.getText().trim());
+                newVaccine.setUnitPrice(unitPrice);
                 newVaccine.setDescription(descriptionArea.getText().trim().isEmpty() ? null : descriptionArea.getText().trim());
                 vaccineTypeService.createVaccineType(newVaccine, currentUser);
                 JOptionPane.showMessageDialog(this, "Thêm vaccine thành công!", "Thành công",
@@ -136,6 +161,7 @@ public class AddEditVaccineTypeDialog extends JDialog {
                 dispose();
             } else {
                 vaccine.setVaccineName(vaccineNameField.getText().trim());
+                vaccine.setUnitPrice(unitPrice);
                 vaccine.setDescription(descriptionArea.getText().trim().isEmpty() ? null : descriptionArea.getText().trim());
                 vaccineTypeService.updateVaccineType(vaccine, currentUser);
                 JOptionPane.showMessageDialog(this, "Cập nhật vaccine thành công!", "Thành công",

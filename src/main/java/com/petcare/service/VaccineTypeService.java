@@ -95,6 +95,7 @@ public class VaccineTypeService implements IVaccineTypeService {
             v.setVaccineId(e.getVaccineId());
             v.setVaccineName(e.getVaccineName());
             v.setDescription(e.getDescription());
+            v.setUnitPrice(e.getUnitPrice());
             return v;
         } catch (PetcareException ex) {
             throw new RuntimeException("Invalid entity data: " + ex.getMessage(), ex);
@@ -106,6 +107,7 @@ public class VaccineTypeService implements IVaccineTypeService {
         e.setVaccineId(v.getVaccineId());
         e.setVaccineName(v.getVaccineName());
         e.setDescription(v.getDescription());
+        e.setUnitPrice(v.getUnitPrice());
         return e;
     }
 }

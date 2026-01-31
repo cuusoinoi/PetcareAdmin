@@ -3,6 +3,7 @@ package com.petcare.service;
 import com.petcare.model.domain.PetVaccination;
 import com.petcare.model.entity.PetVaccinationEntity;
 import com.petcare.model.entity.PetVaccinationListDto;
+import com.petcare.model.entity.VaccinationForInvoiceDto;
 import com.petcare.model.exception.PetcareException;
 import com.petcare.repository.IPetVaccinationRepository;
 import com.petcare.repository.PetVaccinationRepository;
@@ -42,6 +43,10 @@ public class PetVaccinationService {
         return entity != null ? entityToDomain(entity) : null;
     }
 
+    public List<VaccinationForInvoiceDto> getVaccinationsByMedicalRecordId(int medicalRecordId) throws PetcareException {
+        return repository.findByMedicalRecordId(medicalRecordId);
+    }
+
     public void createVaccination(PetVaccination vaccination) throws PetcareException {
         PetVaccinationEntity entity = domainToEntity(vaccination);
         int result = repository.insert(entity);
@@ -71,6 +76,7 @@ public class PetVaccinationService {
         PetVaccination pv = new PetVaccination();
         pv.setPetVaccinationId(e.getPetVaccinationId());
         pv.setVaccineId(e.getVaccineId());
+        pv.setMedicalRecordId(e.getMedicalRecordId());
         pv.setCustomerId(e.getCustomerId());
         pv.setPetId(e.getPetId());
         pv.setDoctorId(e.getDoctorId());
@@ -84,6 +90,7 @@ public class PetVaccinationService {
         PetVaccinationEntity e = new PetVaccinationEntity();
         e.setPetVaccinationId(pv.getPetVaccinationId());
         e.setVaccineId(pv.getVaccineId());
+        e.setMedicalRecordId(pv.getMedicalRecordId());
         e.setCustomerId(pv.getCustomerId());
         e.setPetId(pv.getPetId());
         e.setDoctorId(pv.getDoctorId());

@@ -95,6 +95,7 @@ public class MedicineService implements IMedicineService {
             m.setMedicineId(e.getMedicineId());
             m.setMedicineName(e.getMedicineName());
             m.setMedicineRoute(Medicine.Route.fromCode(e.getMedicineRoute()));
+            m.setUnitPrice(e.getUnitPrice());
             return m;
         } catch (PetcareException ex) {
             throw new RuntimeException("Invalid entity data: " + ex.getMessage(), ex);
@@ -106,6 +107,7 @@ public class MedicineService implements IMedicineService {
         e.setMedicineId(m.getMedicineId());
         e.setMedicineName(m.getMedicineName());
         e.setMedicineRoute(m.getMedicineRoute() != null ? m.getMedicineRoute().getCode() : null);
+        e.setUnitPrice(m.getUnitPrice());
         return e;
     }
 }

@@ -7,7 +7,6 @@ import com.petcare.model.exception.PetcareException;
 import com.petcare.service.IMedicineService;
 import com.petcare.service.MedicineService;
 import com.petcare.util.EmojiFontHelper;
-import com.petcare.util.GUIUtil;
 import com.petcare.util.ThemeManager;
 
 import javax.swing.*;
@@ -41,13 +40,13 @@ public class AddEditMedicineDialog extends JDialog {
     }
 
     private void initComponents() {
-        setSize(520, 220);
+        setSize(540, 320);
         setLocationRelativeTo(getParent());
         setLayout(new BorderLayout());
         getContentPane().setBackground(ThemeManager.getContentBackground());
 
-        JPanel formPanel = new JPanel(new GridLayout(0, 2, 15, 15));
-        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        JPanel formPanel = new JPanel(new GridLayout(0, 2, 15, 18));
+        formPanel.setBorder(BorderFactory.createEmptyBorder(24, 24, 24, 24));
         formPanel.setBackground(ThemeManager.getContentBackground());
 
         formPanel.add(createLabel("Tên thuốc *:"));
@@ -56,7 +55,9 @@ public class AddEditMedicineDialog extends JDialog {
 
         formPanel.add(createLabel("Đường dùng *:"));
         routeCombo = new JComboBox<>();
-        routeCombo.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        routeCombo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        routeCombo.setMinimumSize(new Dimension(200, 36));
+        routeCombo.setPreferredSize(new Dimension(280, 36));
         routeCombo.setBackground(ThemeManager.getTextFieldBackground());
         routeCombo.setForeground(ThemeManager.getTextFieldForeground());
         routeCombo.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
@@ -100,19 +101,21 @@ public class AddEditMedicineDialog extends JDialog {
 
     private JLabel createLabel(String text) {
         JLabel label = new JLabel(text);
-        label.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        label.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         label.setForeground(ThemeManager.getTitleForeground());
         return label;
     }
 
     private JTextField createTextField() {
-        JTextField field = new JTextField(GUIUtil.TEXT_FIELD_COLUMNS);
-        field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        JTextField field = new JTextField(28);
+        field.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        field.setMinimumSize(new Dimension(200, 36));
+        field.setPreferredSize(new Dimension(280, 36));
         field.setBackground(ThemeManager.getTextFieldBackground());
         field.setForeground(ThemeManager.getTextFieldForeground());
         field.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(ThemeManager.getBorderColor()),
-                BorderFactory.createEmptyBorder(5, 10, 5, 10)
+                BorderFactory.createEmptyBorder(8, 12, 8, 12)
         ));
         field.putClientProperty(FlatClientProperties.STYLE, "arc: 5");
         return field;

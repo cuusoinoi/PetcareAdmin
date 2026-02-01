@@ -123,7 +123,8 @@ public class DashboardFrame extends JFrame {
     // Navigation methods
     public void showDashboard() {
         if (currentUser.getRole() != User.Role.ADMIN) {
-            JOptionPane.showMessageDialog(this, "Bạn không có quyền xem Dashboard.", "Phân quyền", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Bạn không có quyền xem Dashboard.",
+                    "Phân quyền", JOptionPane.WARNING_MESSAGE);
             return;
         }
         dashboardPanel.refreshData();

@@ -7,7 +7,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-/** InvocationHandler cho AOP phân quyền: @RequireAdmin → kiểm tra User trong args, ném PetcareException nếu không ADMIN. */
+/** InvocationHandler cho AOP phân quyền @RequireAdmin. */
 public class PermissionHandler implements InvocationHandler {
     private final Object target;
 

@@ -31,9 +31,6 @@ public class User {
         this.userId = userId;
     }
 
-    /**
-     * Alias for compatibility (e.g. DashboardFrame).
-     */
     public int getId() {
         return userId;
     }

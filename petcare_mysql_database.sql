@@ -1,7 +1,5 @@
 -- =====================================================
--- UIT PETCARE DATABASE - Complete SQL Script
--- Dùng cho CodeIgniter 4 Pet Care Management System
--- Created: January 2026
+-- UIT PETCARE - MySQL Database
 -- =====================================================
 
 -- Tạo database (nếu chưa có)
@@ -350,7 +348,7 @@ CREATE TABLE otp_codes (
 -- PHẦN 2: DỮ LIỆU MẪU
 -- =====================================================
 
--- === USERS (admin/123456, staff/654321). Mật khẩu BCrypt. ===
+-- === USERS ===
 INSERT INTO users (username, password, fullname, avatar, role, created_at) VALUES
 ('admin', '$2a$10$N9qo8uLOickgx2ZMRZoMyeapvT9gqHHhU1pKuMj2cpskE48fM3Kwy', 'Quản trị viên', NULL, 'admin', NOW()),
 ('staff', '$2a$10$EixZaYVK1fsbw1ZfbX3OXeabk2r5C7ovVRf5NIaezHaxeq67HvBQS', 'Nhân viên', NULL, 'staff', NOW()),
@@ -657,8 +655,4 @@ INSERT INTO prescriptions (treatment_session_id, medicine_id, treatment_type, do
 
 -- =====================================================
 -- HOÀN TẤT
--- =====================================================
--- Thông tin đăng nhập:
--- Username: admin
--- Password: 123456
 -- =====================================================

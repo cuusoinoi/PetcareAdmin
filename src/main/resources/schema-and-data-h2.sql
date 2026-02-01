@@ -1,7 +1,5 @@
 -- =====================================================
--- PETCARE - H2 Schema (tương thích với petcare_mysql_database.sql)
--- Chạy script này khi dùng H2 (file: ./data/petcare)
--- ENUM MySQL -> VARCHAR trong H2
+-- PETCARE - H2 Schema (file: ./data/petcare)
 -- =====================================================
 
 -- Drop (theo thứ tự FK)
@@ -246,7 +244,7 @@ CREATE TABLE diagnoses (
     FOREIGN KEY (treatment_session_id) REFERENCES treatment_sessions(treatment_session_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
--- Prescriptions (liên kết treatment_session - giữ cho tương thích)
+-- Prescriptions (liên kết treatment_session)
 CREATE TABLE prescriptions (
     prescription_id INT AUTO_INCREMENT PRIMARY KEY,
     treatment_session_id INT NOT NULL,
@@ -338,12 +336,10 @@ CREATE TABLE otp_codes (
 );
 
 -- =====================================================
--- PETCARE - H2 Seed Data (tương đương petcare_mysql_database.sql)
--- Chạy sau schema-h2.sql khi H2 khởi tạo lần đầu.
--- NOW() đã đổi thành CURRENT_TIMESTAMP cho H2.
+-- PETCARE - H2 Seed Data
 -- =====================================================
 
--- === USERS (admin/123456, staff/654321). Mật khẩu BCrypt. ===
+-- === USERS ===
 INSERT INTO users (username, password, fullname, avatar, role, created_at) VALUES
 ('admin', '$2a$10$N9qo8uLOickgx2ZMRZoMyeapvT9gqHHhU1pKuMj2cpskE48fM3Kwy', 'Quản trị viên', NULL, 'admin', CURRENT_TIMESTAMP),
 ('staff', '$2a$10$EixZaYVK1fsbw1ZfbX3OXeabk2r5C7ovVRf5NIaezHaxeq67HvBQS', 'Nhân viên', NULL, 'staff', CURRENT_TIMESTAMP),

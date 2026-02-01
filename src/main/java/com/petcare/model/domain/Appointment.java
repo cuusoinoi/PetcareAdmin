@@ -3,7 +3,7 @@ package com.petcare.model.domain;
 import java.util.Date;
 
 /**
- * Appointment Domain Model - same enums as legacy model
+ * Appointment Domain Model
  */
 public class Appointment {
     private int appointmentId;

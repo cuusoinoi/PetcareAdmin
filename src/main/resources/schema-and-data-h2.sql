@@ -491,7 +491,11 @@ INSERT INTO medical_records (customer_id, pet_id, doctor_id, medical_record_type
 (16, 18, 1, 'Điều trị', '2026-01-17', 'Điều trị cảm lạnh cho Sophie.', 'Giữ ấm, vitamin C và kháng sinh 3 ngày.'),
 (17, 19, 8, 'Khám', '2026-01-19', 'Khám sức khỏe tổng quát Teddy.', 'Ổn định, cân nặng đạt chuẩn giống Pomeranian.'),
 (18, 20, 2, 'Điều trị', '2026-01-21', 'Điều trị stress do xa chủ cho Daisy.', 'Bổ sung vitamin, tạo môi trường thoải mái.'),
-(19, 3, 3, 'Vaccine', '2026-01-25', 'Tiêm vaccine 4 bệnh mèo cho Mimi.', 'Hoàn tất FVRCP, theo dõi tốt.');
+(19, 3, 3, 'Vaccine', '2026-01-25', 'Tiêm vaccine 4 bệnh mèo cho Mimi.', 'Hoàn tất FVRCP, theo dõi tốt.'),
+(1, 1, 1, 'Khám', '2026-01-30', 'Khám định kỳ tháng 1 cho Mochi.', 'Sức khỏe tốt, cân nặng ổn định.'),
+(2, 3, 2, 'Vaccine', '2026-01-30', 'Tiêm nhắc vaccine dại cho Mimi.', 'Đã tiêm Rabisin, phản ứng tốt.'),
+(3, 4, 4, 'Khám', '2026-01-31', 'Khám kiểm tra sức khỏe Max.', 'Cún khỏe, đề xuất tẩy giun.'),
+(4, 5, 5, 'Điều trị', '2026-01-31', 'Kiểm tra tai Luna sau điều trị.', 'Tai đã lành, ngừng thuốc.');
 
 -- === VACCINATION RECORDS ===
 INSERT INTO vaccination_records (medical_record_id, vaccine_name, batch_number, next_injection_date) VALUES
@@ -500,7 +504,8 @@ INSERT INTO vaccination_records (medical_record_id, vaccine_name, batch_number, 
 (8, 'DHPPiL (Phòng 7 bệnh)', 'DHP-2026-01', '2027-01-17'),
 (13, 'Rabisin (Phòng dại)', 'RBS-2026-01B', '2027-01-22'),
 (16, 'DHPPiL (Phòng 7 bệnh)', 'DHP-2026-01', '2027-01-27'),
-(20, 'FVRCP (Phòng 4 bệnh mèo)', 'FVR-2026-01B', '2027-01-25');
+(20, 'FVRCP (Phòng 4 bệnh mèo)', 'FVR-2026-01B', '2027-01-25'),
+(22, 'Rabisin (Phòng dại)', 'RBS-2026-01C', '2027-01-30');
 
 -- === MEDICAL RECORD MEDICINES (thuốc kê trong lượt khám) ===
 INSERT INTO medical_record_medicines (medical_record_id, medicine_id, quantity, unit_price, total_price) VALUES
@@ -521,7 +526,11 @@ INSERT INTO medical_record_services (medical_record_id, service_type_id, quantit
 (5, 8, 1, 80000, 80000),
 (9, 6, 1, 150000, 150000),
 (11, 6, 1, 150000, 150000),
-(12, 7, 1, 250000, 250000);
+(12, 7, 1, 250000, 250000),
+(21, 6, 1, 150000, 150000),
+(22, 7, 1, 250000, 250000),
+(23, 6, 1, 150000, 150000),
+(24, 8, 1, 80000, 80000);
 
 -- === PET ENCLOSURES ===
 INSERT INTO pet_enclosures (customer_id, pet_id, pet_enclosure_number, check_in_date, check_out_date, daily_rate, deposit, emergency_limit, pet_enclosure_note, pet_enclosure_status) VALUES
@@ -544,7 +553,9 @@ INSERT INTO pet_enclosures (customer_id, pet_id, pet_enclosure_number, check_in_
 (17, 19, 117, '2026-01-19 08:30:00', '2026-01-22 09:00:00', 75000, 80000, 400000, 'Chó nhỏ, hay sủa ban đêm.', 'Check Out'),
 (18, 20, 118, '2026-01-21 08:00:00', '2026-01-24 09:00:00', 75000, 80000, 400000, 'Chó nhút nhát, cần nhẹ nhàng.', 'Check Out'),
 (19, 4, 119, '2026-01-28 10:00:00', NULL, 85000, 120000, 700000, 'Gửi trong khi chủ đi du lịch.', 'Check In'),
-(20, 6, 120, '2026-01-27 09:00:00', NULL, 95000, 130000, 700000, 'Mèo VIP, có yêu cầu đặc biệt.', 'Check In');
+(20, 6, 120, '2026-01-27 09:00:00', NULL, 95000, 130000, 700000, 'Mèo VIP, có yêu cầu đặc biệt.', 'Check In'),
+(1, 2, 121, '2026-01-30 08:00:00', '2026-01-31 10:00:00', 80000, 100000, 500000, 'Gửi 1 đêm, Pudding khám vaccine.', 'Check Out'),
+(2, 3, 122, '2026-01-31 09:00:00', NULL, 100000, 150000, 800000, 'Mimi gửi từ 31/1, đang Check In.', 'Check In');
 
 -- === INVOICES ===
 INSERT INTO invoices (customer_id, pet_id, pet_enclosure_id, medical_record_id, invoice_date, discount, subtotal, deposit, total_amount) VALUES
@@ -561,7 +572,8 @@ INSERT INTO invoices (customer_id, pet_id, pet_enclosure_id, medical_record_id, 
 (14, 16, 14, NULL, '2026-01-29 09:40:00', 0, 545000, 180000, 365000),
 (16, 18, 16, NULL, '2026-01-20 09:00:00', 0, 400000, 120000, 280000),
 (17, 19, 17, NULL, '2026-01-22 09:00:00', 0, 325000, 80000, 245000),
-(18, 20, 18, NULL, '2026-01-24 09:00:00', 0, 325000, 80000, 245000);
+(18, 20, 18, NULL, '2026-01-24 09:00:00', 0, 325000, 80000, 245000),
+(1, 2, 21, NULL, '2026-01-31 10:30:00', 0, 330000, 100000, 230000);
 
 -- === INVOICE DETAILS ===
 INSERT INTO invoice_details (invoice_id, service_type_id, quantity, unit_price, total_price) VALUES
@@ -592,7 +604,9 @@ INSERT INTO invoice_details (invoice_id, service_type_id, quantity, unit_price, 
 (13, 1, 3, 75000, 225000),
 (13, 13, 1, 100000, 100000),
 (14, 1, 3, 75000, 225000),
-(14, 8, 1, 100000, 100000);
+(14, 8, 1, 100000, 100000),
+(15, 1, 2, 85000, 170000),
+(15, 4, 1, 160000, 160000);
 
 -- === PET VACCINATIONS ===
 INSERT INTO pet_vaccinations (vaccine_id, medical_record_id, customer_id, pet_id, doctor_id, vaccination_date, next_vaccination_date, notes) VALUES

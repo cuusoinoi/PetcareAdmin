@@ -439,20 +439,22 @@ public class DashboardPanel extends JPanel {
                 false
         );
 
-        Color textColor = ThemeManager.getTitleForeground();
+        Color titleColor = ThemeManager.getTitleForeground();
         chart.getTitle().setFont(ThemeManager.getSemiboldFont(16));
-        chart.getTitle().setPaint(textColor);
+        chart.getTitle().setPaint(titleColor);
         chart.setBackgroundPaint(ThemeManager.getFormBackground());
 
         PiePlot plot = (PiePlot) chart.getPlot();
         plot.setBackgroundPaint(ThemeManager.getFormBackground());
         plot.setLabelFont(ThemeManager.getModernFont(11));
-        plot.setLabelPaint(textColor);
+        plot.setLabelPaint(Color.BLACK);
+        plot.setLabelLinkPaint(Color.BLACK);
+        plot.setLabelOutlinePaint(Color.BLACK);
         try {
             plot.setLabelGenerator(new StandardPieSectionLabelGenerator("{0}: {1} ({2})"));
         } catch (Exception ignored) {
         }
-        applyChartLegendTheme(chart, textColor);
+        applyChartLegendTheme(chart, titleColor);
 
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new Dimension(600, 300));

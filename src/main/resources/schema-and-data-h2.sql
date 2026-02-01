@@ -343,14 +343,14 @@ CREATE TABLE otp_codes (
 -- NOW() đã đổi thành CURRENT_TIMESTAMP cho H2.
 -- =====================================================
 
--- === USERS (admin/123456, staff/654321, 0901234567/123456). Mật khẩu BCrypt. ===
+-- === USERS (admin/123456, staff/654321). Mật khẩu BCrypt. ===
 INSERT INTO users (username, password, fullname, avatar, role, created_at) VALUES
 ('admin', '$2a$10$N9qo8uLOickgx2ZMRZoMyeapvT9gqHHhU1pKuMj2cpskE48fM3Kwy', 'Quản trị viên', NULL, 'admin', CURRENT_TIMESTAMP),
+('staff', '$2a$10$EixZaYVK1fsbw1ZfbX3OXeabk2r5C7ovVRf5NIaezHaxeq67HvBQS', 'Nhân viên', NULL, 'staff', CURRENT_TIMESTAMP),
 ('lethimai', '$2a$10$EixZaYVK1fsbw1ZfbX3OXeabk2r5C7ovVRf5NIaezHaxeq67HvBQS', 'Lê Thị Mai', NULL, 'staff', CURRENT_TIMESTAMP),
 ('tranhung', '$2a$10$EixZaYVK1fsbw1ZfbX3OXeabk2r5C7ovVRf5NIaezHaxeq67HvBQS', 'Trần Văn Hùng', NULL, 'staff', CURRENT_TIMESTAMP),
 ('nguyenlan', '$2a$10$EixZaYVK1fsbw1ZfbX3OXeabk2r5C7ovVRf5NIaezHaxeq67HvBQS', 'Nguyễn Thị Lan', NULL, 'staff', CURRENT_TIMESTAMP),
-('phamquang', '$2a$10$EixZaYVK1fsbw1ZfbX3OXeabk2r5C7ovVRf5NIaezHaxeq67HvBQS', 'Phạm Quang Minh', NULL, 'staff', CURRENT_TIMESTAMP),
-('0901234567', '$2a$10$N9qo8uLOickgx2ZMRZoMyeapvT9gqHHhU1pKuMj2cpskE48fM3Kwy', 'Khách hàng', NULL, 'customer', CURRENT_TIMESTAMP);
+('phamquang', '$2a$10$EixZaYVK1fsbw1ZfbX3OXeabk2r5C7ovVRf5NIaezHaxeq67HvBQS', 'Phạm Quang Minh', NULL, 'staff', CURRENT_TIMESTAMP);
 
 -- === SERVICE TYPES ===
 INSERT INTO service_types (service_name, description, price) VALUES
